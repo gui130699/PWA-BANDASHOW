@@ -34,48 +34,51 @@ function NotFoundPage() {
   )
 }
 
-export const router = createBrowserRouter([
-  { path: '/', element: <HomePage /> },
-  { path: '/login', element: <LoginPage /> },
-  { path: '/cadastro', element: <RegisterPage /> },
-  { path: '/solicitar-orcamento', element: <RequestQuotePage /> },
-  {
-    element: <ProtectedRoute role="client" />,
-    children: [
-      {
-        path: '/cliente',
-        element: <ClientLayout />,
-        children: [
-          { index: true, element: <ClientDashboardPage /> },
-          { path: 'novo-orcamento', element: <NewQuotePage /> },
-          { path: 'orcamentos', element: <ClientQuotesPage /> },
-          { path: 'orcamentos/:id', element: <ClientQuoteDetailPage /> },
-          { path: 'pagamentos', element: <ClientPaymentsPage /> },
-        ],
-      },
-    ],
-  },
-  {
-    element: <ProtectedRoute role="admin" />,
-    children: [
-      {
-        path: '/admin',
-        element: <AdminLayout />,
-        children: [
-          { index: true, element: <Navigate replace to="/admin/dashboard" /> },
-          { path: 'dashboard', element: <AdminDashboardPage /> },
-          { path: 'agenda', element: <AdminAgendaPage /> },
-          { path: 'orcamentos', element: <AdminQuotesPage /> },
-          { path: 'orcamentos/:id', element: <AdminQuoteDetailPage /> },
-          { path: 'servicos', element: <AdminServicesPage /> },
-          { path: 'integrantes', element: <AdminMembersPage /> },
-          { path: 'fornecedores', element: <AdminSuppliersPage /> },
-          { path: 'pagamentos', element: <AdminPaymentsPage /> },
-          { path: 'clientes', element: <AdminClientsPage /> },
-          { path: 'configuracoes', element: <AdminSettingsPage /> },
-        ],
-      },
-    ],
-  },
-  { path: '*', element: <NotFoundPage /> },
-])
+export const router = createBrowserRouter(
+  [
+    { path: '/', element: <HomePage /> },
+    { path: '/login', element: <LoginPage /> },
+    { path: '/cadastro', element: <RegisterPage /> },
+    { path: '/solicitar-orcamento', element: <RequestQuotePage /> },
+    {
+      element: <ProtectedRoute role="client" />,
+      children: [
+        {
+          path: '/cliente',
+          element: <ClientLayout />,
+          children: [
+            { index: true, element: <ClientDashboardPage /> },
+            { path: 'novo-orcamento', element: <NewQuotePage /> },
+            { path: 'orcamentos', element: <ClientQuotesPage /> },
+            { path: 'orcamentos/:id', element: <ClientQuoteDetailPage /> },
+            { path: 'pagamentos', element: <ClientPaymentsPage /> },
+          ],
+        },
+      ],
+    },
+    {
+      element: <ProtectedRoute role="admin" />,
+      children: [
+        {
+          path: '/admin',
+          element: <AdminLayout />,
+          children: [
+            { index: true, element: <Navigate replace to="/admin/dashboard" /> },
+            { path: 'dashboard', element: <AdminDashboardPage /> },
+            { path: 'agenda', element: <AdminAgendaPage /> },
+            { path: 'orcamentos', element: <AdminQuotesPage /> },
+            { path: 'orcamentos/:id', element: <AdminQuoteDetailPage /> },
+            { path: 'servicos', element: <AdminServicesPage /> },
+            { path: 'integrantes', element: <AdminMembersPage /> },
+            { path: 'fornecedores', element: <AdminSuppliersPage /> },
+            { path: 'pagamentos', element: <AdminPaymentsPage /> },
+            { path: 'clientes', element: <AdminClientsPage /> },
+            { path: 'configuracoes', element: <AdminSettingsPage /> },
+          ],
+        },
+      ],
+    },
+    { path: '*', element: <NotFoundPage /> },
+  ],
+  { basename: import.meta.env.BASE_URL },
+)

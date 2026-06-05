@@ -1,5 +1,6 @@
 const CACHE_NAME = 'grupo-dvanera-v1'
-const APP_SHELL = ['/', '/manifest.webmanifest', '/icons/gd-icon.svg']
+const BASE_PATH = new URL(self.registration.scope).pathname
+const APP_SHELL = [BASE_PATH, `${BASE_PATH}manifest.webmanifest`, `${BASE_PATH}icons/gd-icon.svg`]
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -35,7 +36,7 @@ self.addEventListener('fetch', (event) => {
 
           return response
         })
-        .catch(() => caches.match('/'))
+        .catch(() => caches.match(BASE_PATH))
     }),
   )
 })
