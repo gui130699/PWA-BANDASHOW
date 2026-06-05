@@ -174,7 +174,7 @@ git switch --detach <hash-do-commit>
 Retornar para o trabalho atual:
 
 ```bash
-git switch master
+git switch main
 ```
 
 ## Proximos passos recomendados
