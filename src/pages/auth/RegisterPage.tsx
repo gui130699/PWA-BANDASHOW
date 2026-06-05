@@ -8,6 +8,7 @@ import { FirebaseNotice } from '../../components/FirebaseNotice'
 import { Button, Card, Input, Select, Textarea } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
 import { brazilianStates } from '../../utils/constants'
+import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
 
 const registerSchema = z.object({
   name: z.string().min(3, 'Informe seu nome completo.'),
@@ -38,7 +39,7 @@ export function RegisterPage() {
       await registerClient(data)
       navigate('/cliente/novo-orcamento', { replace: true })
     } catch (error) {
-      setFormError(error instanceof Error ? error.message : 'Nao foi possivel criar o cadastro.')
+      setFormError(getFriendlyFirebaseError(error, 'Nao foi possivel criar o cadastro.'))
     }
   }
 

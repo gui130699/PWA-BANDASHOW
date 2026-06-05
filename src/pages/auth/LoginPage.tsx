@@ -7,6 +7,7 @@ import { z } from 'zod'
 import { FirebaseNotice } from '../../components/FirebaseNotice'
 import { Button, Card, Input } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
+import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
 
 const loginSchema = z.object({
   email: z.string().email('Informe um e-mail valido.'),
@@ -35,7 +36,7 @@ export function LoginPage() {
     try {
       await login(data.email, data.password)
     } catch (error) {
-      setFormError(error instanceof Error ? error.message : 'Nao foi possivel entrar.')
+      setFormError(getFriendlyFirebaseError(error, 'Nao foi possivel entrar.'))
     }
   }
 
