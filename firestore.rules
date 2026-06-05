@@ -1,0 +1,98 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function userDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function isAdmin() {
+      return signedIn() && userDoc().data.role == "admin";
+    }
+
+    function isOwner(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    match /users/{uid} {
+      allow read: if isAdmin() || isOwner(uid);
+      allow create: if isOwner(uid) && request.resource.data.role == "client";
+      allow update: if isAdmin() || (
+        isOwner(uid)
+        && !request.resource.data.diff(resource.data).changedKeys().hasAny(["role"])
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /clients/{clientId} {
+      allow read: if isAdmin() || isOwner(resource.data.userId) || isOwner(clientId);
+      allow create: if isAdmin() || isOwner(request.resource.data.userId);
+      allow update: if isAdmin() || isOwner(resource.data.userId) || isOwner(clientId);
+      allow delete: if isAdmin();
+    }
+
+    match /services/{serviceId} {
+      allow read: if isAdmin() || (signedIn() && resource.data.active == true);
+      allow write: if isAdmin();
+    }
+
+    match /bandMembers/{memberId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /suppliers/{supplierId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /quotes/{quoteId} {
+      allow read: if isAdmin() || isOwner(resource.data.clientUserId);
+      allow create: if isAdmin() || (
+        isOwner(request.resource.data.clientUserId)
+        && request.resource.data.status == "em_analise"
+        && request.resource.data.totalCosts == 0
+        && request.resource.data.manualCosts.size() == 0
+      );
+      allow update: if isAdmin() || (
+        isOwner(resource.data.clientUserId)
+        && resource.data.status == "aprovado_aguardando_entrada"
+        && request.resource.data.status == "entrada_informada_pelo_cliente"
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(["status", "clientNotes", "updatedAt"])
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /payments/{paymentId} {
+      allow read: if isAdmin() || isOwner(resource.data.clientId);
+      allow create: if isAdmin();
+      allow update: if isAdmin() || (
+        isOwner(resource.data.clientId)
+        && resource.data.status == "pendente"
+        && request.resource.data.status == "informado_pelo_cliente"
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(["status", "clientMessage", "updatedAt"])
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /memberPayments/{paymentId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /supplierPayments/{paymentId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /settings/{settingId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    match /auditLogs/{logId} {
+      allow read, create: if isAdmin();
+      allow update, delete: if false;
+    }
+  }
+}
