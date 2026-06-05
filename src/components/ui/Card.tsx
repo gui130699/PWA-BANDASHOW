@@ -1,0 +1,31 @@
+import type { HTMLAttributes, ReactNode } from 'react'
+import { clsx } from 'clsx'
+
+type CardProps = HTMLAttributes<HTMLDivElement> & {
+  title?: string
+  description?: string
+  action?: ReactNode
+}
+
+export function Card({ title, description, action, className, children, ...props }: CardProps) {
+  return (
+    <section
+      className={clsx(
+        'rounded-lg border border-white/10 bg-white/[0.055] p-5 shadow-soft backdrop-blur',
+        className,
+      )}
+      {...props}
+    >
+      {(title || description || action) && (
+        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            {title && <h2 className="text-lg font-semibold text-white">{title}</h2>}
+            {description && <p className="mt-1 text-sm text-slate-400">{description}</p>}
+          </div>
+          {action}
+        </div>
+      )}
+      {children}
+    </section>
+  )
+}
