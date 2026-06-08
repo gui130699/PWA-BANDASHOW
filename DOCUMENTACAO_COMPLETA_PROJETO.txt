@@ -1,7 +1,7 @@
 DOCUMENTACAO COMPLETA DO PROJETO - PWA-BANDASHOW / GRUPO DVANERA
 Gerado automaticamente para leitura, manutencao, auditoria tecnica e backup do projeto.
-Data de geracao: 2026-06-08 10:35:45 -03:00
-Commit documentado: 864832b
+Data de geracao: 2026-06-08 10:43:18 -03:00
+Commit documentado: 59e53a2
 Pasta local: C:\Users\guilh\OneDrive\HP Guilherme Notebook\Área de Trabalho\PWA- Everton
 Repositorio: https://github.com/gui130699/PWA-BANDASHOW
 Pages: https://gui130699.github.io/PWA-BANDASHOW/
@@ -13,7 +13,7 @@ Nao ha senha mestre no front-end. O reset admin e feito por script local com Fir
 1. VISAO GERAL ATUALIZADA
 ====================================================================================================
 O projeto e um PWA em React + Vite + TypeScript para gestao de agenda, orcamentos, clientes, pagamentos, fornecedores, integrantes, servicos e configuracoes do Grupo Dvanera.
-A revisao atual consolidou separacao real entre dados internos e dados publicos do cliente, calculo financeiro com custos historicos, percentual de entrada configuravel, pagamentos unificados, auditoria e regras Firestore de producao.
+A revisao atual consolidou separacao real entre dados internos e dados publicos do cliente, calculo financeiro com custos historicos, percentual de entrada configuravel, pagamentos unificados, auditoria, regras Firestore de producao e lockfile sincronizado para GitHub Pages.
 
 Experiencias principais:
 - Publica: home, cadastro/login e acesso admin inicial.
@@ -39,6 +39,7 @@ Experiencias principais:
 - Cliente pode informar entrada e restante, mas nunca confirmar pagamento.
 - Admin visualiza auditoria recente em Configuracoes.
 - Service worker atualizado para `grupo-dvanera-v3`.
+- `package-lock.json` sincronizado com npm 10 para `npm ci` no GitHub Actions.
 
 ====================================================================================================
 3. TECNOLOGIAS E DEPENDENCIAS
@@ -210,6 +211,7 @@ Firestore Rules:
 13. VALIDACOES REALIZADAS NESTA REVISAO
 ====================================================================================================
 - npm install: concluido
+- npm@10 ci --dry-run: concluido, lockfile validado para GitHub Actions
 - npm run lint: concluido sem erros
 - npm run build: concluido sem erros
 - firebase deploy --only firestore --project pwa-bandashow: concluido com regras compiladas e publicadas
@@ -1128,9 +1130,9 @@ INICIO DO ARQUIVO: package-lock.json
       }
     },
     "node_modules/@emnapi/wasi-threads": {
-      "version": "1.2.1",
-      "resolved": "https://registry.npmjs.org/@emnapi/wasi-threads/-/wasi-threads-1.2.1.tgz",
-      "integrity": "sha512-uTII7OYF+/Mes/MrcIOYp5yOtSMLBWSIoLPpcgwipoiKbli6k322tcoFsxoIIxPDqW01SQGAgko4EzZi2BNv2w==",
+      "version": "1.2.2",
+      "resolved": "https://registry.npmjs.org/@emnapi/wasi-threads/-/wasi-threads-1.2.2.tgz",
+      "integrity": "sha512-c95qOXkHdydNKhscBTebqEC1CVAZpyqOfVfBzQ1qgzyl3gfeldUjIggDbIZgDKsHLgnsM+igH7TJ/eAasaVuMA==",
       "dev": true,
       "license": "MIT",
       "optional": true,
@@ -3042,6 +3044,40 @@ INICIO DO ARQUIVO: package-lock.json
       },
       "engines": {
         "node": "^20.19.0 || >=22.12.0"
+      }
+    },
+    "node_modules/@rolldown/binding-wasm32-wasi/node_modules/@emnapi/core": {
+      "version": "1.10.0",
+      "resolved": "https://registry.npmjs.org/@emnapi/core/-/core-1.10.0.tgz",
+      "integrity": "sha512-yq6OkJ4p82CAfPl0u9mQebQHKPJkY7WrIuk205cTYnYe+k2Z8YBh11FrbRG/H6ihirqcacOgl2BIO8oyMQLeXw==",
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "dependencies": {
+        "@emnapi/wasi-threads": "1.2.1",
+        "tslib": "^2.4.0"
+      }
+    },
+    "node_modules/@rolldown/binding-wasm32-wasi/node_modules/@emnapi/runtime": {
+      "version": "1.10.0",
+      "resolved": "https://registry.npmjs.org/@emnapi/runtime/-/runtime-1.10.0.tgz",
+      "integrity": "sha512-ewvYlk86xUoGI0zQRNq/mC+16R1QeDlKQy21Ki3oSYXNgLb45GV1P6A0M+/s6nyCuNDqe5VpaY84BzXGwVbwFA==",
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "dependencies": {
+        "tslib": "^2.4.0"
+      }
+    },
+    "node_modules/@rolldown/binding-wasm32-wasi/node_modules/@emnapi/wasi-threads": {
+      "version": "1.2.1",
+      "resolved": "https://registry.npmjs.org/@emnapi/wasi-threads/-/wasi-threads-1.2.1.tgz",
+      "integrity": "sha512-uTII7OYF+/Mes/MrcIOYp5yOtSMLBWSIoLPpcgwipoiKbli6k322tcoFsxoIIxPDqW01SQGAgko4EzZi2BNv2w==",
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "dependencies": {
+        "tslib": "^2.4.0"
       }
     },
     "node_modules/@rolldown/binding-win32-arm64-msvc": {
