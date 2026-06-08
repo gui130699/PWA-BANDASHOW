@@ -8,6 +8,8 @@ const firebaseAuthMessages: Record<string, string> = {
   'auth/email-already-in-use': 'Este e-mail ja esta cadastrado. Entre com sua senha ou use outro e-mail.',
   'auth/invalid-email': 'Informe um e-mail valido.',
   'auth/invalid-credential': 'E-mail ou senha invalidos.',
+  'auth/requires-recent-login': 'Entre novamente na conta admin e tente excluir o cadastro outra vez.',
+  'permission-denied': 'O Firebase bloqueou esta operacao pelas regras de seguranca.',
   'auth/weak-password': 'Use uma senha mais forte, com pelo menos 6 caracteres.',
 }
 

@@ -10,8 +10,20 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/users/$(request.auth.uid));
     }
 
+    function adminOwnerDoc() {
+      return get(/databases/$(database)/documents/system/adminOwner);
+    }
+
+    function adminOwnerExists() {
+      return exists(/databases/$(database)/documents/system/adminOwner);
+    }
+
     function isAdmin() {
       return signedIn() && userDoc().data.role == "admin";
+    }
+
+    function isPrimaryAdmin() {
+      return signedIn() && adminOwnerExists() && adminOwnerDoc().data.uid == request.auth.uid;
     }
 
     function isOwner(userId) {
@@ -20,12 +32,41 @@ service cloud.firestore {
 
     match /users/{uid} {
       allow read: if isAdmin() || isOwner(uid);
-      allow create: if isOwner(uid) && request.resource.data.role == "client";
-      allow update: if isAdmin() || (
-        isOwner(uid)
-        && !request.resource.data.diff(resource.data).changedKeys().hasAny(["role"])
+      allow create: if isOwner(uid) && (
+        request.resource.data.role == "client"
+        || (
+          request.resource.data.role == "admin"
+          && request.resource.data.uid == uid
+          && !adminOwnerExists()
+          && getAfter(/databases/$(database)/documents/system/adminOwner).data.uid == uid
+          && getAfter(/databases/$(database)/documents/system/adminSetup).data.configured == true
+        )
       );
-      allow delete: if isAdmin();
+      allow update: if (isAdmin() || isOwner(uid)) && (
+        !request.resource.data.diff(resource.data).changedKeys().hasAny(["role", "uid"])
+      );
+      allow delete: if (isAdmin() && resource.data.role != "admin")
+        || (isPrimaryAdmin() && isOwner(uid) && resource.data.role == "admin");
+    }
+
+    match /system/{docId} {
+      allow read: if docId == "adminSetup" || isAdmin();
+      allow create: if signedIn() && (
+        (
+          docId == "adminSetup"
+          && request.resource.data.configured == true
+          && !exists(/databases/$(database)/documents/system/adminSetup)
+          && getAfter(/databases/$(database)/documents/system/adminOwner).data.uid == request.auth.uid
+        )
+        || (
+          docId == "adminOwner"
+          && request.resource.data.uid == request.auth.uid
+          && !adminOwnerExists()
+          && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin"
+        )
+      );
+      allow update: if false;
+      allow delete: if isPrimaryAdmin() && (docId == "adminSetup" || docId == "adminOwner");
     }
 
     match /clients/{clientId} {

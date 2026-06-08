@@ -33,6 +33,14 @@ export function HomePage() {
 
   return (
     <div className="min-h-screen bg-night-950 text-white">
+      <Link
+        aria-label="Acessar admin"
+        className="fixed right-4 top-4 z-30 grid h-12 w-12 place-items-center rounded-md border border-white/15 bg-night-950/80 text-gold-200 shadow-soft backdrop-blur transition hover:border-gold-300/70 hover:bg-gold-400 hover:text-night-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-300"
+        title="Acessar admin"
+        to="/admin/acesso"
+      >
+        <ShieldCheck className="h-5 w-5" />
+      </Link>
       <section
         className="relative flex min-h-[92vh] items-center overflow-hidden bg-cover bg-center"
         style={{ backgroundImage: `url(${heroImage})` }}

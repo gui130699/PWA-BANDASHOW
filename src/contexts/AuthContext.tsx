@@ -16,6 +16,12 @@ import {
   type ReactNode,
 } from 'react'
 import { auth, db, isFirebaseConfigured } from '../lib/firebase'
+import {
+  createPrimaryAdminAccount,
+  deletePrimaryAdminAccount,
+  type DeleteAdminAccountInput,
+  type RegisterAdminInput,
+} from '../services/adminAccountService'
 import type { AppUser } from '../types'
 
 type RegisterClientInput = {
@@ -36,6 +42,8 @@ type AuthContextValue = {
   firebaseReady: boolean
   login: (email: string, password: string) => Promise<void>
   registerClient: (data: RegisterClientInput) => Promise<void>
+  registerAdmin: (data: RegisterAdminInput) => Promise<void>
+  deleteAdminAccount: (data: DeleteAdminAccountInput) => Promise<void>
   logout: () => Promise<void>
   refreshProfile: () => Promise<void>
 }
@@ -118,6 +126,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
+  const registerAdmin = useCallback(async (data: RegisterAdminInput) => {
+    const adminProfile = await createPrimaryAdminAccount(data)
+    setProfile(adminProfile)
+  }, [])
+
+  const deleteAdminAccount = useCallback(async (data: DeleteAdminAccountInput) => {
+    await deletePrimaryAdminAccount(data)
+    setProfile(null)
+    setUser(null)
+  }, [])
+
   const logout = useCallback(async () => {
     if (!auth) return
     await signOut(auth)
@@ -131,10 +150,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       firebaseReady: isFirebaseConfigured,
       login,
       registerClient,
+      registerAdmin,
+      deleteAdminAccount,
       logout,
       refreshProfile,
     }),
-    [loading, login, logout, profile, refreshProfile, registerClient, user],
+    [deleteAdminAccount, loading, login, logout, profile, refreshProfile, registerAdmin, registerClient, user],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

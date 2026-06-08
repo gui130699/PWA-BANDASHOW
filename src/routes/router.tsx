@@ -11,6 +11,7 @@ import { AdminQuotesPage } from '../pages/admin/AdminQuotesPage'
 import { AdminServicesPage } from '../pages/admin/AdminServicesPage'
 import { AdminSettingsPage } from '../pages/admin/AdminSettingsPage'
 import { AdminSuppliersPage } from '../pages/admin/AdminSuppliersPage'
+import { AdminAccessPage } from '../pages/auth/AdminAccessPage'
 import { LoginPage } from '../pages/auth/LoginPage'
 import { RegisterPage } from '../pages/auth/RegisterPage'
 import { ClientDashboardPage } from '../pages/client/ClientDashboardPage'
@@ -21,6 +22,8 @@ import { NewQuotePage } from '../pages/client/NewQuotePage'
 import { HomePage } from '../pages/public/HomePage'
 import { RequestQuotePage } from '../pages/public/RequestQuotePage'
 import { ProtectedRoute } from './ProtectedRoute'
+
+const basename = import.meta.env.BASE_URL === '/' ? '/' : import.meta.env.BASE_URL.replace(/\/$/, '')
 
 function NotFoundPage() {
   return (
@@ -39,6 +42,7 @@ export const router = createBrowserRouter(
     { path: '/', element: <HomePage /> },
     { path: '/login', element: <LoginPage /> },
     { path: '/cadastro', element: <RegisterPage /> },
+    { path: '/admin/acesso', element: <AdminAccessPage /> },
     { path: '/solicitar-orcamento', element: <RequestQuotePage /> },
     {
       element: <ProtectedRoute role="client" />,
@@ -80,5 +84,5 @@ export const router = createBrowserRouter(
     },
     { path: '*', element: <NotFoundPage /> },
   ],
-  { basename: import.meta.env.BASE_URL },
+  { basename },
 )

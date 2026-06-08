@@ -10,7 +10,14 @@ async function main() {
     throw new Error('Preencha ADMIN_EMAIL e ADMIN_PASSWORD no .env.')
   }
 
+  const adminOwnerRef = adminDb.collection('system').doc('adminOwner')
+  const adminOwnerSnapshot = await adminOwnerRef.get()
+
   let user = await adminAuth.getUserByEmail(email).catch(() => null)
+
+  if (adminOwnerSnapshot.exists && adminOwnerSnapshot.data()?.uid !== user?.uid) {
+    throw new Error('Ja existe um cadastro admin neste projeto.')
+  }
 
   if (!user) {
     user = await adminAuth.createUser({
@@ -27,6 +34,24 @@ async function main() {
       name,
       email,
       role: 'admin',
+      updatedAt: FieldValue.serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
+    },
+    { merge: true },
+  )
+
+  await adminDb.collection('system').doc('adminSetup').set(
+    {
+      configured: true,
+      updatedAt: FieldValue.serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
+    },
+    { merge: true },
+  )
+
+  await adminOwnerRef.set(
+    {
+      uid: user.uid,
       updatedAt: FieldValue.serverTimestamp(),
       createdAt: FieldValue.serverTimestamp(),
     },
