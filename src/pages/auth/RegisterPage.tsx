@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { UserPlus } from 'lucide-react'
+import { ArrowLeft, UserPlus } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
@@ -46,6 +46,11 @@ export function RegisterPage() {
   return (
     <div className="min-h-screen bg-night-950 px-4 py-10 text-white">
       <div className="mx-auto max-w-3xl space-y-4">
+        <Link className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-gold-200" to="/">
+          <ArrowLeft className="h-4 w-4" />
+          Voltar para o inicio
+        </Link>
+
         {!firebaseReady && <FirebaseNotice />}
         <Card>
           <div className="mb-8 flex items-center gap-3">

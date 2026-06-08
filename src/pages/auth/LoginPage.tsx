@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Music2 } from 'lucide-react'
+import { ArrowLeft, Music2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
@@ -43,6 +43,11 @@ export function LoginPage() {
   return (
     <div className="grid min-h-screen place-items-center bg-night-950 px-4 py-10 text-white">
       <div className="w-full max-w-md space-y-4">
+        <Link className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-gold-200" to="/">
+          <ArrowLeft className="h-4 w-4" />
+          Voltar para o inicio
+        </Link>
+
         {!firebaseReady && <FirebaseNotice />}
         <Card>
           <div className="mb-8 text-center">
