@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "create-admin": "tsx scripts/createAdmin.ts",
+    "reset-admin": "tsx scripts/resetAdmin.ts",
     "seed": "tsx scripts/seed.ts",
     "deploy": "npm run build && firebase deploy"
   },

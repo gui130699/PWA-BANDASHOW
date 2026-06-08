@@ -1,8 +1,6 @@
 import {
   BadgeCheck,
   CalendarDays,
-  CheckCircle2,
-  Clock3,
   Hourglass,
   Info,
   OctagonX,
@@ -82,11 +80,6 @@ export const quoteStatusMeta: Record<
     icon: typeof Hourglass
   }
 > = {
-  rascunho: {
-    label: 'Rascunho',
-    className: 'bg-slate-500/15 text-slate-200 ring-slate-400/20',
-    icon: Clock3,
-  },
   em_analise: {
     label: 'Em analise',
     className: 'bg-amber-400/15 text-amber-200 ring-amber-300/30',
@@ -101,11 +94,6 @@ export const quoteStatusMeta: Record<
     label: 'Entrada informada',
     className: 'bg-violet-400/15 text-violet-200 ring-violet-300/30',
     icon: Info,
-  },
-  entrada_confirmada: {
-    label: 'Entrada confirmada',
-    className: 'bg-emerald-400/15 text-emerald-200 ring-emerald-300/30',
-    icon: CheckCircle2,
   },
   agendado: {
     label: 'Agendado',

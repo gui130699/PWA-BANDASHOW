@@ -27,6 +27,7 @@ export function AdminDashboardPage() {
     const receivedMonth = payments
       .filter((payment) => payment.status === 'confirmado')
       .reduce((sum, payment) => sum + payment.amount, 0)
+    const confirmedQuotes = monthQuotes.filter((quote) => ['agendado', 'realizado'].includes(quote.status))
 
     return [
       {
@@ -35,28 +36,48 @@ export function AdminDashboardPage() {
         icon: ClipboardList,
       },
       {
+        label: 'Aguardando entrada',
+        value: quotes.filter((quote) => quote.status === 'aprovado_aguardando_entrada').length,
+        icon: WalletCards,
+      },
+      {
+        label: 'Entradas informadas',
+        value: quotes.filter((quote) => quote.status === 'entrada_informada_pelo_cliente').length,
+        icon: WalletCards,
+      },
+      {
         label: 'Eventos agendados',
         value: quotes.filter((quote) => quote.status === 'agendado').length,
         icon: CalendarDays,
       },
       {
-        label: 'Entradas pendentes',
-        value: payments.filter((payment) => payment.type === 'entrada_50' && payment.status !== 'confirmado').length,
+        label: 'Realizados no mes',
+        value: monthQuotes.filter((quote) => quote.status === 'realizado').length,
+        icon: CalendarDays,
+      },
+      {
+        label: 'Pagamentos pendentes',
+        value: payments.filter((payment) => payment.status !== 'confirmado' && payment.status !== 'cancelado').length,
         icon: WalletCards,
       },
       {
-        label: 'Recebido no mes',
+        label: 'Receita confirmada',
         value: formatCurrency(receivedMonth),
         icon: TrendingUp,
       },
       {
-        label: 'Previsto no mes',
+        label: 'Receita prevista',
         value: formatCurrency(monthQuotes.reduce((sum, quote) => sum + quote.total, 0)),
         icon: BarChart3,
       },
       {
+        label: 'Custos estimados',
+        value: formatCurrency(confirmedQuotes.reduce((sum, quote) => sum + quote.totalCosts, 0)),
+        icon: BarChart3,
+      },
+      {
         label: 'Lucro estimado',
-        value: formatCurrency(monthQuotes.reduce((sum, quote) => sum + quote.estimatedProfit, 0)),
+        value: formatCurrency(confirmedQuotes.reduce((sum, quote) => sum + quote.estimatedProfit, 0)),
         icon: TrendingUp,
       },
     ]
@@ -77,7 +98,7 @@ export function AdminDashboardPage() {
   }, [quotes])
 
   const upcoming = [...quotes]
-    .filter((quote) => ['agendado', 'entrada_confirmada'].includes(quote.status))
+    .filter((quote) => quote.status === 'agendado')
     .sort((a, b) => a.event.date.localeCompare(b.event.date))
     .slice(0, 6)
 

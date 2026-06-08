@@ -1,4 +1,4 @@
-import { addDoc, collection, doc, serverTimestamp, setDoc, where } from 'firebase/firestore'
+import { doc, serverTimestamp, setDoc, where } from 'firebase/firestore'
 import { ArrowLeft, ArrowRight, Check, Minus, Plus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -7,12 +7,13 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
 import { useDocument } from '../../hooks/useDocument'
 import { requireDb } from '../../lib/firebase'
-import type { Client, QuoteEvent, QuoteItem, Service } from '../../types'
+import { createClientQuote } from '../../services/quoteService'
+import type { Client, PublicService, QuoteEvent, QuoteItem } from '../../types'
 import { brazilianStates, eventTypes } from '../../utils/constants'
 import { formatCurrency } from '../../utils/format'
 
 type SelectedService = {
-  service: Service
+  service: PublicService
   quantity: number
 }
 
@@ -51,7 +52,7 @@ export function NewQuotePage() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const serviceConstraints = useMemo(() => [where('active', '==', true)], [])
-  const { data: services, loading: servicesLoading } = useCollection<Service>('services', serviceConstraints)
+  const { data: services, loading: servicesLoading } = useCollection<PublicService>('publicServices', serviceConstraints)
   const { data: client } = useDocument<Client>('clients', user?.uid)
 
   useEffect(() => {
@@ -79,7 +80,7 @@ export function NewQuotePage() {
     setEventForm((current) => ({ ...current, [key]: value }))
   }
 
-  function toggleService(service: Service) {
+  function toggleService(service: PublicService) {
     setSelected((current) => {
       if (current[service.id]) {
         const copy = { ...current }
@@ -133,6 +134,17 @@ export function NewQuotePage() {
         notes: clientForm.notes || '',
         updatedAt: serverTimestamp(),
       }
+      const clientQuotePayload: Client = {
+        id: clientId,
+        userId: user.uid,
+        name: clientForm.name,
+        document: clientForm.document,
+        phone: clientForm.phone,
+        email: clientForm.email,
+        city: clientForm.city,
+        state: clientForm.state,
+        notes: clientForm.notes || '',
+      }
       const items: QuoteItem[] = selectedItems.map(({ service, quantity }) => ({
         serviceId: service.id,
         serviceName: service.name,
@@ -142,8 +154,6 @@ export function NewQuotePage() {
         totalPrice: service.basePrice * quantity,
         costSnapshot: [],
       }))
-      const total = items.reduce((sum, item) => sum + item.totalPrice, 0)
-
       await setDoc(
         doc(database, 'clients', clientId),
         {
@@ -153,34 +163,11 @@ export function NewQuotePage() {
         { merge: true },
       )
 
-      const quoteRef = await addDoc(collection(database, 'quotes'), {
-        clientId,
-        clientUserId: user.uid,
-        clientSnapshot: {
-          name: clientPayload.name,
-          document: clientPayload.document,
-          phone: clientPayload.phone,
-          email: clientPayload.email,
-          city: clientPayload.city,
-          state: clientPayload.state,
-        },
+      const quoteRef = await createClientQuote({
+        client: clientQuotePayload,
         event: eventForm,
         items,
-        manualCosts: [],
-        subtotal: total,
-        discount: 0,
-        travelFee: 0,
-        total,
-        totalCosts: 0,
-        estimatedProfit: total,
-        estimatedMargin: total > 0 ? 100 : 0,
-        depositAmount: total * 0.5,
-        remainingAmount: total * 0.5,
-        status: 'em_analise',
         clientNotes,
-        adminNotes: '',
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
       })
 
       navigate(`/cliente/orcamentos/${quoteRef.id}`)
@@ -314,7 +301,7 @@ export function NewQuotePage() {
           />
           <p className="mt-4 rounded-md bg-gold-300/10 p-4 text-sm leading-6 text-gold-50">
             Sua solicitacao sera enviada para analise do Grupo Dvanera. Apos aprovacao, sera
-            liberado o pagamento de 50% de entrada via Pix.
+            liberado o pagamento da entrada via Pix conforme percentual configurado.
           </p>
         </Card>
       )}

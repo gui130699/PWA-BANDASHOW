@@ -5,11 +5,9 @@ export type UserRole = 'admin' | 'client'
 export type PixKeyType = 'cpf' | 'cnpj' | 'email' | 'telefone' | 'aleatoria'
 
 export type QuoteStatus =
-  | 'rascunho'
   | 'em_analise'
   | 'aprovado_aguardando_entrada'
   | 'entrada_informada_pelo_cliente'
-  | 'entrada_confirmada'
   | 'agendado'
   | 'realizado'
   | 'recusado'
@@ -51,6 +49,8 @@ export type CostSnapshot = {
   refId?: string
   name: string
   cost: number
+  quantity?: number
+  totalCost?: number
   notes?: string
 }
 
@@ -78,6 +78,16 @@ export type Service = FirestoreEntity & {
   supplierLinks: SupplierLink[]
   memberCostLinks: MemberCostLink[]
   internalNotes?: string
+}
+
+export type PublicService = FirestoreEntity & {
+  serviceId: string
+  name: string
+  description: string
+  category: string
+  basePrice: number
+  active: boolean
+  allowPriceEdit: boolean
 }
 
 export type BandMember = FirestoreEntity & {
@@ -149,6 +159,7 @@ export type Quote = FirestoreEntity & {
   totalCosts: number
   estimatedProfit: number
   estimatedMargin: number
+  depositPercent: number
   depositAmount: number
   remainingAmount: number
   status: QuoteStatus
@@ -159,10 +170,38 @@ export type Quote = FirestoreEntity & {
   depositConfirmedAt?: DateLike
 }
 
+export type ClientQuoteViewItem = Omit<QuoteItem, 'costSnapshot'>
+
+export type ClientQuoteView = FirestoreEntity & {
+  quoteId: string
+  clientId: string
+  clientUserId: string
+  clientSnapshot: Quote['clientSnapshot']
+  event: QuoteEvent
+  items: ClientQuoteViewItem[]
+  subtotal: number
+  discount: number
+  travelFee: number
+  total: number
+  depositPercent: number
+  depositAmount: number
+  remainingAmount: number
+  status: QuoteStatus
+  clientNotes?: string
+  rejectionReason?: string
+  paymentSummary?: {
+    depositStatus?: PaymentStatus
+    remainingStatus?: PaymentStatus
+  }
+  approvedAt?: DateLike
+  depositConfirmedAt?: DateLike
+}
+
 export type Payment = FirestoreEntity & {
   quoteId: string
   clientId: string
-  type: 'entrada_50' | 'restante_50' | 'outro'
+  clientUserId?: string
+  type: 'entrada' | 'restante' | 'entrada_50' | 'restante_50' | 'outro'
   amount: number
   status: PaymentStatus
   pixKeyUsed: string
@@ -206,6 +245,18 @@ export type Settings = {
   updatedAt?: DateLike
 }
 
+export type PublicSettings = {
+  bandName: string
+  pixReceiverName: string
+  pixKey: string
+  pixKeyType: PixKeyType
+  bankName?: string
+  paymentInstructions?: string
+  whatsapp?: string
+  email?: string
+  updatedAt?: DateLike
+}
+
 export type AuditLog = FirestoreEntity & {
   userId: string
   userName: string
@@ -213,4 +264,5 @@ export type AuditLog = FirestoreEntity & {
   entity: string
   entityId: string
   description: string
+  metadata?: Record<string, unknown>
 }

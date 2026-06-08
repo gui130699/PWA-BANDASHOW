@@ -2,9 +2,11 @@ import { collection, getDocs } from 'firebase/firestore'
 import { Edit, Plus, RotateCcw, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Badge, Button, Card, DataTable, Input, Select, Textarea } from '../../components/ui'
+import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
 import { requireDb } from '../../lib/firebase'
-import { addEntity, removeEntity, updateEntity } from '../../services/firestoreService'
+import { createService, removeService, updateService } from '../../services/serviceService'
+import { createAuditLog } from '../../services/auditService'
 import type { BandMember, MemberCostLink, Quote, Service, Supplier, SupplierLink } from '../../types'
 import { serviceCategories } from '../../utils/constants'
 import { formatCurrency } from '../../utils/format'
@@ -22,6 +24,7 @@ const emptyService: Omit<Service, 'id'> = {
 }
 
 export function AdminServicesPage() {
+  const { user, profile } = useAuth()
   const { data: services, loading } = useCollection<Service>('services')
   const { data: suppliers } = useCollection<Supplier>('suppliers')
   const { data: members } = useCollection<BandMember>('bandMembers')
@@ -71,10 +74,26 @@ export function AdminServicesPage() {
     setFeedback('')
     try {
       if (editingId) {
-        await updateEntity('services', editingId, form)
+        await updateService(editingId, form)
+        await createAuditLog({
+          userId: user?.uid || 'admin',
+          userName: profile?.name || 'Admin',
+          action: 'service_updated',
+          entity: 'services',
+          entityId: editingId,
+          description: `Servico ${form.name} atualizado.`,
+        }).catch(() => undefined)
         setFeedback('Servico atualizado.')
       } else {
-        await addEntity('services', form)
+        const reference = await createService(form)
+        await createAuditLog({
+          userId: user?.uid || 'admin',
+          userName: profile?.name || 'Admin',
+          action: 'service_created',
+          entity: 'services',
+          entityId: reference.id,
+          description: `Servico ${form.name} criado.`,
+        }).catch(() => undefined)
         setFeedback('Servico criado.')
       }
       resetForm()
@@ -124,7 +143,7 @@ export function AdminServicesPage() {
         return
       }
 
-      await removeEntity('services', service.id)
+      await removeService(service.id)
       setFeedback('Servico excluido.')
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : 'Nao foi possivel excluir.')
@@ -241,7 +260,7 @@ export function AdminServicesPage() {
                   <Button aria-label="Editar" className="h-9 w-9 px-0" onClick={() => edit(service)} variant="ghost">
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button aria-label="Ativar ou desativar" className="h-9 px-3" onClick={() => updateEntity('services', service.id, { active: !service.active })} variant="secondary">
+                  <Button aria-label="Ativar ou desativar" className="h-9 px-3" onClick={() => updateService(service.id, { active: !service.active })} variant="secondary">
                     {service.active ? 'Desativar' : 'Reativar'}
                   </Button>
                   <Button aria-label="Excluir" className="h-9 w-9 px-0" onClick={() => removeIfUnused(service)} variant="danger">

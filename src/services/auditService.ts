@@ -8,6 +8,7 @@ export async function createAuditLog(input: {
   entity: string
   entityId: string
   description: string
+  metadata?: Record<string, unknown>
 }) {
   const database = requireDb()
   await addDoc(collection(database, 'auditLogs'), {

@@ -18,7 +18,7 @@ const highlights = [
   },
   {
     title: 'Pix com conferencia manual',
-    description: 'Entrada de 50%, chave Pix configuravel e confirmacao segura pelo admin.',
+    description: 'Entrada configuravel, chave Pix publica segura e confirmacao manual pelo admin.',
     icon: WalletCards,
   },
   {

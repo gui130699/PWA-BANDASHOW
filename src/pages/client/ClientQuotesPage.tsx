@@ -4,13 +4,13 @@ import { Link } from 'react-router-dom'
 import { Card, DataTable, StatusBadge } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
-import type { Quote } from '../../types'
+import type { ClientQuoteView } from '../../types'
 import { formatCurrency, formatDate } from '../../utils/format'
 
 export function ClientQuotesPage() {
   const { user } = useAuth()
   const constraints = useMemo(() => [where('clientUserId', '==', user?.uid || '')], [user?.uid])
-  const { data: quotes, loading } = useCollection<Quote>('quotes', constraints)
+  const { data: quotes, loading } = useCollection<ClientQuoteView>('clientQuoteViews', constraints)
 
   return (
     <Card title="Meus orcamentos">
@@ -32,7 +32,7 @@ export function ClientQuotesPage() {
           {
             header: 'Acao',
             cell: (quote) => (
-              <Link className="font-semibold text-gold-300 hover:text-gold-100" to={`/cliente/orcamentos/${quote.id}`}>
+              <Link className="font-semibold text-gold-300 hover:text-gold-100" to={`/cliente/orcamentos/${quote.quoteId}`}>
                 Ver detalhes
               </Link>
             ),

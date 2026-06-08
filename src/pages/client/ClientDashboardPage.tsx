@@ -5,13 +5,13 @@ import { where } from 'firebase/firestore'
 import { Button, Card, DataTable, StatusBadge } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
-import type { Quote } from '../../types'
+import type { ClientQuoteView } from '../../types'
 import { formatCurrency, formatDate } from '../../utils/format'
 
 export function ClientDashboardPage() {
   const { user } = useAuth()
   const constraints = useMemo(() => [where('clientUserId', '==', user?.uid || '')], [user?.uid])
-  const { data: quotes, loading } = useCollection<Quote>('quotes', constraints)
+  const { data: quotes, loading } = useCollection<ClientQuoteView>('clientQuoteViews', constraints)
 
   const stats = useMemo(
     () => [
@@ -76,7 +76,7 @@ export function ClientDashboardPage() {
             {
               header: 'Detalhes',
               cell: (quote) => (
-                <Link className="font-semibold text-gold-300 hover:text-gold-100" to={`/cliente/orcamentos/${quote.id}`}>
+                <Link className="font-semibold text-gold-300 hover:text-gold-100" to={`/cliente/orcamentos/${quote.quoteId}`}>
                   Abrir
                 </Link>
               ),
@@ -85,7 +85,7 @@ export function ClientDashboardPage() {
           data={quotes.slice(0, 5)}
           emptyDescription="Quando voce enviar uma solicitacao, ela aparecera aqui."
           emptyTitle="Nenhum orcamento encontrado"
-          getRowKey={(quote) => quote.id}
+          getRowKey={(quote) => quote.quoteId}
           loading={loading}
         />
       </Card>

@@ -1,26 +1,22 @@
-import { Save, Trash2 } from 'lucide-react'
+import { Save, TerminalSquare } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Button, Card, Input, Modal, Select, Textarea } from '../../components/ui'
+import { Button, Card, DataTable, Input, Select, Textarea } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
+import { useCollection } from '../../hooks/useCollection'
+import { createAuditLog } from '../../services/auditService'
 import { saveSettings, getSettings } from '../../services/settingsService'
-import type { PixKeyType, Settings } from '../../types'
+import type { AuditLog, PixKeyType, Settings } from '../../types'
 import { defaultSettings } from '../../utils/constants'
-import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
+import { formatDate } from '../../utils/format'
 
 const pixOptions: PixKeyType[] = ['cpf', 'cnpj', 'email', 'telefone', 'aleatoria']
 
 export function AdminSettingsPage() {
-  const { deleteAdminAccount } = useAuth()
-  const navigate = useNavigate()
+  const { user, profile } = useAuth()
   const [settings, setSettings] = useState<Settings>(defaultSettings)
+  const { data: auditLogs, loading: auditLoading } = useCollection<AuditLog>('auditLogs')
   const [saving, setSaving] = useState(false)
   const [feedback, setFeedback] = useState('')
-  const [deleteOpen, setDeleteOpen] = useState(false)
-  const [masterPassword, setMasterPassword] = useState('')
-  const [accountPassword, setAccountPassword] = useState('')
-  const [deleteFeedback, setDeleteFeedback] = useState('')
-  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     getSettings().then(setSettings).catch(() => setSettings(defaultSettings))
@@ -35,32 +31,19 @@ export function AdminSettingsPage() {
     setFeedback('')
     try {
       await saveSettings(settings)
+      await createAuditLog({
+        userId: user?.uid || 'admin',
+        userName: profile?.name || 'Admin',
+        action: 'settings_updated',
+        entity: 'settings',
+        entityId: 'main',
+        description: 'Configuracoes de Pix e pagamento atualizadas.',
+      }).catch(() => undefined)
       setFeedback('Configuracoes salvas.')
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : 'Nao foi possivel salvar.')
     } finally {
       setSaving(false)
-    }
-  }
-
-  function closeDeleteModal() {
-    if (deleting) return
-    setDeleteOpen(false)
-    setMasterPassword('')
-    setAccountPassword('')
-    setDeleteFeedback('')
-  }
-
-  async function confirmDelete() {
-    setDeleting(true)
-    setDeleteFeedback('')
-    try {
-      await deleteAdminAccount({ masterPassword, accountPassword })
-      navigate('/admin/acesso', { replace: true })
-    } catch (error) {
-      setDeleteFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel excluir o cadastro.'))
-    } finally {
-      setDeleting(false)
     }
   }
 
@@ -105,51 +88,34 @@ export function AdminSettingsPage() {
 
       <Card
         action={
-          <Button icon={<Trash2 className="h-4 w-4" />} onClick={() => setDeleteOpen(true)} variant="danger">
-            Excluir cadastro
-          </Button>
+          <div className="grid h-11 w-11 place-items-center rounded-md bg-white/8 text-gold-200">
+            <TerminalSquare className="h-5 w-5" />
+          </div>
         }
-        description="Remove o unico cadastro admin e libera a criacao de um novo primeiro admin."
-        title="Cadastro admin"
+        description="O reset do admin deve ser feito somente no terminal, com service account."
+        title="Reset seguro do admin"
       >
-        <p className="text-sm leading-6 text-slate-300">
-          Esta acao exige a senha mestre e a senha da propria conta admin para confirmar a exclusao no Firebase.
-        </p>
+        <div className="rounded-md border border-white/10 bg-white/[0.04] p-4 text-sm leading-6 text-slate-300">
+          <p>Por seguranca, o painel nao possui segredo fixo nem exclusao de admin no front-end.</p>
+          <p className="mt-3">Para liberar a criacao de um novo primeiro admin, rode localmente:</p>
+          <pre className="mt-3 overflow-x-auto rounded-md bg-night-950 p-3 text-gold-200">npm run reset-admin</pre>
+        </div>
       </Card>
 
-      <Modal onClose={closeDeleteModal} open={deleteOpen} title="Excluir cadastro admin">
-        <div className="space-y-4">
-          <p className="rounded-md border border-red-400/30 bg-red-500/10 p-3 text-sm leading-6 text-red-100">
-            Depois de excluir, o painel admin ficara sem cadastro e o proximo acesso podera criar um novo primeiro admin.
-          </p>
-          <Input
-            label="Senha mestre"
-            onChange={(event) => setMasterPassword(event.target.value)}
-            type="password"
-            value={masterPassword}
-          />
-          <Input
-            label="Senha da conta admin"
-            onChange={(event) => setAccountPassword(event.target.value)}
-            type="password"
-            value={accountPassword}
-          />
-          {deleteFeedback && <p className="rounded-md bg-red-500/10 p-3 text-sm text-red-200">{deleteFeedback}</p>}
-          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <Button disabled={deleting} onClick={closeDeleteModal} variant="secondary">
-              Cancelar
-            </Button>
-            <Button
-              icon={<Trash2 className="h-4 w-4" />}
-              isLoading={deleting}
-              onClick={confirmDelete}
-              variant="danger"
-            >
-              Excluir cadastro
-            </Button>
-          </div>
-        </div>
-      </Modal>
+      <Card description="Ultimas acoes registradas no painel administrativo." title="Auditoria">
+        <DataTable
+          columns={[
+            { header: 'Data', cell: (log) => formatDate(log.createdAt) },
+            { header: 'Usuario', cell: (log) => log.userName },
+            { header: 'Acao', cell: (log) => log.action },
+            { header: 'Descricao', cell: (log) => log.description },
+          ]}
+          data={auditLogs.slice(0, 10)}
+          emptyTitle="Nenhum log registrado"
+          getRowKey={(log) => log.id}
+          loading={auditLoading}
+        />
+      </Card>
     </div>
   )
 }

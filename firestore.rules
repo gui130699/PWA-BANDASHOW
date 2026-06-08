@@ -77,6 +77,10 @@ service cloud.firestore {
     }
 
     match /services/{serviceId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /publicServices/{serviceId} {
       allow read: if isAdmin() || (signedIn() && resource.data.active == true);
       allow write: if isAdmin();
     }
@@ -90,27 +94,67 @@ service cloud.firestore {
     }
 
     match /quotes/{quoteId} {
-      allow read: if isAdmin() || isOwner(resource.data.clientUserId);
+      allow read: if isAdmin();
       allow create: if isAdmin() || (
         isOwner(request.resource.data.clientUserId)
         && request.resource.data.status == "em_analise"
         && request.resource.data.totalCosts == 0
         && request.resource.data.manualCosts.size() == 0
+        && request.resource.data.adminNotes == ""
       );
       allow update: if isAdmin() || (
         isOwner(resource.data.clientUserId)
-        && resource.data.status == "aprovado_aguardando_entrada"
+        && resource.data.status in ["aprovado_aguardando_entrada", "entrada_informada_pelo_cliente"]
         && request.resource.data.status == "entrada_informada_pelo_cliente"
-        && request.resource.data.diff(resource.data).changedKeys().hasOnly(["status", "clientNotes", "updatedAt"])
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(["status", "updatedAt"])
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /clientQuoteViews/{quoteId} {
+      allow read: if isAdmin() || isOwner(resource.data.clientUserId);
+      allow create: if isAdmin() || (
+        isOwner(request.resource.data.clientUserId)
+        && request.resource.data.quoteId == quoteId
+        && request.resource.data.status == "em_analise"
+        && request.resource.data.keys().hasOnly([
+          "quoteId",
+          "clientId",
+          "clientUserId",
+          "clientSnapshot",
+          "event",
+          "items",
+          "subtotal",
+          "discount",
+          "travelFee",
+          "total",
+          "depositPercent",
+          "depositAmount",
+          "remainingAmount",
+          "status",
+          "clientNotes",
+          "rejectionReason",
+          "paymentSummary",
+          "createdAt",
+          "updatedAt",
+          "approvedAt",
+          "depositConfirmedAt"
+        ])
+      );
+      allow update: if isAdmin() || (
+        isOwner(resource.data.clientUserId)
+        && resource.data.status in ["aprovado_aguardando_entrada", "entrada_informada_pelo_cliente"]
+        && request.resource.data.status == "entrada_informada_pelo_cliente"
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(["status", "paymentSummary", "updatedAt"])
       );
       allow delete: if isAdmin();
     }
 
     match /payments/{paymentId} {
-      allow read: if isAdmin() || isOwner(resource.data.clientId);
+      allow read: if isAdmin() || isOwner(resource.data.clientId) || isOwner(resource.data.clientUserId);
       allow create: if isAdmin();
       allow update: if isAdmin() || (
-        isOwner(resource.data.clientId)
+        (isOwner(resource.data.clientId) || isOwner(resource.data.clientUserId))
         && resource.data.status == "pendente"
         && request.resource.data.status == "informado_pelo_cliente"
         && request.resource.data.diff(resource.data).changedKeys().hasOnly(["status", "clientMessage", "updatedAt"])
@@ -127,12 +171,18 @@ service cloud.firestore {
     }
 
     match /settings/{settingId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /publicSettings/{settingId} {
       allow read: if signedIn();
       allow write: if isAdmin();
     }
 
     match /auditLogs/{logId} {
-      allow read, create: if isAdmin();
+      allow read: if isAdmin();
+      allow create: if isAdmin();
       allow update, delete: if false;
     }
   }

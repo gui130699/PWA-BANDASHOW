@@ -39,32 +39,61 @@ async function upsertByName(collectionName: string, item: Record<string, unknown
   }
 
   if (existing.empty) {
-    await adminDb.collection(collectionName).add({ ...payload, createdAt: now() })
-    return
+    const reference = await adminDb.collection(collectionName).add({ ...payload, createdAt: now() })
+    return reference.id
   }
 
   await existing.docs[0].ref.set(payload, { merge: true })
+  return existing.docs[0].id
 }
 
-async function main() {
-  await Promise.all(services.map((item) => upsertByName('services', item)))
-  await Promise.all(suppliers.map((item) => upsertByName('suppliers', item)))
-  await Promise.all(members.map((item) => upsertByName('bandMembers', item)))
+async function syncSeedPublicService(serviceId: string) {
+  const serviceSnapshot = await adminDb.collection('services').doc(serviceId).get()
+  if (!serviceSnapshot.exists) return
 
-  await adminDb.collection('settings').doc('main').set(
+  const service = serviceSnapshot.data() || {}
+  await adminDb.collection('publicServices').doc(serviceId).set(
     {
-      bandName: 'Grupo Dvanera',
-      pixReceiverName: '',
-      pixKey: '',
-      pixKeyType: 'cpf',
-      bankName: '',
-      defaultDepositPercent: 50,
-      paymentInstructions:
-        'Apos realizar o Pix, clique em "Ja realizei o pagamento" para que nossa equipe confirme manualmente.',
+      serviceId,
+      name: service.name,
+      description: service.description,
+      category: service.category,
+      basePrice: service.basePrice,
+      active: service.active,
+      allowPriceEdit: service.allowPriceEdit,
+      createdAt: service.createdAt || now(),
       updatedAt: now(),
     },
     { merge: true },
   )
+}
+
+async function main() {
+  const serviceIds = await Promise.all(services.map((item) => upsertByName('services', item)))
+  await Promise.all(serviceIds.filter(Boolean).map((serviceId) => syncSeedPublicService(serviceId as string)))
+  await Promise.all(suppliers.map((item) => upsertByName('suppliers', item)))
+  await Promise.all(members.map((item) => upsertByName('bandMembers', item)))
+
+  const publicSettings = {
+    bandName: 'Grupo Dvanera',
+    pixReceiverName: '',
+    pixKey: '',
+    pixKeyType: 'cpf',
+    bankName: '',
+    paymentInstructions:
+      'Apos realizar o Pix, clique em "Ja realizei o pagamento" para que nossa equipe confirme manualmente.',
+    updatedAt: now(),
+  }
+
+  await adminDb.collection('settings').doc('main').set(
+    {
+      ...publicSettings,
+      defaultDepositPercent: 50,
+      updatedAt: now(),
+    },
+    { merge: true },
+  )
+  await adminDb.collection('publicSettings').doc('main').set(publicSettings, { merge: true })
 
   console.log('Seed concluido.')
 }

@@ -1,5 +1,5 @@
 import { where } from 'firebase/firestore'
-import { CheckCircle2, CircleDollarSign, Save, XCircle } from 'lucide-react'
+import { CheckCircle2, CircleDollarSign, RefreshCcw, Save, XCircle } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Button, Card, DataTable, Input, Loading, StatusBadge, Textarea } from '../../components/ui'
@@ -12,13 +12,14 @@ import { formatCurrency, formatDate, formatPercent } from '../../utils/format'
 import {
   approveQuote,
   cancelQuote,
-  confirmDepositPayment,
   createFinalPayment,
   markQuoteAsDone,
+  recalculateQuote,
   rejectQuote,
   updateQuoteFinancials,
 } from '../../services/quoteService'
 import { getSettings } from '../../services/settingsService'
+import { confirmPayment } from '../../services/paymentService'
 
 const emptyManualCost: CostSnapshot = {
   type: 'manual',
@@ -29,7 +30,7 @@ const emptyManualCost: CostSnapshot = {
 
 export function AdminQuoteDetailPage() {
   const { id } = useParams()
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const { data: quote, loading } = useDocument<Quote>('quotes', id)
   const paymentConstraints = useMemo(() => [where('quoteId', '==', id || '')], [id])
   const { data: payments } = useCollection<Payment>('payments', paymentConstraints)
@@ -60,8 +61,16 @@ export function AdminQuoteDetailPage() {
   if (loading) return <Loading />
   if (!quote) return <Card title="Orcamento nao encontrado" />
 
-  const totals = calculateQuoteTotals(items, discount, travelFee, manualCosts)
+  const totals = calculateQuoteTotals(
+    items,
+    discount,
+    travelFee,
+    manualCosts,
+    settings?.defaultDepositPercent || quote.depositPercent,
+  )
   const editableQuote: Quote = { ...quote, items, manualCosts, discount, travelFee, adminNotes, ...totals }
+  const actor = { userId: user?.uid || 'admin', userName: profile?.name || 'Admin' }
+  const depositPayment = payments.find((payment) => payment.type === 'entrada' || payment.type === 'entrada_50')
 
   function updateItem(index: number, patch: Partial<QuoteItem>) {
     setItems((current) =>
@@ -99,7 +108,7 @@ export function AdminQuoteDetailPage() {
         description={`${quote.event.type} em ${formatDate(quote.event.date)} - ${quote.event.venueName}`}
         title={`Analise de ${quote.clientSnapshot.name}`}
       >
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
           <div>
             <p className="text-sm text-slate-400">Subtotal</p>
             <p className="text-xl font-semibold">{formatCurrency(totals.subtotal)}</p>
@@ -119,6 +128,10 @@ export function AdminQuoteDetailPage() {
           <div>
             <p className="text-sm text-slate-400">Margem</p>
             <p className="text-xl font-semibold">{formatPercent(totals.estimatedMargin)}</p>
+          </div>
+          <div>
+            <p className="text-sm text-slate-400">Entrada</p>
+            <p className="text-xl font-semibold">{totals.depositPercent}%</p>
           </div>
         </div>
       </Card>
@@ -151,9 +164,17 @@ export function AdminQuoteDetailPage() {
             <Button
               icon={<Save className="h-4 w-4" />}
               isLoading={saving}
-              onClick={() => runAction(() => updateQuoteFinancials(quote, { items, manualCosts, discount, travelFee, adminNotes }), 'Orcamento atualizado.')}
+              onClick={() => runAction(() => updateQuoteFinancials(quote, { items, manualCosts, discount, travelFee, adminNotes }, settings || undefined, actor), 'Orcamento atualizado.')}
             >
               Salvar ajustes
+            </Button>
+            <Button
+              icon={<RefreshCcw className="h-4 w-4" />}
+              isLoading={saving}
+              onClick={() => runAction(() => recalculateQuote(quote.id, settings || undefined, actor), 'Custos internos recalculados.')}
+              variant="secondary"
+            >
+              Recalcular custos
             </Button>
           </div>
         </Card>
@@ -190,6 +211,19 @@ export function AdminQuoteDetailPage() {
             { header: 'Valor', cell: (payment) => formatCurrency(payment.amount) },
             { header: 'Status', cell: (payment) => payment.status.replaceAll('_', ' ') },
             { header: 'Pix', cell: (payment) => payment.pixKeyUsed || '-' },
+            {
+              header: 'Acao',
+              cell: (payment) => (
+                <Button
+                  className="h-9 px-3"
+                  disabled={payment.status === 'confirmado'}
+                  onClick={() => runAction(() => confirmPayment(payment.id, actor), 'Pagamento confirmado.')}
+                  variant="success"
+                >
+                  Confirmar
+                </Button>
+              ),
+            },
           ]}
           data={payments}
           emptyTitle="Nenhum pagamento gerado"
@@ -205,8 +239,8 @@ export function AdminQuoteDetailPage() {
               icon={<CheckCircle2 className="h-4 w-4" />}
               isLoading={saving}
               onClick={() => runAction(async () => {
-                await updateQuoteFinancials(quote, { items, manualCosts, discount, travelFee, adminNotes })
-                await approveQuote(editableQuote, settings || undefined)
+                await updateQuoteFinancials(quote, { items, manualCosts, discount, travelFee, adminNotes }, settings || undefined, actor)
+                await approveQuote(editableQuote, settings || undefined, actor)
               }, 'Orcamento aprovado e entrada Pix gerada.')}
               variant="success"
             >
@@ -216,7 +250,7 @@ export function AdminQuoteDetailPage() {
               disabled={!rejectionReason}
               icon={<XCircle className="h-4 w-4" />}
               isLoading={saving}
-              onClick={() => runAction(() => rejectQuote(quote.id, rejectionReason), 'Orcamento recusado.')}
+              onClick={() => runAction(() => rejectQuote(quote.id, rejectionReason, actor), 'Orcamento recusado.')}
               variant="danger"
             >
               Reprovar
@@ -225,7 +259,10 @@ export function AdminQuoteDetailPage() {
               disabled={quote.status !== 'entrada_informada_pelo_cliente'}
               icon={<CircleDollarSign className="h-4 w-4" />}
               isLoading={saving}
-              onClick={() => runAction(() => confirmDepositPayment(quote, user?.uid || 'admin'), 'Entrada confirmada e evento agendado.')}
+              onClick={() => runAction(() => {
+                if (!depositPayment) throw new Error('Pagamento de entrada nao encontrado.')
+                return confirmPayment(depositPayment.id, actor)
+              }, 'Entrada confirmada e evento agendado.')}
               variant="primary"
             >
               Confirmar entrada
@@ -241,14 +278,14 @@ export function AdminQuoteDetailPage() {
               Gerar restante
             </Button>
             <Button
-              disabled={!['agendado', 'entrada_confirmada'].includes(quote.status)}
+              disabled={quote.status !== 'agendado'}
               isLoading={saving}
-              onClick={() => runAction(() => markQuoteAsDone(quote.id), 'Evento marcado como realizado.')}
+              onClick={() => runAction(() => markQuoteAsDone(quote.id, actor), 'Evento marcado como realizado.')}
               variant="secondary"
             >
               Marcar realizado
             </Button>
-            <Button isLoading={saving} onClick={() => runAction(() => cancelQuote(quote.id), 'Orcamento cancelado.')} variant="ghost">
+            <Button isLoading={saving} onClick={() => runAction(() => cancelQuote(quote.id, actor), 'Orcamento cancelado.')} variant="ghost">
               Cancelar
             </Button>
           </div>

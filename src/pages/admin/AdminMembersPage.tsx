@@ -1,7 +1,9 @@
 import { Edit, HandCoins, Plus, RotateCcw } from 'lucide-react'
 import { useState } from 'react'
 import { Badge, Button, Card, DataTable, Input, Select, Textarea } from '../../components/ui'
+import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
+import { createAuditLog } from '../../services/auditService'
 import { addEntity, updateEntity } from '../../services/firestoreService'
 import type { BandMember, MemberPayment } from '../../types'
 import { formatCurrency, formatDate } from '../../utils/format'
@@ -22,6 +24,7 @@ const emptyMember: Omit<BandMember, 'id'> = {
 }
 
 export function AdminMembersPage() {
+  const { user, profile } = useAuth()
   const { data: members, loading } = useCollection<BandMember>('bandMembers')
   const { data: payments } = useCollection<MemberPayment>('memberPayments')
   const [form, setForm] = useState(emptyMember)
@@ -57,9 +60,25 @@ export function AdminMembersPage() {
     try {
       if (editingId) {
         await updateEntity('bandMembers', editingId, form)
+        await createAuditLog({
+          userId: user?.uid || 'admin',
+          userName: profile?.name || 'Admin',
+          action: 'member_updated',
+          entity: 'bandMembers',
+          entityId: editingId,
+          description: `Integrante ${form.name} atualizado.`,
+        }).catch(() => undefined)
         setFeedback('Integrante atualizado.')
       } else {
-        await addEntity('bandMembers', form)
+        const reference = await addEntity('bandMembers', form)
+        await createAuditLog({
+          userId: user?.uid || 'admin',
+          userName: profile?.name || 'Admin',
+          action: 'member_created',
+          entity: 'bandMembers',
+          entityId: reference.id,
+          description: `Integrante ${form.name} cadastrado.`,
+        }).catch(() => undefined)
         setFeedback('Integrante cadastrado.')
       }
       resetForm()
@@ -152,7 +171,17 @@ export function AdminMembersPage() {
               cell: (member) => (
                 <div className="flex gap-2">
                   <Button aria-label="Editar" className="h-9 w-9 px-0" onClick={() => edit(member)} variant="ghost"><Edit className="h-4 w-4" /></Button>
-                  <Button className="h-9 px-3" onClick={() => updateEntity('bandMembers', member.id, { active: !member.active })} variant="secondary">{member.active ? 'Desativar' : 'Reativar'}</Button>
+                  <Button className="h-9 px-3" onClick={async () => {
+                    await updateEntity('bandMembers', member.id, { active: !member.active })
+                    await createAuditLog({
+                      userId: user?.uid || 'admin',
+                      userName: profile?.name || 'Admin',
+                      action: member.active ? 'member_disabled' : 'member_enabled',
+                      entity: 'bandMembers',
+                      entityId: member.id,
+                      description: `Integrante ${member.name} ${member.active ? 'desativado' : 'reativado'}.`,
+                    }).catch(() => undefined)
+                  }} variant="secondary">{member.active ? 'Desativar' : 'Reativar'}</Button>
                 </div>
               ),
             },

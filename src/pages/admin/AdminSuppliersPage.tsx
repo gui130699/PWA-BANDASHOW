@@ -1,7 +1,9 @@
 import { Edit, HandCoins, Plus, RotateCcw } from 'lucide-react'
 import { useState } from 'react'
 import { Badge, Button, Card, DataTable, Input, Select, Textarea } from '../../components/ui'
+import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
+import { createAuditLog } from '../../services/auditService'
 import { addEntity, updateEntity } from '../../services/firestoreService'
 import type { Supplier, SupplierPayment } from '../../types'
 import { supplierTypes } from '../../utils/constants'
@@ -23,6 +25,7 @@ const emptySupplier: Omit<Supplier, 'id'> = {
 }
 
 export function AdminSuppliersPage() {
+  const { user, profile } = useAuth()
   const { data: suppliers, loading } = useCollection<Supplier>('suppliers')
   const { data: payments } = useCollection<SupplierPayment>('supplierPayments')
   const [form, setForm] = useState(emptySupplier)
@@ -58,9 +61,25 @@ export function AdminSuppliersPage() {
     try {
       if (editingId) {
         await updateEntity('suppliers', editingId, form)
+        await createAuditLog({
+          userId: user?.uid || 'admin',
+          userName: profile?.name || 'Admin',
+          action: 'supplier_updated',
+          entity: 'suppliers',
+          entityId: editingId,
+          description: `Fornecedor ${form.name} atualizado.`,
+        }).catch(() => undefined)
         setFeedback('Fornecedor atualizado.')
       } else {
-        await addEntity('suppliers', form)
+        const reference = await addEntity('suppliers', form)
+        await createAuditLog({
+          userId: user?.uid || 'admin',
+          userName: profile?.name || 'Admin',
+          action: 'supplier_created',
+          entity: 'suppliers',
+          entityId: reference.id,
+          description: `Fornecedor ${form.name} cadastrado.`,
+        }).catch(() => undefined)
         setFeedback('Fornecedor cadastrado.')
       }
       resetForm()
@@ -145,7 +164,17 @@ export function AdminSuppliersPage() {
               cell: (supplier) => (
                 <div className="flex gap-2">
                   <Button aria-label="Editar" className="h-9 w-9 px-0" onClick={() => edit(supplier)} variant="ghost"><Edit className="h-4 w-4" /></Button>
-                  <Button className="h-9 px-3" onClick={() => updateEntity('suppliers', supplier.id, { active: !supplier.active })} variant="secondary">{supplier.active ? 'Desativar' : 'Reativar'}</Button>
+                  <Button className="h-9 px-3" onClick={async () => {
+                    await updateEntity('suppliers', supplier.id, { active: !supplier.active })
+                    await createAuditLog({
+                      userId: user?.uid || 'admin',
+                      userName: profile?.name || 'Admin',
+                      action: supplier.active ? 'supplier_disabled' : 'supplier_enabled',
+                      entity: 'suppliers',
+                      entityId: supplier.id,
+                      description: `Fornecedor ${supplier.name} ${supplier.active ? 'desativado' : 'reativado'}.`,
+                    }).catch(() => undefined)
+                  }} variant="secondary">{supplier.active ? 'Desativar' : 'Reativar'}</Button>
                 </div>
               ),
             },

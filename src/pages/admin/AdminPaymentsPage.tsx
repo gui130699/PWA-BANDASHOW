@@ -2,13 +2,12 @@ import { CheckCircle2 } from 'lucide-react'
 import { Button, Card, DataTable, Badge } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
-import { updateEntity } from '../../services/firestoreService'
-import { confirmFinalPayment } from '../../services/quoteService'
+import { confirmPayment, markInternalPaymentAsPaid } from '../../services/paymentService'
 import type { MemberPayment, Payment, SupplierPayment } from '../../types'
 import { formatCurrency, formatDate } from '../../utils/format'
 
 export function AdminPaymentsPage() {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const { data: payments, loading } = useCollection<Payment>('payments')
   const { data: memberPayments } = useCollection<MemberPayment>('memberPayments')
   const { data: supplierPayments } = useCollection<SupplierPayment>('supplierPayments')
@@ -33,7 +32,7 @@ export function AdminPaymentsPage() {
                   className="h-9 px-3"
                   disabled={payment.status === 'confirmado'}
                   icon={<CheckCircle2 className="h-4 w-4" />}
-                  onClick={() => confirmFinalPayment(payment.id, user?.uid || 'admin')}
+                  onClick={() => confirmPayment(payment.id, { userId: user?.uid || 'admin', userName: profile?.name || 'Admin' })}
                   variant="success"
                 >
                   Confirmar
@@ -61,7 +60,7 @@ export function AdminPaymentsPage() {
                 <Button
                   className="h-9 px-3"
                   disabled={payment.status === 'pago'}
-                  onClick={() => updateEntity('memberPayments', payment.id, { status: 'pago', paidAt: new Date() })}
+                  onClick={() => markInternalPaymentAsPaid('memberPayments', payment.id)}
                   variant="secondary"
                 >
                   Marcar pago
@@ -88,7 +87,7 @@ export function AdminPaymentsPage() {
                 <Button
                   className="h-9 px-3"
                   disabled={payment.status === 'pago'}
-                  onClick={() => updateEntity('supplierPayments', payment.id, { status: 'pago', paidAt: new Date() })}
+                  onClick={() => markInternalPaymentAsPaid('supplierPayments', payment.id)}
                   variant="secondary"
                 >
                   Marcar pago
