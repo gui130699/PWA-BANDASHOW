@@ -1,28 +1,47 @@
 DOCUMENTACAO COMPLETA DO PROJETO - PWA-BANDASHOW / GRUPO DVANERA
-Gerado automaticamente para leitura, manutencao e backup tecnico do projeto.
-Data de geracao: 2026-06-08 09:47:05 -03:00
-Commit documentado: d62e9b8
+Gerado automaticamente para leitura, manutencao, auditoria tecnica e backup do projeto.
+Data de geracao: 2026-06-08 10:35:45 -03:00
+Commit documentado: 864832b
 Pasta local: C:\Users\guilh\OneDrive\HP Guilherme Notebook\Área de Trabalho\PWA- Everton
 Repositorio: https://github.com/gui130699/PWA-BANDASHOW
 Pages: https://gui130699.github.io/PWA-BANDASHOW/
 
-Observacao sobre seguranca: este TXT nao inclui .env.local, node_modules, dist, .git, logs nem arquivos binarios.
-A chave Firebase usada no frontend e uma configuracao publica de app web; credenciais privadas/service accounts nao devem ser colocadas neste arquivo.
+Observacao de seguranca: este TXT nao inclui .env.local, node_modules, dist, .git, logs nem arquivos binarios.
+Nao ha senha mestre no front-end. O reset admin e feito por script local com Firebase Admin SDK.
 
 ====================================================================================================
-1. VISAO GERAL
+1. VISAO GERAL ATUALIZADA
 ====================================================================================================
-O projeto e um PWA em React + Vite + TypeScript para gestao de agenda, orcamentos, clientes, pagamentos, fornecedores, integrantes e configuracoes do Grupo Dvanera.
-A aplicacao tem tres experiencias principais:
-- Publica: home, solicitacao/cadastro e entrada no sistema.
-- Cliente: dashboard, novo orcamento, lista/detalhe de orcamentos e pagamentos.
-- Admin: dashboard, agenda, orcamentos, servicos, integrantes, fornecedores, pagamentos, clientes e configuracoes.
+O projeto e um PWA em React + Vite + TypeScript para gestao de agenda, orcamentos, clientes, pagamentos, fornecedores, integrantes, servicos e configuracoes do Grupo Dvanera.
+A revisao atual consolidou separacao real entre dados internos e dados publicos do cliente, calculo financeiro com custos historicos, percentual de entrada configuravel, pagamentos unificados, auditoria e regras Firestore de producao.
 
-O backend usado e Firebase: Authentication para login/cadastro e Firestore para dados operacionais.
-O deploy publico esta configurado via GitHub Pages, usando workflow em .github/workflows/deploy-pages.yml.
+Experiencias principais:
+- Publica: home, cadastro/login e acesso admin inicial.
+- Cliente: dashboard, novo orcamento, orcamentos seguros, detalhe sanitizado e pagamentos.
+- Admin: dashboard, agenda, orcamentos internos, servicos com custos, integrantes, fornecedores, pagamentos, clientes, configuracoes e auditoria.
 
 ====================================================================================================
-2. TECNOLOGIAS E DEPENDENCIAS
+2. PRINCIPAIS CORRECOES DE PRODUCAO
+====================================================================================================
+- Cliente deixou de ler `quotes` internos.
+- Cliente deixou de ler `services` internos.
+- Cliente deixou de ler `settings/main` interno.
+- Criada `clientQuoteViews/{quoteId}` para orcamentos sanitizados.
+- Criada `publicServices/{serviceId}` para catalogo publico sem custos.
+- Criada `publicSettings/main` para Pix/contatos/instrucoes publicas.
+- Removido reset/exclusao de admin via front-end.
+- Criado `npm run reset-admin` com Firebase Admin SDK e confirmacao no terminal.
+- Status `entrada_confirmada` deixou de ser usado.
+- Percentual de entrada passou a vir de `settings/main.defaultDepositPercent`.
+- `depositPercent` fica salvo no orcamento para preservar historico.
+- Custos internos sao copiados para `costSnapshot` no momento de recalculo/aprovacao.
+- Confirmacao de pagamento foi centralizada em `confirmPayment`.
+- Cliente pode informar entrada e restante, mas nunca confirmar pagamento.
+- Admin visualiza auditoria recente em Configuracoes.
+- Service worker atualizado para `grupo-dvanera-v3`.
+
+====================================================================================================
+3. TECNOLOGIAS E DEPENDENCIAS
 ====================================================================================================
 - React 19
 - TypeScript
@@ -31,52 +50,49 @@ O deploy publico esta configurado via GitHub Pages, usando workflow em .github/w
 - React Router
 - Firebase Web SDK
 - Firebase Admin SDK para scripts locais
-- React Hook Form + Zod para formularios
-- Lucide React para icones
-- Recharts para graficos
-- ESLint para verificacao de codigo
+- React Hook Form + Zod
+- Lucide React
+- Recharts
+- ESLint
 
 ====================================================================================================
-3. COMANDOS PRINCIPAIS
+4. COMANDOS PRINCIPAIS
 ====================================================================================================
 Instalar dependencias:
   npm install
 
-Rodar em desenvolvimento:
+Rodar localmente:
   npm run dev
 
-Gerar build de producao:
+Validar:
+  npm run lint
   npm run build
 
-Verificar lint:
-  npm run lint
-
-Preview local do build:
-  npm run preview
-
-Criar admin via script local com Firebase Admin:
+Criar primeiro admin via script:
   npm run create-admin
 
-Semear dados iniciais:
+Resetar admin com seguranca:
+  npm run reset-admin
+
+Popular dados iniciais:
   npm run seed
 
-Deploy Firebase configurado no script npm:
-  npm run deploy
+Publicar Firestore Rules e indexes:
+  firebase deploy --only firestore --project pwa-bandashow
 
 ====================================================================================================
-4. VARIAVEIS DE AMBIENTE
+5. VARIAVEIS DE AMBIENTE
 ====================================================================================================
-O arquivo .env.example documenta as variaveis esperadas. O arquivo real .env.local nao foi incluido neste TXT.
-Variaveis do app web:
+Frontend Vite:
 - VITE_FIREBASE_API_KEY
 - VITE_FIREBASE_AUTH_DOMAIN
 - VITE_FIREBASE_PROJECT_ID
 - VITE_FIREBASE_STORAGE_BUCKET
 - VITE_FIREBASE_MESSAGING_SENDER_ID
 - VITE_FIREBASE_APP_ID
-- VITE_BASE_PATH, usado no GitHub Pages como /PWA-BANDASHOW/
+- VITE_BASE_PATH=/PWA-BANDASHOW/ no GitHub Pages
 
-Variaveis para scripts admin:
+Scripts locais com Firebase Admin SDK:
 - FIREBASE_PROJECT_ID
 - FIREBASE_SERVICE_ACCOUNT_PATH ou FIREBASE_SERVICE_ACCOUNT_JSON
 - ADMIN_EMAIL
@@ -84,126 +100,127 @@ Variaveis para scripts admin:
 - ADMIN_NAME
 
 ====================================================================================================
-5. FIREBASE
+6. COLECOES FIRESTORE
 ====================================================================================================
-Projeto Firebase: pwa-bandashow
-Servicos usados:
-- Firebase Authentication: login/cadastro com e-mail e senha.
-- Cloud Firestore: persistencia de usuarios, clientes, orcamentos, pagamentos, servicos, fornecedores, integrantes, configuracoes e controle do admin primario.
-
-Configuracao obrigatoria no Console Firebase:
-- Em Authentication, habilitar Email/Password.
-- Em Authentication > Settings > Authorized domains, garantir gui130699.github.io autorizado.
-- Em Firestore, publicar firestore.rules e firestore.indexes.json.
-
-====================================================================================================
-6. REGRA DO ADMIN UNICO
-====================================================================================================
-A pagina publica /admin/acesso cria o primeiro e unico cadastro admin quando ainda nao existe um admin primario.
-O controle e feito com documentos de sistema no Firestore:
-- system/adminSetup: marca configured=true quando o admin foi criado.
-- system/adminOwner: guarda o uid do primeiro admin.
-
-Depois que esses documentos existem, a tela /admin/acesso passa a funcionar como login admin.
-Para excluir o cadastro admin, o usuario precisa estar logado como admin, abrir Configuracoes, clicar em Excluir cadastro, informar a senha mestre e a senha da propria conta.
-A senha mestre definida no codigo atual e: 9331077093.Gui
-
-A exclusao remove:
-- users/{uid} do admin
-- system/adminOwner
+Internas/admin:
+- users
+- clients
+- services
+- bandMembers
+- suppliers
+- quotes
+- payments
+- memberPayments
+- supplierPayments
+- settings/main
+- auditLogs
 - system/adminSetup
-- conta do Firebase Authentication
+- system/adminOwner
 
-Apos a exclusao, /admin/acesso volta a liberar a criacao de um novo primeiro admin.
-
-====================================================================================================
-7. ROTAS PRINCIPAIS
-====================================================================================================
-Publicas:
-- /
-- /login
-- /cadastro
-- /admin/acesso
-- /solicitar-orcamento
-
-Cliente:
-- /cliente
-- /cliente/novo-orcamento
-- /cliente/orcamentos
-- /cliente/orcamentos/:id
-- /cliente/pagamentos
-
-Admin:
-- /admin/dashboard
-- /admin/agenda
-- /admin/orcamentos
-- /admin/orcamentos/:id
-- /admin/servicos
-- /admin/integrantes
-- /admin/fornecedores
-- /admin/pagamentos
-- /admin/clientes
-- /admin/configuracoes
+Publicas/sanitizadas:
+- publicServices
+- clientQuoteViews
+- publicSettings/main
 
 ====================================================================================================
-8. COLECOES DO FIRESTORE
+7. SEGURANCA DE DADOS
 ====================================================================================================
-- users: perfis de usuarios, com role admin ou client.
-- clients: dados cadastrais do cliente.
-- services: servicos oferecidos, precos e custos vinculados.
-- bandMembers: integrantes da banda e pagamentos padrao.
-- suppliers: fornecedores e custos padrao.
-- quotes: orcamentos e dados do evento.
-- payments: pagamentos vinculados a orcamentos/clientes.
-- memberPayments: pagamentos de integrantes.
-- supplierPayments: pagamentos de fornecedores.
-- settings: configuracoes de Pix, banda e instrucoes de pagamento.
-- auditLogs: registros de auditoria.
-- system/adminSetup e system/adminOwner: controle do admin unico.
+Cliente nao le:
+- quotes
+- services
+- suppliers
+- bandMembers
+- settings
+
+Cliente le:
+- clientQuoteViews dele
+- payments dele
+- publicServices ativos
+- publicSettings/main
+
+Motivo: Firestore nao mascara campos em leitura de documento. Por isso dados internos e publicos ficam em documentos separados.
 
 ====================================================================================================
-9. DEPLOY
+8. FLUXO OFICIAL DE ORCAMENTO
 ====================================================================================================
-O deploy do GitHub Pages e feito pelo workflow .github/workflows/deploy-pages.yml.
-O workflow injeta as secrets VITE_FIREBASE_* e define VITE_BASE_PATH=/PWA-BANDASHOW/ antes do build.
-A cada push na branch main, o GitHub Actions gera o dist e publica no Pages.
+Status validos:
+- em_analise
+- aprovado_aguardando_entrada
+- entrada_informada_pelo_cliente
+- agendado
+- realizado
+- recusado
+- cancelado
 
-As regras do Firestore sao publicadas com:
+Fluxo:
+1. Cliente solicita orcamento.
+2. Sistema cria quotes/{quoteId} e clientQuoteViews/{quoteId}.
+3. Admin recalcula custos internos e aprova/recusa.
+4. Aprovacao gera pagamento de entrada.
+5. Cliente informa pagamento.
+6. Admin confirma pagamento.
+7. Evento vira agendado.
+8. Admin pode gerar restante e marcar realizado.
+
+====================================================================================================
+9. CALCULOS FINANCEIROS
+====================================================================================================
+Formula de entrada:
+  depositAmount = total * (depositPercent / 100)
+  remainingAmount = total - depositAmount
+
+Custos internos:
+- Fornecedores e integrantes vinculados ao servico sao copiados para costSnapshot.
+- Cada custo guarda cost, quantity e totalCost.
+- Orcamentos antigos mantem historico mesmo se o servico mudar depois.
+
+====================================================================================================
+10. PAGAMENTOS
+====================================================================================================
+Funcoes centrais:
+- clientMarkPaymentAsPaid(payment, message)
+- confirmPayment(paymentId, actor)
+- createFinalPayment(quote, settings)
+
+Cliente pode alterar somente status pendente para informado_pelo_cliente e clientMessage.
+Admin confirma pagamentos e, se for entrada, o evento entra na agenda.
+
+====================================================================================================
+11. RESET ADMIN SEGURO
+====================================================================================================
+Nao existe segredo fixo no front-end.
+O reset do admin primario e feito somente localmente:
+  npm run reset-admin
+
+O script pede para digitar RESETAR, remove documentos de sistema, remove users/{uid}, tenta deletar o usuario do Auth e registra auditoria.
+
+====================================================================================================
+12. DEPLOY
+====================================================================================================
+GitHub Pages e o deploy principal:
+  git push origin main
+
+Firebase Hosting opcional:
+  npm run deploy
+
+Firestore Rules:
   firebase deploy --only firestore --project pwa-bandashow
 
 ====================================================================================================
-10. PWA
+13. VALIDACOES REALIZADAS NESTA REVISAO
 ====================================================================================================
-Arquivos principais:
-- public/manifest.webmanifest
-- public/sw.js
-- public/icons/gd-icon.svg
-
-O service worker usa cache basico e estrategia network-first para navegacao, reduzindo problemas de tela antiga em GitHub Pages.
-
-====================================================================================================
-11. TROUBLESHOOTING
-====================================================================================================
-Erro Firebase: auth/configuration-not-found
-- Causa comum: Firebase Authentication ainda nao foi iniciado no Console.
-- Solucao: abrir Firebase Console > Authentication > Get started > habilitar Email/Password.
-
-Erro auth/unauthorized-domain
-- Causa: dominio do GitHub Pages nao autorizado.
-- Solucao: adicionar gui130699.github.io nos dominios autorizados do Authentication.
-
-Tela branca no Pages
-- Conferir se o deploy do GitHub Actions concluiu com sucesso.
-- Limpar cache do navegador ou unregister do service worker antigo.
-- Conferir se VITE_BASE_PATH esta como /PWA-BANDASHOW/ no workflow.
-
-Segundo admin bloqueado
-- Comportamento esperado. Excluir o cadastro admin atual em /admin/configuracoes antes de criar outro.
+- npm install: concluido
+- npm run lint: concluido sem erros
+- npm run build: concluido sem erros
+- firebase deploy --only firestore --project pwa-bandashow: concluido com regras compiladas e publicadas
+- Aviso restante: bundle Vite acima de 500 kB por Firebase/Recharts; nao bloqueia build.
+- Aviso restante: npm audit reportou 8 vulnerabilidades moderadas em dependencias; nao foi aplicado audit fix force para evitar breaking changes.
 
 ====================================================================================================
-12. ARVORE DE ARQUIVOS DOCUMENTADA
+14. ARVORE DE ARQUIVOS DOCUMENTADA
 ====================================================================================================
 - .env.example
+- CHECKLIST_PRODUCAO.md
 - eslint.config.js
 - firebase.json
 - firestore.indexes.json
@@ -218,6 +235,7 @@ Segundo admin bloqueado
 - README.md
 - scripts\createAdmin.ts
 - scripts\firebaseAdmin.ts
+- scripts\resetAdmin.ts
 - scripts\seed.ts
 - src\App.tsx
 - src\components\FirebaseNotice.tsx
@@ -272,7 +290,9 @@ Segundo admin bloqueado
 - src\services\adminAccountService.ts
 - src\services\auditService.ts
 - src\services\firestoreService.ts
+- src\services\paymentService.ts
 - src\services\quoteService.ts
+- src\services\serviceService.ts
 - src\services\settingsService.ts
 - src\types\index.ts
 - src\utils\calculations.ts
@@ -291,7 +311,7 @@ Arquivos binarios encontrados e nao embutidos:
 Diretorios/arquivos omitidos propositalmente: node_modules, dist, .git, logs, .env.local e binarios.
 
 ====================================================================================================
-13. CODIGO-FONTE COMPLETO DOS ARQUIVOS DE TEXTO
+15. CODIGO-FONTE COMPLETO DOS ARQUIVOS DE TEXTO
 ====================================================================================================
 
 ----------------------------------------------------------------------------------------------------
@@ -316,8 +336,106 @@ ADMIN_EMAIL=admin@grupodvanera.com.br
 ADMIN_PASSWORD=
 ADMIN_NAME=Administrador Grupo Dvanera
 
+# npm run reset-admin usa as mesmas credenciais FIREBASE_SERVICE_ACCOUNT_*.
+
 ----------------------------------------------------------------------------------------------------
 FIM DO ARQUIVO: .env.example
+
+----------------------------------------------------------------------------------------------------
+INICIO DO ARQUIVO: CHECKLIST_PRODUCAO.md
+----------------------------------------------------------------------------------------------------
+# Checklist de Producao - Grupo Dvanera
+
+## Seguranca
+
+- [x] Cliente nao le `quotes` internos
+- [x] Cliente nao le `services` internos
+- [x] Cliente nao le `suppliers`
+- [x] Cliente nao le `bandMembers`
+- [x] Cliente nao le `settings` internos
+- [x] `clientQuoteViews` criada para leitura segura do cliente
+- [x] `publicServices` criada para catalogo publico sem custos
+- [x] `publicSettings` criada para Pix/contatos publicos
+- [x] Senha mestre removida do front-end
+- [x] Reset admin movido para script local com Firebase Admin SDK
+- [x] Firestore Rules revisadas
+
+## Orcamentos
+
+- [x] Custos internos copiados para `costSnapshot` ao recalcular/aprovar
+- [x] `costSnapshot` guarda custo historico com quantidade e custo total
+- [x] Lucro calculado a partir de custos internos
+- [x] Margem calculada a partir do lucro
+- [x] Entrada usa percentual configuravel
+- [x] `depositPercent` salvo no orcamento
+- [x] Status oficial padronizado sem `entrada_confirmada`
+
+## Pagamentos
+
+- [x] Cliente informa entrada
+- [x] Cliente informa restante
+- [x] Cliente nao confirma pagamento
+- [x] Admin confirma entrada por funcao unica
+- [x] Admin confirma restante por funcao unica
+- [x] Evento entra na agenda ao confirmar entrada
+- [x] `clientQuoteViews` sincronizada apos confirmacoes
+
+## Auditoria
+
+- [x] Servicos registram criacao/edicao
+- [x] Integrantes registram criacao/edicao/desativacao
+- [x] Fornecedores registram criacao/edicao/desativacao
+- [x] Orcamentos registram aprovacoes, recusas, cancelamentos, recalculos e realizados
+- [x] Pagamentos confirmados registram log
+- [x] Configuracoes registram log
+- [x] Reset admin registra log via script local
+- [x] Admin visualiza logs recentes
+
+## UX/Admin
+
+- [x] Dashboard admin usa dados reais do mes
+- [x] Agenda filtra por status, cidade, cliente e tipo
+- [x] Agenda mostra telefone, local, servicos, entrada e restante
+- [x] Detalhe admin mostra percentual de entrada
+- [x] Detalhe admin possui recalculo de custos
+
+## UX/Cliente
+
+- [x] Cliente visualiza orcamentos por `clientQuoteViews`
+- [x] Cliente visualiza status amigavel
+- [x] Cliente ve entrada/restante conforme percentual salvo
+- [x] Cliente ve todos os pagamentos pendentes
+- [x] Cliente copia chave Pix
+- [x] Cliente informa pagamento com observacao
+
+## Deploy
+
+- [x] PWA cache atualizado para `grupo-dvanera-v3`
+- [x] `npm install`
+- [x] `npm run lint`
+- [x] `npm run build`
+- [x] Firestore Rules publicadas
+- [ ] GitHub Pages funcionando
+- [ ] PWA instalavel
+
+## Testes manuais recomendados
+
+- [ ] Criar primeiro admin em `/admin/acesso`
+- [ ] Criar servico com fornecedor/integrante vinculado
+- [ ] Criar cliente
+- [ ] Solicitar orcamento
+- [ ] Aprovar orcamento
+- [ ] Conferir `clientQuoteViews` sem custos internos
+- [ ] Cliente informar entrada
+- [ ] Admin confirmar entrada
+- [ ] Ver evento na agenda
+- [ ] Gerar pagamento restante
+- [ ] Cliente informar restante
+- [ ] Admin confirmar restante
+- [ ] Marcar evento como realizado
+
+----------------------------------------------------------------------------------------------------
+FIM DO ARQUIVO: CHECKLIST_PRODUCAO.md
 
 ----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: eslint.config.js
@@ -513,6 +631,10 @@ service cloud.firestore {
     }
 
     match /services/{serviceId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /publicServices/{serviceId} {
       allow read: if isAdmin() || (signedIn() && resource.data.active == true);
       allow write: if isAdmin();
     }
@@ -526,27 +648,67 @@ service cloud.firestore {
     }
 
     match /quotes/{quoteId} {
-      allow read: if isAdmin() || isOwner(resource.data.clientUserId);
+      allow read: if isAdmin();
       allow create: if isAdmin() || (
         isOwner(request.resource.data.clientUserId)
         && request.resource.data.status == "em_analise"
         && request.resource.data.totalCosts == 0
         && request.resource.data.manualCosts.size() == 0
+        && request.resource.data.adminNotes == ""
       );
       allow update: if isAdmin() || (
         isOwner(resource.data.clientUserId)
-        && resource.data.status == "aprovado_aguardando_entrada"
+        && resource.data.status in ["aprovado_aguardando_entrada", "entrada_informada_pelo_cliente"]
         && request.resource.data.status == "entrada_informada_pelo_cliente"
-        && request.resource.data.diff(resource.data).changedKeys().hasOnly(["status", "clientNotes", "updatedAt"])
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(["status", "updatedAt"])
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /clientQuoteViews/{quoteId} {
+      allow read: if isAdmin() || isOwner(resource.data.clientUserId);
+      allow create: if isAdmin() || (
+        isOwner(request.resource.data.clientUserId)
+        && request.resource.data.quoteId == quoteId
+        && request.resource.data.status == "em_analise"
+        && request.resource.data.keys().hasOnly([
+          "quoteId",
+          "clientId",
+          "clientUserId",
+          "clientSnapshot",
+          "event",
+          "items",
+          "subtotal",
+          "discount",
+          "travelFee",
+          "total",
+          "depositPercent",
+          "depositAmount",
+          "remainingAmount",
+          "status",
+          "clientNotes",
+          "rejectionReason",
+          "paymentSummary",
+          "createdAt",
+          "updatedAt",
+          "approvedAt",
+          "depositConfirmedAt"
+        ])
+      );
+      allow update: if isAdmin() || (
+        isOwner(resource.data.clientUserId)
+        && resource.data.status in ["aprovado_aguardando_entrada", "entrada_informada_pelo_cliente"]
+        && request.resource.data.status == "entrada_informada_pelo_cliente"
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(["status", "paymentSummary", "updatedAt"])
       );
       allow delete: if isAdmin();
     }
 
     match /payments/{paymentId} {
-      allow read: if isAdmin() || isOwner(resource.data.clientId);
+      allow read: if isAdmin() || isOwner(resource.data.clientId) || isOwner(resource.data.clientUserId);
       allow create: if isAdmin();
       allow update: if isAdmin() || (
-        isOwner(resource.data.clientId)
+        (isOwner(resource.data.clientId) || isOwner(resource.data.clientUserId))
         && resource.data.status == "pendente"
         && request.resource.data.status == "informado_pelo_cliente"
         && request.resource.data.diff(resource.data).changedKeys().hasOnly(["status", "clientMessage", "updatedAt"])
@@ -563,12 +725,18 @@ service cloud.firestore {
     }
 
     match /settings/{settingId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /publicSettings/{settingId} {
       allow read: if signedIn();
       allow write: if isAdmin();
     }
 
     match /auditLogs/{logId} {
-      allow read, create: if isAdmin();
+      allow read: if isAdmin();
+      allow create: if isAdmin();
       allow update, delete: if false;
     }
   }
@@ -617,6 +785,7 @@ INICIO DO ARQUIVO: package.json
     "lint": "eslint .",
     "preview": "vite preview",
     "create-admin": "tsx scripts/createAdmin.ts",
+    "reset-admin": "tsx scripts/resetAdmin.ts",
     "seed": "tsx scripts/seed.ts",
     "deploy": "npm run build && firebase deploy"
   },
@@ -748,6 +917,7 @@ INICIO DO ARQUIVO: package-lock.json
       "integrity": "sha512-RgHBCvtjbOK2gXSNBNIkNoEc9qoVEtau3hj8gEqKQuL3HZAibKarWFEI3Lfm6EYKkLalOh8eSrj9b+ch9H/VBA==",
       "dev": true,
       "license": "MIT",
+      "peer": true,
       "dependencies": {
         "@babel/code-frame": "^7.29.7",
         "@babel/generator": "^7.29.7",
@@ -955,29 +1125,6 @@ INICIO DO ARQUIVO: package-lock.json
       },
       "engines": {
         "node": ">=6.9.0"
-      }
-    },
-    "node_modules/@emnapi/core": {
-      "version": "1.10.0",
-      "resolved": "https://registry.npmjs.org/@emnapi/core/-/core-1.10.0.tgz",
-      "integrity": "sha512-yq6OkJ4p82CAfPl0u9mQebQHKPJkY7WrIuk205cTYnYe+k2Z8YBh11FrbRG/H6ihirqcacOgl2BIO8oyMQLeXw==",
-      "dev": true,
-      "license": "MIT",
-      "optional": true,
-      "dependencies": {
-        "@emnapi/wasi-threads": "1.2.1",
-        "tslib": "^2.4.0"
-      }
-    },
-    "node_modules/@emnapi/runtime": {
-      "version": "1.10.0",
-      "resolved": "https://registry.npmjs.org/@emnapi/runtime/-/runtime-1.10.0.tgz",
-      "integrity": "sha512-ewvYlk86xUoGI0zQRNq/mC+16R1QeDlKQy21Ki3oSYXNgLb45GV1P6A0M+/s6nyCuNDqe5VpaY84BzXGwVbwFA==",
-      "dev": true,
-      "license": "MIT",
-      "optional": true,
-      "dependencies": {
-        "tslib": "^2.4.0"
       }
     },
     "node_modules/@emnapi/wasi-threads": {
@@ -1631,6 +1778,7 @@ INICIO DO ARQUIVO: package-lock.json
       "resolved": "https://registry.npmjs.org/@firebase/app/-/app-0.14.13.tgz",
       "integrity": "sha512-H89Jeyp31+EZk9GPu6vaeL9mEmoXgM3nASB7UPBYYS/lqAks21mO1BU1dF8NbsVTL6tgGZkGUtiGJgxtDiwHkw==",
       "license": "Apache-2.0",
+      "peer": true,
       "dependencies": {
         "@firebase/component": "0.7.3",
         "@firebase/logger": "0.5.1",
@@ -1697,6 +1845,7 @@ INICIO DO ARQUIVO: package-lock.json
       "resolved": "https://registry.npmjs.org/@firebase/app-compat/-/app-compat-0.5.13.tgz",
       "integrity": "sha512-pn3FvXwUR34kWPccDQfCKsNZcM2wD1OS+J1jeEgzM1ZNXoxR2NaF6e5DjDuRrnTwR6LN2XQQt0IqE6yKmgpCQg==",
       "license": "Apache-2.0",
+      "peer": true,
       "dependencies": {
         "@firebase/app": "0.14.13",
         "@firebase/component": "0.7.3",
@@ -1713,6 +1862,7 @@ INICIO DO ARQUIVO: package-lock.json
       "resolved": "https://registry.npmjs.org/@firebase/app-types/-/app-types-0.9.5.tgz",
       "integrity": "sha512-YevqTjvo7Iujsa9Dwowmd6dSoElhzmD63ZSrq6bzjvQ6POjYgNjOFHLmNIgJs48eNO093NCERibuFnxbfOvU7A==",
       "license": "Apache-2.0",
+      "peer": true,
       "dependencies": {
         "@firebase/logger": "0.5.1"
       }
@@ -2166,6 +2316,7 @@ INICIO DO ARQUIVO: package-lock.json
       "integrity": "sha512-LUdM4Wg7YM9Pq/49nGYySJA0CSQEKnGffFzWV8+6gXN7mGxn+FL1IqvFbuZUtAQcfZgHYDwCE1wwlK7rB7gl2g==",
       "hasInstallScript": true,
       "license": "Apache-2.0",
+      "peer": true,
       "dependencies": {
         "tslib": "^2.1.0"
       },
@@ -3101,6 +3252,7 @@ INICIO DO ARQUIVO: package-lock.json
       "integrity": "sha512-esJiCAnl0kfpNdE69f3So4WJUXy95dLZydX0KwK46riIHDzHM7O9Vtf9xCHW0PXIqvgqNrswl522kA/5yx+F4w==",
       "devOptional": true,
       "license": "MIT",
+      "peer": true,
       "dependencies": {
         "csstype": "^3.2.2"
       }
@@ -3188,6 +3340,7 @@ INICIO DO ARQUIVO: package-lock.json
       "integrity": "sha512-A0M6ua6H252bVjPvvtSgl2QA4+ET9S5Mtkb2GDyTxIhH/C4qDItT7RQNO5PhMC6NXGYXOR9dIalcDDgBKT7oFA==",
       "dev": true,
       "license": "MIT",
+      "peer": true,
       "dependencies": {
         "@typescript-eslint/scope-manager": "8.60.1",
         "@typescript-eslint/types": "8.60.1",
@@ -3432,6 +3585,7 @@ INICIO DO ARQUIVO: package-lock.json
       "integrity": "sha512-UVJyE9MttOsBQIDKw1skb9nAwQuR5wuGD3+82K6JgJlm/Y+KI92oNsMNGZCYdDsVtRHSak0pcV5Dno5+4jh9sw==",
       "dev": true,
       "license": "MIT",
+      "peer": true,
       "bin": {
         "acorn": "bin/acorn"
       },
@@ -3721,6 +3875,7 @@ INICIO DO ARQUIVO: package-lock.json
         }
       ],
       "license": "MIT",
+      "peer": true,
       "dependencies": {
         "baseline-browser-mapping": "^2.10.12",
         "caniuse-lite": "^1.0.30001782",
@@ -4362,6 +4517,7 @@ INICIO DO ARQUIVO: package-lock.json
       "integrity": "sha512-AyIKhnOBuOAdueD7RB3xB+YeAWScb9jHsJBgH2Hcde8InP5JYhqrRR6iTMHyTEwgENK54Cp44e4v8BwNhsuHuw==",
       "dev": true,
       "license": "MIT",
+      "peer": true,
       "dependencies": {
         "@eslint-community/eslint-utils": "^4.8.0",
         "@eslint-community/regexpp": "^4.12.2",
@@ -5594,6 +5750,7 @@ INICIO DO ARQUIVO: package-lock.json
       "integrity": "sha512-/imKNG4EbWNrVjoNC/1H5/9GFy+tqjGBHCaSsN+P2RnPqjsLmv6UD3Ej+Kj8nBWaRAwyk7kK5ZUc+OEatnTR3A==",
       "dev": true,
       "license": "MIT",
+      "peer": true,
       "bin": {
         "jiti": "bin/jiti.js"
       }
@@ -6542,6 +6699,7 @@ INICIO DO ARQUIVO: package-lock.json
       "integrity": "sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A==",
       "dev": true,
       "license": "MIT",
+      "peer": true,
       "engines": {
         "node": ">=12"
       },
@@ -6589,6 +6747,7 @@ INICIO DO ARQUIVO: package-lock.json
         }
       ],
       "license": "MIT",
+      "peer": true,
       "dependencies": {
         "nanoid": "^3.3.12",
         "picocolors": "^1.1.1",
@@ -6816,6 +6975,7 @@ INICIO DO ARQUIVO: package-lock.json
       "resolved": "https://registry.npmjs.org/react/-/react-19.2.7.tgz",
       "integrity": "sha512-HNe9WslTbXmFK8o8cmwgAeJFSBvt1bPdHCVKtaaV+WlAN36mpT4hcRpwbf3fY56ar2oIXzsBpOAiIRHAdY0OlQ==",
       "license": "MIT",
+      "peer": true,
       "engines": {
         "node": ">=0.10.0"
       }
@@ -6825,6 +6985,7 @@ INICIO DO ARQUIVO: package-lock.json
       "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-19.2.7.tgz",
       "integrity": "sha512-t0BRVXvbiE/o20Hfw669rLbMCDWtYZLvmJigy2f0MxsXF+71pxhR3xOkspmsO8h3ZlNzyibAmtCa3l4lYKk6gQ==",
       "license": "MIT",
+      "peer": true,
       "dependencies": {
         "scheduler": "^0.27.0"
       },
@@ -6837,6 +6998,7 @@ INICIO DO ARQUIVO: package-lock.json
       "resolved": "https://registry.npmjs.org/react-hook-form/-/react-hook-form-7.77.0.tgz",
       "integrity": "sha512-Sslh9YDYc0GDlWT/lxasnIduNo4v3yyvqRGvmGKUre5AFjDs/HV9/OafHGD8d+sB2yoL4UIL9L8X9i0WlZZebg==",
       "license": "MIT",
+      "peer": true,
       "engines": {
         "node": ">=18.0.0"
       },
@@ -6860,6 +7022,7 @@ INICIO DO ARQUIVO: package-lock.json
       "resolved": "https://registry.npmjs.org/react-redux/-/react-redux-9.3.0.tgz",
       "integrity": "sha512-KQopgqFo/p/fgmAs5qz6p5RWaNAzq40WAu7fJIXnQpYxFPbJYtsJPWvGeF2rOBaY/kEuV77AVsX8TsQzKm+A/g==",
       "license": "MIT",
+      "peer": true,
       "dependencies": {
         "@types/use-sync-external-store": "^0.0.6",
         "use-sync-external-store": "^1.4.0"
@@ -7002,7 +7165,8 @@ INICIO DO ARQUIVO: package-lock.json
       "version": "5.0.1",
       "resolved": "https://registry.npmjs.org/redux/-/redux-5.0.1.tgz",
       "integrity": "sha512-M9/ELqF6fy8FwmkpnF0S3YKOqMyoWJ4+CS5Efg2ct3oY9daQvd/Pc71FpGZsVsbl3Cpb+IIcjBDUnnyBdQbq4w==",
-      "license": "MIT"
+      "license": "MIT",
+      "peer": true
     },
     "node_modules/redux-thunk": {
       "version": "3.1.0",
@@ -7535,6 +7699,7 @@ INICIO DO ARQUIVO: package-lock.json
       "integrity": "sha512-X8EX+XV4QR5xCsrgxaED954zTDfY8KqlDtskKEL0cHhyS/P8b4IFOvGDQpsC9Q1XnLq915wEfwwY/zzskCtmhg==",
       "dev": true,
       "license": "MIT",
+      "peer": true,
       "dependencies": {
         "esbuild": "~0.28.0"
       },
@@ -7567,6 +7732,7 @@ INICIO DO ARQUIVO: package-lock.json
       "integrity": "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==",
       "dev": true,
       "license": "Apache-2.0",
+      "peer": true,
       "bin": {
         "tsc": "bin/tsc",
         "tsserver": "bin/tsserver"
@@ -7702,6 +7868,7 @@ INICIO DO ARQUIVO: package-lock.json
       "integrity": "sha512-h9bXPmJichP5fLmVQo3PyaGSDE2n3aPuomeAlVRm0JLmt4rY6zmPKd59HYI4LNW8oTK7tlTsuC7l/m7awx9Jcw==",
       "dev": true,
       "license": "MIT",
+      "peer": true,
       "dependencies": {
         "lightningcss": "^1.32.0",
         "picomatch": "^4.0.4",
@@ -7962,6 +8129,7 @@ INICIO DO ARQUIVO: package-lock.json
       "resolved": "https://registry.npmjs.org/zod/-/zod-4.4.3.tgz",
       "integrity": "sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==",
       "license": "MIT",
+      "peer": true,
       "funding": {
         "url": "https://github.com/sponsors/colinhacks"
       }
@@ -8039,7 +8207,7 @@ FIM DO ARQUIVO: public\manifest.webmanifest
 ----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: public\sw.js
 ----------------------------------------------------------------------------------------------------
-const CACHE_NAME = 'grupo-dvanera-v2'
+const CACHE_NAME = 'grupo-dvanera-v3'
 const BASE_PATH = new URL(self.registration.scope).pathname
 const APP_SHELL = [BASE_PATH, `${BASE_PATH}manifest.webmanifest`, `${BASE_PATH}icons/gd-icon.svg`]
 
@@ -8098,16 +8266,17 @@ INICIO DO ARQUIVO: README.md
 ----------------------------------------------------------------------------------------------------
 # Grupo Dvanera - Gestao de Agenda e Orcamentos
 
-PWA profissional para administrar agenda, orcamentos, servicos, custos internos, integrantes, fornecedores e pagamentos Pix do Grupo Dvanera.
+PWA profissional para administrar agenda, orcamentos, servicos, custos internos, integrantes, fornecedores, pagamentos Pix e configuracoes do Grupo Dvanera.
 
 ## Stack
 
 - React + Vite + TypeScript
 - Tailwind CSS
-- Firebase Auth, Firestore e Firebase Hosting
+- Firebase Auth e Cloud Firestore
+- GitHub Pages como deploy principal
+- Firebase Hosting opcional
 - React Router
 - react-hook-form + zod
-- date-fns
 - lucide-react
 - Recharts
 
@@ -8117,55 +8286,20 @@ PWA profissional para administrar agenda, orcamentos, servicos, custos internos,
 npm install
 ```
 
-## Configurar Firebase
+## Configurar ambiente
 
-1. Copie `.env.example` para `.env`.
-2. Preencha as variaveis `VITE_FIREBASE_*` com os dados do app web do projeto Firebase `pwa-bandashow`.
-3. Ative Firebase Auth com provedor e-mail/senha.
-4. Crie o Firestore Database.
-5. Publique regras e indices:
+Copie `.env.example` para `.env.local` para o app web e preencha:
 
-```bash
-firebase login
-firebase use pwa-bandashow
-firebase deploy --only firestore
+```env
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=pwa-bandashow.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=pwa-bandashow
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
 ```
 
-As credenciais reais nao devem ser commitadas.
-
-Para GitHub Pages, cadastre estas variaveis em `Settings > Secrets and variables > Actions`:
-
-- `VITE_FIREBASE_API_KEY`
-- `VITE_FIREBASE_AUTH_DOMAIN`
-- `VITE_FIREBASE_PROJECT_ID`
-- `VITE_FIREBASE_STORAGE_BUCKET`
-- `VITE_FIREBASE_MESSAGING_SENDER_ID`
-- `VITE_FIREBASE_APP_ID`
-
-## Rodar localmente
-
-```bash
-npm run dev
-```
-
-## Build
-
-```bash
-npm run build
-npm run preview
-```
-
-## Deploy Hosting
-
-```bash
-firebase login
-firebase use pwa-bandashow
-npm run deploy
-```
-
-## Criar primeiro admin
-
-Baixe uma service account no Firebase Console e configure uma das opcoes no `.env`:
+Para scripts administrativos locais, use uma service account do Firebase:
 
 ```env
 FIREBASE_SERVICE_ACCOUNT_PATH=C:\caminho\service-account.json
@@ -8175,21 +8309,111 @@ ADMIN_PASSWORD=sua-senha-forte
 ADMIN_NAME=Administrador Grupo Dvanera
 ```
 
-Depois rode:
+Tambem e possivel usar `FIREBASE_SERVICE_ACCOUNT_JSON` com o JSON em uma unica linha.
+
+## Firebase obrigatorio
+
+No Firebase Console do projeto `pwa-bandashow`:
+
+1. Ative Authentication.
+2. Habilite o provedor Email/Password.
+3. Em Authorized domains, adicione `gui130699.github.io`.
+4. Crie o Cloud Firestore.
+5. Publique regras e indices:
+
+```bash
+firebase login
+firebase deploy --only firestore --project pwa-bandashow
+```
+
+## Rodar localmente
+
+```bash
+npm run dev
+```
+
+## Validar
+
+```bash
+npm run lint
+npm run build
+```
+
+## Deploy principal - GitHub Pages
+
+O deploy principal e feito por GitHub Actions a cada push na branch `main`.
+
+```bash
+git push origin main
+```
+
+O workflow `.github/workflows/deploy-pages.yml` injeta as secrets `VITE_FIREBASE_*` e define:
+
+```env
+VITE_BASE_PATH=/PWA-BANDASHOW/
+```
+
+URL publica:
+
+```txt
+https://gui130699.github.io/PWA-BANDASHOW/
+```
+
+## Deploy Firebase Hosting opcional
+
+```bash
+npm run deploy
+```
+
+## Criar primeiro admin
+
+Opcao via navegador:
+
+1. Abra `/admin/acesso`.
+2. Se ainda nao existir admin, crie o primeiro cadastro.
+3. Depois disso, a tela passa a ser apenas login admin.
+
+Opcao via script local:
 
 ```bash
 npm run create-admin
 ```
 
-O script cria o usuario no Firebase Auth e grava `users/{uid}` com `role: "admin"`.
+O script usa Firebase Admin SDK, cria o usuario no Auth e grava:
 
-## Popular dados de teste
+- `users/{uid}` com `role: "admin"`
+- `system/adminSetup`
+- `system/adminOwner`
+
+## Resetar admin com seguranca
+
+Nao existe segredo administrativo no front-end. Para remover o admin primario e liberar novo cadastro, rode localmente:
+
+```bash
+npm run reset-admin
+```
+
+O script:
+
+- exige service account local;
+- localiza `system/adminOwner`;
+- pede confirmacao digitando `RESETAR`;
+- remove `users/{uid}`;
+- remove `system/adminOwner`;
+- remove `system/adminSetup`;
+- remove o usuario do Firebase Auth, se existir;
+- registra auditoria em `auditLogs`.
+
+## Popular dados iniciais
 
 ```bash
 npm run seed
 ```
 
-O seed cria servicos, fornecedores, integrantes e `settings/main` com valores iniciais.
+O seed cria dados internos e tambem espelhos publicos:
+
+- `services` e `publicServices`
+- `settings/main` e `publicSettings/main`
 
 ## Rotas
 
@@ -8198,6 +8422,7 @@ Publicas:
 - `/`
 - `/login`
 - `/cadastro`
+- `/admin/acesso`
 - `/solicitar-orcamento`
 
 Cliente:
@@ -8223,40 +8448,129 @@ Admin:
 
 ## Colecoes Firestore
 
-- `users`: perfil e role.
+Internas:
+
+- `users`: perfis e roles.
 - `clients`: dados cadastrais do cliente.
-- `services`: servicos vendidos, preco base, status e custos vinculados.
-- `bandMembers`: integrantes, Pix e valor padrao.
-- `suppliers`: fornecedores, Pix e custo padrao.
-- `quotes`: orcamentos, evento, itens, status, totais e custos internos.
-- `payments`: entrada de 50%, restante e confirmacoes.
+- `services`: servicos internos com custos, fornecedores, integrantes e observacoes internas.
+- `bandMembers`: integrantes, Pix e valores padrao.
+- `suppliers`: fornecedores, Pix e custos padrao.
+- `quotes`: orcamentos internos com custos, lucro, margem e notas admin.
+- `payments`: pagamentos de cliente.
 - `memberPayments`: pagamentos para integrantes.
 - `supplierPayments`: pagamentos para fornecedores.
-- `settings/main`: Pix da banda e mensagens padrao.
-- `auditLogs`: historico/auditoria administrativa.
+- `settings/main`: configuracoes completas do admin.
+- `auditLogs`: auditoria administrativa.
+- `system/adminSetup` e `system/adminOwner`: controle de admin unico.
 
-## Regras de seguranca
+Publicas/sanitizadas:
 
-- Admin pode ler e escrever tudo.
-- Cliente le e atualiza os proprios dados.
-- Cliente cria orcamento apenas para si mesmo.
-- Cliente le apenas os proprios orcamentos e pagamentos.
-- Cliente so pode informar pagamento de entrada; confirmacao e sempre admin.
-- Cliente nao tem permissoes para colecoes internas de integrantes, fornecedores e custos financeiros.
+- `publicServices`: catalogo de servicos sem custos internos.
+- `clientQuoteViews`: versao segura do orcamento para cliente, sem `totalCosts`, `estimatedProfit`, `estimatedMargin`, `manualCosts`, `costSnapshot` e `adminNotes`.
+- `publicSettings/main`: Pix, recebedor, instrucoes e contatos publicos.
 
-Observacao importante: Firestore nao faz mascaramento de campos por leitura no mesmo documento. O front-end nao exibe custos internos ao cliente e as regras limitam escrita indevida, mas para seguranca maxima futura recomenda-se criar uma colecao publica separada, por exemplo `clientQuoteViews`, sem campos de custo.
+## Separacao de dados sensiveis
 
-## Fluxo principal
+O cliente nao le:
 
-1. Cliente cria cadastro.
-2. Cliente solicita orcamento em quatro etapas.
-3. Orcamento nasce com status `em_analise`.
-4. Admin ajusta valores, desconto, taxa, custos e aprova ou reprova.
-5. Aprovado gera pagamento de entrada `entrada_50`.
-6. Cliente copia Pix e informa pagamento.
-7. Admin confirma manualmente.
+- `quotes`
+- `services`
+- `suppliers`
+- `bandMembers`
+- `settings`
+
+O cliente le:
+
+- seus documentos em `clientQuoteViews`
+- seus documentos em `payments`
+- `publicServices` ativos
+- `publicSettings/main`
+
+Essa separacao existe porque Firestore nao mascara campos de um documento. Por isso dados internos e dados publicos ficam em documentos diferentes.
+
+## Fluxo oficial do orcamento
+
+```txt
+em_analise
+aprovado_aguardando_entrada
+entrada_informada_pelo_cliente
+agendado
+realizado
+recusado
+cancelado
+```
+
+1. Cliente solicita orcamento.
+2. O sistema cria `quotes/{quoteId}` e `clientQuoteViews/{quoteId}`.
+3. Admin revisa valores e recalcula custos internos.
+4. Admin aprova ou recusa.
+5. Ao aprovar, o sistema gera pagamento de entrada.
+6. Cliente informa pagamento.
+7. Admin confirma pagamento.
 8. Evento entra na agenda como `agendado`.
-9. Admin pode gerar pagamento restante e marcar evento como `realizado`.
+9. Admin pode gerar pagamento restante.
+10. Cliente informa restante.
+11. Admin confirma restante.
+12. Admin marca evento como `realizado`.
+
+## Calculos financeiros
+
+O percentual de entrada vem de `settings/main.defaultDepositPercent` no momento da aprovacao/recalculo.
+
+```ts
+depositAmount = total * (depositPercent / 100)
+remainingAmount = total - depositAmount
+```
+
+O campo `depositPercent` fica salvo no orcamento para preservar o historico caso a configuracao mude no futuro.
+
+Custos internos sao copiados para `costSnapshot` no momento da aprovacao/recalculo. Assim, alteracoes futuras em fornecedores ou integrantes nao alteram orcamentos antigos.
+
+## Pagamentos
+
+Tipos novos:
+
+- `entrada`
+- `restante`
+- `outro`
+
+Tipos legados ainda sao reconhecidos para compatibilidade:
+
+- `entrada_50`
+- `restante_50`
+
+Funcoes centrais:
+
+- `clientMarkPaymentAsPaid(payment, message)`: cliente informa pagamento.
+- `confirmPayment(paymentId, actor)`: admin confirma entrada/restante e sincroniza agenda/cliente.
+- `createFinalPayment(quote, settings)`: gera pagamento restante.
+
+## Auditoria
+
+Acoes administrativas importantes registram `auditLogs`, incluindo:
+
+- servico criado/editado;
+- fornecedor criado/editado/desativado;
+- integrante criado/editado/desativado;
+- orcamento aprovado/recusado/cancelado/recalculado/realizado;
+- pagamento confirmado;
+- configuracoes alteradas;
+- reset admin via script.
+
+Os ultimos logs aparecem em `/admin/configuracoes`.
+
+## Checklist de seguranca
+
+- Cliente nao le `quotes`.
+- Cliente nao le `services`.
+- Cliente nao le `suppliers`.
+- Cliente nao le `bandMembers`.
+- Cliente nao le `settings`.
+- Cliente so informa pagamento, nunca confirma.
+- Admin confirma pagamentos.
+- Senha mestre removida do front-end.
+- Regras Firestore protegem colecoes internas.
+- Dados publicos sao sincronizados em colecoes proprias.
 
 ## Restauracao Git
 
@@ -8266,31 +8580,37 @@ Ver commits:
 git log --oneline
 ```
 
-Voltar para o ultimo commit estavel mantendo historico:
+Voltar para um commit mantendo historico:
 
 ```bash
 git revert <hash-do-commit>
 ```
 
-Voltar temporariamente para um commit para inspecao:
+Inspecionar um commit:
 
 ```bash
 git switch --detach <hash-do-commit>
 ```
 
-Retornar para o trabalho atual:
+Retornar:
 
 ```bash
 git switch main
 ```
 
-## Proximos passos recomendados
+## Comandos uteis
 
-- Separar bundle por rota com `lazy()` e `Suspense`.
-- Criar `clientQuoteViews` para leitura publica segura sem custos internos.
-- Adicionar upload de comprovante com Firebase Storage.
-- Adicionar testes de regras Firestore com Emulator Suite.
-- Criar auditoria automatica nas principais mutacoes administrativas.
+```bash
+npm install
+npm run lint
+npm run build
+npm run dev
+npm run preview
+npm run create-admin
+npm run reset-admin
+npm run seed
+firebase deploy --only firestore --project pwa-bandashow
+```
 
 ----------------------------------------------------------------------------------------------------
 FIM DO ARQUIVO: README.md
@@ -8402,6 +8722,74 @@ export const adminDb = getFirestore()
 FIM DO ARQUIVO: scripts\firebaseAdmin.ts
 
 ----------------------------------------------------------------------------------------------------
+INICIO DO ARQUIVO: scripts\resetAdmin.ts
+----------------------------------------------------------------------------------------------------
+import { FieldValue } from 'firebase-admin/firestore'
+import { createInterface } from 'node:readline/promises'
+import { stdin as input, stdout as output } from 'node:process'
+import { adminAuth, adminDb } from './firebaseAdmin.js'
+
+async function main() {
+  const ownerRef = adminDb.collection('system').doc('adminOwner')
+  const setupRef = adminDb.collection('system').doc('adminSetup')
+  const ownerSnapshot = await ownerRef.get()
+
+  if (!ownerSnapshot.exists) {
+    console.log('Nenhum admin primario encontrado em system/adminOwner.')
+    return
+  }
+
+  const uid = ownerSnapshot.data()?.uid as string | undefined
+  if (!uid) {
+    throw new Error('Documento system/adminOwner nao possui uid.')
+  }
+
+  const authUser = await adminAuth.getUser(uid).catch(() => null)
+  const rl = createInterface({ input, output })
+  const answer = await rl.question(
+    `Digite RESETAR para remover o admin ${authUser?.email || uid} e liberar novo cadastro: `,
+  )
+  rl.close()
+
+  if (answer.trim() !== 'RESETAR') {
+    console.log('Operacao cancelada.')
+    return
+  }
+
+  const batch = adminDb.batch()
+  batch.delete(adminDb.collection('users').doc(uid))
+  batch.delete(ownerRef)
+  batch.delete(setupRef)
+  batch.set(adminDb.collection('auditLogs').doc(), {
+    userId: 'local-script',
+    userName: 'Script reset-admin',
+    action: 'admin_reset',
+    entity: 'system',
+    entityId: uid,
+    description: 'Cadastro admin primario removido por script local.',
+    metadata: {
+      email: authUser?.email || null,
+    },
+    createdAt: FieldValue.serverTimestamp(),
+  })
+  await batch.commit()
+
+  if (authUser) {
+    await adminAuth.deleteUser(uid)
+  }
+
+  console.log('Admin removido com sucesso. O proximo acesso em /admin/acesso podera criar um novo primeiro admin.')
+}
+
+main().catch((error) => {
+  console.error(error)
+  process.exit(1)
+})
+
+----------------------------------------------------------------------------------------------------
+FIM DO ARQUIVO: scripts\resetAdmin.ts
+
+----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: scripts\seed.ts
 ----------------------------------------------------------------------------------------------------
 import { FieldValue } from 'firebase-admin/firestore'
@@ -8445,32 +8833,61 @@ async function upsertByName(collectionName: string, item: Record<string, unknown
   }
 
   if (existing.empty) {
-    await adminDb.collection(collectionName).add({ ...payload, createdAt: now() })
-    return
+    const reference = await adminDb.collection(collectionName).add({ ...payload, createdAt: now() })
+    return reference.id
   }
 
   await existing.docs[0].ref.set(payload, { merge: true })
+  return existing.docs[0].id
 }
 
-async function main() {
-  await Promise.all(services.map((item) => upsertByName('services', item)))
-  await Promise.all(suppliers.map((item) => upsertByName('suppliers', item)))
-  await Promise.all(members.map((item) => upsertByName('bandMembers', item)))
+async function syncSeedPublicService(serviceId: string) {
+  const serviceSnapshot = await adminDb.collection('services').doc(serviceId).get()
+  if (!serviceSnapshot.exists) return
 
-  await adminDb.collection('settings').doc('main').set(
+  const service = serviceSnapshot.data() || {}
+  await adminDb.collection('publicServices').doc(serviceId).set(
     {
-      bandName: 'Grupo Dvanera',
-      pixReceiverName: '',
-      pixKey: '',
-      pixKeyType: 'cpf',
-      bankName: '',
-      defaultDepositPercent: 50,
-      paymentInstructions:
-        'Apos realizar o Pix, clique em "Ja realizei o pagamento" para que nossa equipe confirme manualmente.',
+      serviceId,
+      name: service.name,
+      description: service.description,
+      category: service.category,
+      basePrice: service.basePrice,
+      active: service.active,
+      allowPriceEdit: service.allowPriceEdit,
+      createdAt: service.createdAt || now(),
       updatedAt: now(),
     },
     { merge: true },
   )
+}
+
+async function main() {
+  const serviceIds = await Promise.all(services.map((item) => upsertByName('services', item)))
+  await Promise.all(serviceIds.filter(Boolean).map((serviceId) => syncSeedPublicService(serviceId as string)))
+  await Promise.all(suppliers.map((item) => upsertByName('suppliers', item)))
+  await Promise.all(members.map((item) => upsertByName('bandMembers', item)))
+
+  const publicSettings = {
+    bandName: 'Grupo Dvanera',
+    pixReceiverName: '',
+    pixKey: '',
+    pixKeyType: 'cpf',
+    bankName: '',
+    paymentInstructions:
+      'Apos realizar o Pix, clique em "Ja realizei o pagamento" para que nossa equipe confirme manualmente.',
+    updatedAt: now(),
+  }
+
+  await adminDb.collection('settings').doc('main').set(
+    {
+      ...publicSettings,
+      defaultDepositPercent: 50,
+      updatedAt: now(),
+    },
+    { merge: true },
+  )
+  await adminDb.collection('publicSettings').doc('main').set(publicSettings, { merge: true })
 
   console.log('Seed concluido.')
 }
@@ -9350,8 +9767,6 @@ import {
 import { auth, db, isFirebaseConfigured } from '../lib/firebase'
 import {
   createPrimaryAdminAccount,
-  deletePrimaryAdminAccount,
-  type DeleteAdminAccountInput,
   type RegisterAdminInput,
 } from '../services/adminAccountService'
 import type { AppUser } from '../types'
@@ -9375,7 +9790,6 @@ type AuthContextValue = {
   login: (email: string, password: string) => Promise<void>
   registerClient: (data: RegisterClientInput) => Promise<void>
   registerAdmin: (data: RegisterAdminInput) => Promise<void>
-  deleteAdminAccount: (data: DeleteAdminAccountInput) => Promise<void>
   logout: () => Promise<void>
   refreshProfile: () => Promise<void>
 }
@@ -9463,12 +9877,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(adminProfile)
   }, [])
 
-  const deleteAdminAccount = useCallback(async (data: DeleteAdminAccountInput) => {
-    await deletePrimaryAdminAccount(data)
-    setProfile(null)
-    setUser(null)
-  }, [])
-
   const logout = useCallback(async () => {
     if (!auth) return
     await signOut(auth)
@@ -9483,11 +9891,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login,
       registerClient,
       registerAdmin,
-      deleteAdminAccount,
       logout,
       refreshProfile,
     }),
-    [deleteAdminAccount, loading, login, logout, profile, refreshProfile, registerAdmin, registerClient, user],
+    [loading, login, logout, profile, refreshProfile, registerAdmin, registerClient, user],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
@@ -9737,37 +10144,52 @@ INICIO DO ARQUIVO: src\pages\admin\AdminAgendaPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Card, DataTable, Select, StatusBadge } from '../../components/ui'
+import { Button, Card, DataTable, Input, Select, StatusBadge } from '../../components/ui'
+import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
+import { cancelQuote, markQuoteAsDone } from '../../services/quoteService'
 import type { Quote, QuoteStatus } from '../../types'
 import { quoteStatusMeta } from '../../utils/constants'
 import { formatCurrency, formatDate } from '../../utils/format'
 
-const agendaStatuses: QuoteStatus[] = ['agendado', 'entrada_confirmada', 'realizado', 'cancelado']
+const agendaStatuses: QuoteStatus[] = ['agendado', 'realizado', 'cancelado']
 
 export function AdminAgendaPage() {
+  const { user, profile } = useAuth()
   const { data: quotes, loading } = useCollection<Quote>('quotes')
   const [status, setStatus] = useState('')
+  const [city, setCity] = useState('')
+  const [client, setClient] = useState('')
+  const [type, setType] = useState('')
+  const actor = { userId: user?.uid || 'admin', userName: profile?.name || 'Admin' }
 
   const events = useMemo(
     () =>
       quotes
         .filter((quote) => agendaStatuses.includes(quote.status))
         .filter((quote) => (status ? quote.status === status : true))
+        .filter((quote) => quote.event.city.toLowerCase().includes(city.toLowerCase()))
+        .filter((quote) => quote.clientSnapshot.name.toLowerCase().includes(client.toLowerCase()))
+        .filter((quote) => quote.event.type.toLowerCase().includes(type.toLowerCase()))
         .sort((a, b) => a.event.date.localeCompare(b.event.date)),
-    [quotes, status],
+    [city, client, quotes, status, type],
   )
 
   return (
     <div className="space-y-6">
       <Card
         action={
-          <Select
-            onChange={(event) => setStatus(event.target.value)}
-            options={agendaStatuses.map((item) => ({ label: quoteStatusMeta[item].label, value: item }))}
-            placeholder="Todos"
-            value={status}
-          />
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <Select
+              onChange={(event) => setStatus(event.target.value)}
+              options={agendaStatuses.map((item) => ({ label: quoteStatusMeta[item].label, value: item }))}
+              placeholder="Todos"
+              value={status}
+            />
+            <Input onChange={(event) => setCity(event.target.value)} placeholder="Cidade" value={city} />
+            <Input onChange={(event) => setClient(event.target.value)} placeholder="Cliente" value={client} />
+            <Input onChange={(event) => setType(event.target.value)} placeholder="Tipo" value={type} />
+          </div>
         }
         description="Eventos confirmados entram aqui automaticamente apos confirmacao da entrada."
         title="Agenda"
@@ -9776,26 +10198,38 @@ export function AdminAgendaPage() {
           columns={[
             { header: 'Data', cell: (quote) => formatDate(quote.event.date) },
             {
-              header: 'Cliente e local',
+              header: 'Cliente, contato e local',
               cell: (quote) => (
                 <div>
                   <p className="font-medium text-white">{quote.clientSnapshot.name}</p>
+                  <p className="text-xs text-slate-400">{quote.clientSnapshot.phone}</p>
                   <p className="text-xs text-slate-400">{quote.event.venueName} - {quote.event.city}/{quote.event.state}</p>
                 </div>
               ),
             },
+            { header: 'Tipo', cell: (quote) => quote.event.type },
             { header: 'Status', cell: (quote) => <StatusBadge status={quote.status} /> },
             { header: 'Valor', cell: (quote) => formatCurrency(quote.total) },
+            { header: 'Entrada', cell: (quote) => formatCurrency(quote.depositAmount) },
+            { header: 'Restante', cell: (quote) => formatCurrency(quote.remainingAmount) },
             {
               header: 'Servicos',
               cell: (quote) => quote.items.map((item) => item.serviceName).join(', '),
             },
             {
-              header: 'Detalhes',
+              header: 'Acoes',
               cell: (quote) => (
-                <Link className="font-semibold text-gold-300 hover:text-gold-100" to={`/admin/orcamentos/${quote.id}`}>
-                  Abrir
-                </Link>
+                <div className="flex flex-wrap gap-2">
+                  <Link className="font-semibold text-gold-300 hover:text-gold-100" to={`/admin/orcamentos/${quote.id}`}>
+                    Abrir
+                  </Link>
+                  <Button className="h-8 px-2" disabled={quote.status !== 'agendado'} onClick={() => markQuoteAsDone(quote.id, actor)} variant="secondary">
+                    Realizado
+                  </Button>
+                  <Button className="h-8 px-2" disabled={quote.status === 'cancelado'} onClick={() => cancelQuote(quote.id, actor)} variant="danger">
+                    Cancelar
+                  </Button>
+                </div>
               ),
             },
           ]}
@@ -9878,6 +10312,7 @@ export function AdminDashboardPage() {
     const receivedMonth = payments
       .filter((payment) => payment.status === 'confirmado')
       .reduce((sum, payment) => sum + payment.amount, 0)
+    const confirmedQuotes = monthQuotes.filter((quote) => ['agendado', 'realizado'].includes(quote.status))
 
     return [
       {
@@ -9886,28 +10321,48 @@ export function AdminDashboardPage() {
         icon: ClipboardList,
       },
       {
+        label: 'Aguardando entrada',
+        value: quotes.filter((quote) => quote.status === 'aprovado_aguardando_entrada').length,
+        icon: WalletCards,
+      },
+      {
+        label: 'Entradas informadas',
+        value: quotes.filter((quote) => quote.status === 'entrada_informada_pelo_cliente').length,
+        icon: WalletCards,
+      },
+      {
         label: 'Eventos agendados',
         value: quotes.filter((quote) => quote.status === 'agendado').length,
         icon: CalendarDays,
       },
       {
-        label: 'Entradas pendentes',
-        value: payments.filter((payment) => payment.type === 'entrada_50' && payment.status !== 'confirmado').length,
+        label: 'Realizados no mes',
+        value: monthQuotes.filter((quote) => quote.status === 'realizado').length,
+        icon: CalendarDays,
+      },
+      {
+        label: 'Pagamentos pendentes',
+        value: payments.filter((payment) => payment.status !== 'confirmado' && payment.status !== 'cancelado').length,
         icon: WalletCards,
       },
       {
-        label: 'Recebido no mes',
+        label: 'Receita confirmada',
         value: formatCurrency(receivedMonth),
         icon: TrendingUp,
       },
       {
-        label: 'Previsto no mes',
+        label: 'Receita prevista',
         value: formatCurrency(monthQuotes.reduce((sum, quote) => sum + quote.total, 0)),
         icon: BarChart3,
       },
       {
+        label: 'Custos estimados',
+        value: formatCurrency(confirmedQuotes.reduce((sum, quote) => sum + quote.totalCosts, 0)),
+        icon: BarChart3,
+      },
+      {
         label: 'Lucro estimado',
-        value: formatCurrency(monthQuotes.reduce((sum, quote) => sum + quote.estimatedProfit, 0)),
+        value: formatCurrency(confirmedQuotes.reduce((sum, quote) => sum + quote.estimatedProfit, 0)),
         icon: TrendingUp,
       },
     ]
@@ -9928,7 +10383,7 @@ export function AdminDashboardPage() {
   }, [quotes])
 
   const upcoming = [...quotes]
-    .filter((quote) => ['agendado', 'entrada_confirmada'].includes(quote.status))
+    .filter((quote) => quote.status === 'agendado')
     .sort((a, b) => a.event.date.localeCompare(b.event.date))
     .slice(0, 6)
 
@@ -9993,7 +10448,9 @@ INICIO DO ARQUIVO: src\pages\admin\AdminMembersPage.tsx
 import { Edit, HandCoins, Plus, RotateCcw } from 'lucide-react'
 import { useState } from 'react'
 import { Badge, Button, Card, DataTable, Input, Select, Textarea } from '../../components/ui'
+import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
+import { createAuditLog } from '../../services/auditService'
 import { addEntity, updateEntity } from '../../services/firestoreService'
 import type { BandMember, MemberPayment } from '../../types'
 import { formatCurrency, formatDate } from '../../utils/format'
@@ -10014,6 +10471,7 @@ const emptyMember: Omit<BandMember, 'id'> = {
 }
 
 export function AdminMembersPage() {
+  const { user, profile } = useAuth()
   const { data: members, loading } = useCollection<BandMember>('bandMembers')
   const { data: payments } = useCollection<MemberPayment>('memberPayments')
   const [form, setForm] = useState(emptyMember)
@@ -10049,9 +10507,25 @@ export function AdminMembersPage() {
     try {
       if (editingId) {
         await updateEntity('bandMembers', editingId, form)
+        await createAuditLog({
+          userId: user?.uid || 'admin',
+          userName: profile?.name || 'Admin',
+          action: 'member_updated',
+          entity: 'bandMembers',
+          entityId: editingId,
+          description: `Integrante ${form.name} atualizado.`,
+        }).catch(() => undefined)
         setFeedback('Integrante atualizado.')
       } else {
-        await addEntity('bandMembers', form)
+        const reference = await addEntity('bandMembers', form)
+        await createAuditLog({
+          userId: user?.uid || 'admin',
+          userName: profile?.name || 'Admin',
+          action: 'member_created',
+          entity: 'bandMembers',
+          entityId: reference.id,
+          description: `Integrante ${form.name} cadastrado.`,
+        }).catch(() => undefined)
         setFeedback('Integrante cadastrado.')
       }
       resetForm()
@@ -10144,7 +10618,17 @@ export function AdminMembersPage() {
               cell: (member) => (
                 <div className="flex gap-2">
                   <Button aria-label="Editar" className="h-9 w-9 px-0" onClick={() => edit(member)} variant="ghost"><Edit className="h-4 w-4" /></Button>
-                  <Button className="h-9 px-3" onClick={() => updateEntity('bandMembers', member.id, { active: !member.active })} variant="secondary">{member.active ? 'Desativar' : 'Reativar'}</Button>
+                  <Button className="h-9 px-3" onClick={async () => {
+                    await updateEntity('bandMembers', member.id, { active: !member.active })
+                    await createAuditLog({
+                      userId: user?.uid || 'admin',
+                      userName: profile?.name || 'Admin',
+                      action: member.active ? 'member_disabled' : 'member_enabled',
+                      entity: 'bandMembers',
+                      entityId: member.id,
+                      description: `Integrante ${member.name} ${member.active ? 'desativado' : 'reativado'}.`,
+                    }).catch(() => undefined)
+                  }} variant="secondary">{member.active ? 'Desativar' : 'Reativar'}</Button>
                 </div>
               ),
             },
@@ -10183,13 +10667,12 @@ import { CheckCircle2 } from 'lucide-react'
 import { Button, Card, DataTable, Badge } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
-import { updateEntity } from '../../services/firestoreService'
-import { confirmFinalPayment } from '../../services/quoteService'
+import { confirmPayment, markInternalPaymentAsPaid } from '../../services/paymentService'
 import type { MemberPayment, Payment, SupplierPayment } from '../../types'
 import { formatCurrency, formatDate } from '../../utils/format'
 
 export function AdminPaymentsPage() {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const { data: payments, loading } = useCollection<Payment>('payments')
   const { data: memberPayments } = useCollection<MemberPayment>('memberPayments')
   const { data: supplierPayments } = useCollection<SupplierPayment>('supplierPayments')
@@ -10214,7 +10697,7 @@ export function AdminPaymentsPage() {
                   className="h-9 px-3"
                   disabled={payment.status === 'confirmado'}
                   icon={<CheckCircle2 className="h-4 w-4" />}
-                  onClick={() => confirmFinalPayment(payment.id, user?.uid || 'admin')}
+                  onClick={() => confirmPayment(payment.id, { userId: user?.uid || 'admin', userName: profile?.name || 'Admin' })}
                   variant="success"
                 >
                   Confirmar
@@ -10242,7 +10725,7 @@ export function AdminPaymentsPage() {
                 <Button
                   className="h-9 px-3"
                   disabled={payment.status === 'pago'}
-                  onClick={() => updateEntity('memberPayments', payment.id, { status: 'pago', paidAt: new Date() })}
+                  onClick={() => markInternalPaymentAsPaid('memberPayments', payment.id)}
                   variant="secondary"
                 >
                   Marcar pago
@@ -10269,7 +10752,7 @@ export function AdminPaymentsPage() {
                 <Button
                   className="h-9 px-3"
                   disabled={payment.status === 'pago'}
-                  onClick={() => updateEntity('supplierPayments', payment.id, { status: 'pago', paidAt: new Date() })}
+                  onClick={() => markInternalPaymentAsPaid('supplierPayments', payment.id)}
                   variant="secondary"
                 >
                   Marcar pago
@@ -10293,7 +10776,7 @@ FIM DO ARQUIVO: src\pages\admin\AdminPaymentsPage.tsx
 INICIO DO ARQUIVO: src\pages\admin\AdminQuoteDetailPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { where } from 'firebase/firestore'
-import { CheckCircle2, CircleDollarSign, Save, XCircle } from 'lucide-react'
+import { CheckCircle2, CircleDollarSign, RefreshCcw, Save, XCircle } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Button, Card, DataTable, Input, Loading, StatusBadge, Textarea } from '../../components/ui'
@@ -10306,13 +10789,14 @@ import { formatCurrency, formatDate, formatPercent } from '../../utils/format'
 import {
   approveQuote,
   cancelQuote,
-  confirmDepositPayment,
   createFinalPayment,
   markQuoteAsDone,
+  recalculateQuote,
   rejectQuote,
   updateQuoteFinancials,
 } from '../../services/quoteService'
 import { getSettings } from '../../services/settingsService'
+import { confirmPayment } from '../../services/paymentService'
 
 const emptyManualCost: CostSnapshot = {
   type: 'manual',
@@ -10323,7 +10807,7 @@ const emptyManualCost: CostSnapshot = {
 
 export function AdminQuoteDetailPage() {
   const { id } = useParams()
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const { data: quote, loading } = useDocument<Quote>('quotes', id)
   const paymentConstraints = useMemo(() => [where('quoteId', '==', id || '')], [id])
   const { data: payments } = useCollection<Payment>('payments', paymentConstraints)
@@ -10354,8 +10838,16 @@ export function AdminQuoteDetailPage() {
   if (loading) return <Loading />
   if (!quote) return <Card title="Orcamento nao encontrado" />
 
-  const totals = calculateQuoteTotals(items, discount, travelFee, manualCosts)
+  const totals = calculateQuoteTotals(
+    items,
+    discount,
+    travelFee,
+    manualCosts,
+    settings?.defaultDepositPercent || quote.depositPercent,
+  )
   const editableQuote: Quote = { ...quote, items, manualCosts, discount, travelFee, adminNotes, ...totals }
+  const actor = { userId: user?.uid || 'admin', userName: profile?.name || 'Admin' }
+  const depositPayment = payments.find((payment) => payment.type === 'entrada' || payment.type === 'entrada_50')
 
   function updateItem(index: number, patch: Partial<QuoteItem>) {
     setItems((current) =>
@@ -10393,7 +10885,7 @@ export function AdminQuoteDetailPage() {
         description={`${quote.event.type} em ${formatDate(quote.event.date)} - ${quote.event.venueName}`}
         title={`Analise de ${quote.clientSnapshot.name}`}
       >
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
           <div>
             <p className="text-sm text-slate-400">Subtotal</p>
             <p className="text-xl font-semibold">{formatCurrency(totals.subtotal)}</p>
@@ -10413,6 +10905,10 @@ export function AdminQuoteDetailPage() {
           <div>
             <p className="text-sm text-slate-400">Margem</p>
             <p className="text-xl font-semibold">{formatPercent(totals.estimatedMargin)}</p>
+          </div>
+          <div>
+            <p className="text-sm text-slate-400">Entrada</p>
+            <p className="text-xl font-semibold">{totals.depositPercent}%</p>
           </div>
         </div>
       </Card>
@@ -10445,9 +10941,17 @@ export function AdminQuoteDetailPage() {
             <Button
               icon={<Save className="h-4 w-4" />}
               isLoading={saving}
-              onClick={() => runAction(() => updateQuoteFinancials(quote, { items, manualCosts, discount, travelFee, adminNotes }), 'Orcamento atualizado.')}
+              onClick={() => runAction(() => updateQuoteFinancials(quote, { items, manualCosts, discount, travelFee, adminNotes }, settings || undefined, actor), 'Orcamento atualizado.')}
             >
               Salvar ajustes
+            </Button>
+            <Button
+              icon={<RefreshCcw className="h-4 w-4" />}
+              isLoading={saving}
+              onClick={() => runAction(() => recalculateQuote(quote.id, settings || undefined, actor), 'Custos internos recalculados.')}
+              variant="secondary"
+            >
+              Recalcular custos
             </Button>
           </div>
         </Card>
@@ -10484,6 +10988,19 @@ export function AdminQuoteDetailPage() {
             { header: 'Valor', cell: (payment) => formatCurrency(payment.amount) },
             { header: 'Status', cell: (payment) => payment.status.replaceAll('_', ' ') },
             { header: 'Pix', cell: (payment) => payment.pixKeyUsed || '-' },
+            {
+              header: 'Acao',
+              cell: (payment) => (
+                <Button
+                  className="h-9 px-3"
+                  disabled={payment.status === 'confirmado'}
+                  onClick={() => runAction(() => confirmPayment(payment.id, actor), 'Pagamento confirmado.')}
+                  variant="success"
+                >
+                  Confirmar
+                </Button>
+              ),
+            },
           ]}
           data={payments}
           emptyTitle="Nenhum pagamento gerado"
@@ -10499,8 +11016,8 @@ export function AdminQuoteDetailPage() {
               icon={<CheckCircle2 className="h-4 w-4" />}
               isLoading={saving}
               onClick={() => runAction(async () => {
-                await updateQuoteFinancials(quote, { items, manualCosts, discount, travelFee, adminNotes })
-                await approveQuote(editableQuote, settings || undefined)
+                await updateQuoteFinancials(quote, { items, manualCosts, discount, travelFee, adminNotes }, settings || undefined, actor)
+                await approveQuote(editableQuote, settings || undefined, actor)
               }, 'Orcamento aprovado e entrada Pix gerada.')}
               variant="success"
             >
@@ -10510,7 +11027,7 @@ export function AdminQuoteDetailPage() {
               disabled={!rejectionReason}
               icon={<XCircle className="h-4 w-4" />}
               isLoading={saving}
-              onClick={() => runAction(() => rejectQuote(quote.id, rejectionReason), 'Orcamento recusado.')}
+              onClick={() => runAction(() => rejectQuote(quote.id, rejectionReason, actor), 'Orcamento recusado.')}
               variant="danger"
             >
               Reprovar
@@ -10519,7 +11036,10 @@ export function AdminQuoteDetailPage() {
               disabled={quote.status !== 'entrada_informada_pelo_cliente'}
               icon={<CircleDollarSign className="h-4 w-4" />}
               isLoading={saving}
-              onClick={() => runAction(() => confirmDepositPayment(quote, user?.uid || 'admin'), 'Entrada confirmada e evento agendado.')}
+              onClick={() => runAction(() => {
+                if (!depositPayment) throw new Error('Pagamento de entrada nao encontrado.')
+                return confirmPayment(depositPayment.id, actor)
+              }, 'Entrada confirmada e evento agendado.')}
               variant="primary"
             >
               Confirmar entrada
@@ -10535,14 +11055,14 @@ export function AdminQuoteDetailPage() {
               Gerar restante
             </Button>
             <Button
-              disabled={!['agendado', 'entrada_confirmada'].includes(quote.status)}
+              disabled={quote.status !== 'agendado'}
               isLoading={saving}
-              onClick={() => runAction(() => markQuoteAsDone(quote.id), 'Evento marcado como realizado.')}
+              onClick={() => runAction(() => markQuoteAsDone(quote.id, actor), 'Evento marcado como realizado.')}
               variant="secondary"
             >
               Marcar realizado
             </Button>
-            <Button isLoading={saving} onClick={() => runAction(() => cancelQuote(quote.id), 'Orcamento cancelado.')} variant="ghost">
+            <Button isLoading={saving} onClick={() => runAction(() => cancelQuote(quote.id, actor), 'Orcamento cancelado.')} variant="ghost">
               Cancelar
             </Button>
           </div>
@@ -10636,9 +11156,11 @@ import { collection, getDocs } from 'firebase/firestore'
 import { Edit, Plus, RotateCcw, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Badge, Button, Card, DataTable, Input, Select, Textarea } from '../../components/ui'
+import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
 import { requireDb } from '../../lib/firebase'
-import { addEntity, removeEntity, updateEntity } from '../../services/firestoreService'
+import { createService, removeService, updateService } from '../../services/serviceService'
+import { createAuditLog } from '../../services/auditService'
 import type { BandMember, MemberCostLink, Quote, Service, Supplier, SupplierLink } from '../../types'
 import { serviceCategories } from '../../utils/constants'
 import { formatCurrency } from '../../utils/format'
@@ -10656,6 +11178,7 @@ const emptyService: Omit<Service, 'id'> = {
 }
 
 export function AdminServicesPage() {
+  const { user, profile } = useAuth()
   const { data: services, loading } = useCollection<Service>('services')
   const { data: suppliers } = useCollection<Supplier>('suppliers')
   const { data: members } = useCollection<BandMember>('bandMembers')
@@ -10705,10 +11228,26 @@ export function AdminServicesPage() {
     setFeedback('')
     try {
       if (editingId) {
-        await updateEntity('services', editingId, form)
+        await updateService(editingId, form)
+        await createAuditLog({
+          userId: user?.uid || 'admin',
+          userName: profile?.name || 'Admin',
+          action: 'service_updated',
+          entity: 'services',
+          entityId: editingId,
+          description: `Servico ${form.name} atualizado.`,
+        }).catch(() => undefined)
         setFeedback('Servico atualizado.')
       } else {
-        await addEntity('services', form)
+        const reference = await createService(form)
+        await createAuditLog({
+          userId: user?.uid || 'admin',
+          userName: profile?.name || 'Admin',
+          action: 'service_created',
+          entity: 'services',
+          entityId: reference.id,
+          description: `Servico ${form.name} criado.`,
+        }).catch(() => undefined)
         setFeedback('Servico criado.')
       }
       resetForm()
@@ -10758,7 +11297,7 @@ export function AdminServicesPage() {
         return
       }
 
-      await removeEntity('services', service.id)
+      await removeService(service.id)
       setFeedback('Servico excluido.')
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : 'Nao foi possivel excluir.')
@@ -10875,7 +11414,7 @@ export function AdminServicesPage() {
                   <Button aria-label="Editar" className="h-9 w-9 px-0" onClick={() => edit(service)} variant="ghost">
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button aria-label="Ativar ou desativar" className="h-9 px-3" onClick={() => updateEntity('services', service.id, { active: !service.active })} variant="secondary">
+                  <Button aria-label="Ativar ou desativar" className="h-9 px-3" onClick={() => updateService(service.id, { active: !service.active })} variant="secondary">
                     {service.active ? 'Desativar' : 'Reativar'}
                   </Button>
                   <Button aria-label="Excluir" className="h-9 w-9 px-0" onClick={() => removeIfUnused(service)} variant="danger">
@@ -10901,29 +11440,25 @@ FIM DO ARQUIVO: src\pages\admin\AdminServicesPage.tsx
 ----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: src\pages\admin\AdminSettingsPage.tsx
 ----------------------------------------------------------------------------------------------------
-import { Save, Trash2 } from 'lucide-react'
+import { Save, TerminalSquare } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Button, Card, Input, Modal, Select, Textarea } from '../../components/ui'
+import { Button, Card, DataTable, Input, Select, Textarea } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
+import { useCollection } from '../../hooks/useCollection'
+import { createAuditLog } from '../../services/auditService'
 import { saveSettings, getSettings } from '../../services/settingsService'
-import type { PixKeyType, Settings } from '../../types'
+import type { AuditLog, PixKeyType, Settings } from '../../types'
 import { defaultSettings } from '../../utils/constants'
-import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
+import { formatDate } from '../../utils/format'
 
 const pixOptions: PixKeyType[] = ['cpf', 'cnpj', 'email', 'telefone', 'aleatoria']
 
 export function AdminSettingsPage() {
-  const { deleteAdminAccount } = useAuth()
-  const navigate = useNavigate()
+  const { user, profile } = useAuth()
   const [settings, setSettings] = useState<Settings>(defaultSettings)
+  const { data: auditLogs, loading: auditLoading } = useCollection<AuditLog>('auditLogs')
   const [saving, setSaving] = useState(false)
   const [feedback, setFeedback] = useState('')
-  const [deleteOpen, setDeleteOpen] = useState(false)
-  const [masterPassword, setMasterPassword] = useState('')
-  const [accountPassword, setAccountPassword] = useState('')
-  const [deleteFeedback, setDeleteFeedback] = useState('')
-  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     getSettings().then(setSettings).catch(() => setSettings(defaultSettings))
@@ -10938,32 +11473,19 @@ export function AdminSettingsPage() {
     setFeedback('')
     try {
       await saveSettings(settings)
+      await createAuditLog({
+        userId: user?.uid || 'admin',
+        userName: profile?.name || 'Admin',
+        action: 'settings_updated',
+        entity: 'settings',
+        entityId: 'main',
+        description: 'Configuracoes de Pix e pagamento atualizadas.',
+      }).catch(() => undefined)
       setFeedback('Configuracoes salvas.')
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : 'Nao foi possivel salvar.')
     } finally {
       setSaving(false)
-    }
-  }
-
-  function closeDeleteModal() {
-    if (deleting) return
-    setDeleteOpen(false)
-    setMasterPassword('')
-    setAccountPassword('')
-    setDeleteFeedback('')
-  }
-
-  async function confirmDelete() {
-    setDeleting(true)
-    setDeleteFeedback('')
-    try {
-      await deleteAdminAccount({ masterPassword, accountPassword })
-      navigate('/admin/acesso', { replace: true })
-    } catch (error) {
-      setDeleteFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel excluir o cadastro.'))
-    } finally {
-      setDeleting(false)
     }
   }
 
@@ -11008,51 +11530,34 @@ export function AdminSettingsPage() {
 
       <Card
         action={
-          <Button icon={<Trash2 className="h-4 w-4" />} onClick={() => setDeleteOpen(true)} variant="danger">
-            Excluir cadastro
-          </Button>
+          <div className="grid h-11 w-11 place-items-center rounded-md bg-white/8 text-gold-200">
+            <TerminalSquare className="h-5 w-5" />
+          </div>
         }
-        description="Remove o unico cadastro admin e libera a criacao de um novo primeiro admin."
-        title="Cadastro admin"
+        description="O reset do admin deve ser feito somente no terminal, com service account."
+        title="Reset seguro do admin"
       >
-        <p className="text-sm leading-6 text-slate-300">
-          Esta acao exige a senha mestre e a senha da propria conta admin para confirmar a exclusao no Firebase.
-        </p>
+        <div className="rounded-md border border-white/10 bg-white/[0.04] p-4 text-sm leading-6 text-slate-300">
+          <p>Por seguranca, o painel nao possui segredo fixo nem exclusao de admin no front-end.</p>
+          <p className="mt-3">Para liberar a criacao de um novo primeiro admin, rode localmente:</p>
+          <pre className="mt-3 overflow-x-auto rounded-md bg-night-950 p-3 text-gold-200">npm run reset-admin</pre>
+        </div>
       </Card>
 
-      <Modal onClose={closeDeleteModal} open={deleteOpen} title="Excluir cadastro admin">
-        <div className="space-y-4">
-          <p className="rounded-md border border-red-400/30 bg-red-500/10 p-3 text-sm leading-6 text-red-100">
-            Depois de excluir, o painel admin ficara sem cadastro e o proximo acesso podera criar um novo primeiro admin.
-          </p>
-          <Input
-            label="Senha mestre"
-            onChange={(event) => setMasterPassword(event.target.value)}
-            type="password"
-            value={masterPassword}
-          />
-          <Input
-            label="Senha da conta admin"
-            onChange={(event) => setAccountPassword(event.target.value)}
-            type="password"
-            value={accountPassword}
-          />
-          {deleteFeedback && <p className="rounded-md bg-red-500/10 p-3 text-sm text-red-200">{deleteFeedback}</p>}
-          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <Button disabled={deleting} onClick={closeDeleteModal} variant="secondary">
-              Cancelar
-            </Button>
-            <Button
-              icon={<Trash2 className="h-4 w-4" />}
-              isLoading={deleting}
-              onClick={confirmDelete}
-              variant="danger"
-            >
-              Excluir cadastro
-            </Button>
-          </div>
-        </div>
-      </Modal>
+      <Card description="Ultimas acoes registradas no painel administrativo." title="Auditoria">
+        <DataTable
+          columns={[
+            { header: 'Data', cell: (log) => formatDate(log.createdAt) },
+            { header: 'Usuario', cell: (log) => log.userName },
+            { header: 'Acao', cell: (log) => log.action },
+            { header: 'Descricao', cell: (log) => log.description },
+          ]}
+          data={auditLogs.slice(0, 10)}
+          emptyTitle="Nenhum log registrado"
+          getRowKey={(log) => log.id}
+          loading={auditLoading}
+        />
+      </Card>
     </div>
   )
 }
@@ -11066,7 +11571,9 @@ INICIO DO ARQUIVO: src\pages\admin\AdminSuppliersPage.tsx
 import { Edit, HandCoins, Plus, RotateCcw } from 'lucide-react'
 import { useState } from 'react'
 import { Badge, Button, Card, DataTable, Input, Select, Textarea } from '../../components/ui'
+import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
+import { createAuditLog } from '../../services/auditService'
 import { addEntity, updateEntity } from '../../services/firestoreService'
 import type { Supplier, SupplierPayment } from '../../types'
 import { supplierTypes } from '../../utils/constants'
@@ -11088,6 +11595,7 @@ const emptySupplier: Omit<Supplier, 'id'> = {
 }
 
 export function AdminSuppliersPage() {
+  const { user, profile } = useAuth()
   const { data: suppliers, loading } = useCollection<Supplier>('suppliers')
   const { data: payments } = useCollection<SupplierPayment>('supplierPayments')
   const [form, setForm] = useState(emptySupplier)
@@ -11123,9 +11631,25 @@ export function AdminSuppliersPage() {
     try {
       if (editingId) {
         await updateEntity('suppliers', editingId, form)
+        await createAuditLog({
+          userId: user?.uid || 'admin',
+          userName: profile?.name || 'Admin',
+          action: 'supplier_updated',
+          entity: 'suppliers',
+          entityId: editingId,
+          description: `Fornecedor ${form.name} atualizado.`,
+        }).catch(() => undefined)
         setFeedback('Fornecedor atualizado.')
       } else {
-        await addEntity('suppliers', form)
+        const reference = await addEntity('suppliers', form)
+        await createAuditLog({
+          userId: user?.uid || 'admin',
+          userName: profile?.name || 'Admin',
+          action: 'supplier_created',
+          entity: 'suppliers',
+          entityId: reference.id,
+          description: `Fornecedor ${form.name} cadastrado.`,
+        }).catch(() => undefined)
         setFeedback('Fornecedor cadastrado.')
       }
       resetForm()
@@ -11210,7 +11734,17 @@ export function AdminSuppliersPage() {
               cell: (supplier) => (
                 <div className="flex gap-2">
                   <Button aria-label="Editar" className="h-9 w-9 px-0" onClick={() => edit(supplier)} variant="ghost"><Edit className="h-4 w-4" /></Button>
-                  <Button className="h-9 px-3" onClick={() => updateEntity('suppliers', supplier.id, { active: !supplier.active })} variant="secondary">{supplier.active ? 'Desativar' : 'Reativar'}</Button>
+                  <Button className="h-9 px-3" onClick={async () => {
+                    await updateEntity('suppliers', supplier.id, { active: !supplier.active })
+                    await createAuditLog({
+                      userId: user?.uid || 'admin',
+                      userName: profile?.name || 'Admin',
+                      action: supplier.active ? 'supplier_disabled' : 'supplier_enabled',
+                      entity: 'suppliers',
+                      entityId: supplier.id,
+                      description: `Fornecedor ${supplier.name} ${supplier.active ? 'desativado' : 'reativado'}.`,
+                    }).catch(() => undefined)
+                  }} variant="secondary">{supplier.active ? 'Desativar' : 'Reativar'}</Button>
                 </div>
               ),
             },
@@ -11617,13 +12151,13 @@ import { where } from 'firebase/firestore'
 import { Button, Card, DataTable, StatusBadge } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
-import type { Quote } from '../../types'
+import type { ClientQuoteView } from '../../types'
 import { formatCurrency, formatDate } from '../../utils/format'
 
 export function ClientDashboardPage() {
   const { user } = useAuth()
   const constraints = useMemo(() => [where('clientUserId', '==', user?.uid || '')], [user?.uid])
-  const { data: quotes, loading } = useCollection<Quote>('quotes', constraints)
+  const { data: quotes, loading } = useCollection<ClientQuoteView>('clientQuoteViews', constraints)
 
   const stats = useMemo(
     () => [
@@ -11688,7 +12222,7 @@ export function ClientDashboardPage() {
             {
               header: 'Detalhes',
               cell: (quote) => (
-                <Link className="font-semibold text-gold-300 hover:text-gold-100" to={`/cliente/orcamentos/${quote.id}`}>
+                <Link className="font-semibold text-gold-300 hover:text-gold-100" to={`/cliente/orcamentos/${quote.quoteId}`}>
                   Abrir
                 </Link>
               ),
@@ -11697,7 +12231,7 @@ export function ClientDashboardPage() {
           data={quotes.slice(0, 5)}
           emptyDescription="Quando voce enviar uma solicitacao, ela aparecera aqui."
           emptyTitle="Nenhum orcamento encontrado"
-          getRowKey={(quote) => quote.id}
+          getRowKey={(quote) => quote.quoteId}
           loading={loading}
         />
       </Card>
@@ -11712,39 +12246,97 @@ FIM DO ARQUIVO: src\pages\client\ClientDashboardPage.tsx
 INICIO DO ARQUIVO: src\pages\client\ClientPaymentsPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { where } from 'firebase/firestore'
-import { useMemo } from 'react'
-import { Card, DataTable, Badge } from '../../components/ui'
+import { Copy, Send } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { Badge, Button, Card, Textarea } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
+import { clientMarkPaymentAsPaid } from '../../services/paymentService'
 import type { Payment } from '../../types'
 import { formatCurrency } from '../../utils/format'
+
+function paymentLabel(type: Payment['type']) {
+  if (type === 'entrada' || type === 'entrada_50') return 'Entrada'
+  if (type === 'restante' || type === 'restante_50') return 'Restante'
+  return 'Outro pagamento'
+}
 
 export function ClientPaymentsPage() {
   const { user } = useAuth()
   const constraints = useMemo(() => [where('clientId', '==', user?.uid || '')], [user?.uid])
   const { data: payments, loading } = useCollection<Payment>('payments', constraints)
+  const [messages, setMessages] = useState<Record<string, string>>({})
+  const [submittingId, setSubmittingId] = useState('')
+  const [feedback, setFeedback] = useState('')
+
+  async function copyPixKey(pixKey: string) {
+    if (!pixKey) return
+    await navigator.clipboard.writeText(pixKey)
+    setFeedback('Chave Pix copiada.')
+  }
+
+  async function informPayment(payment: Payment) {
+    setSubmittingId(payment.id)
+    setFeedback('')
+    try {
+      await clientMarkPaymentAsPaid(payment, messages[payment.id] || '')
+      setFeedback('Pagamento informado. Aguarde a conferencia manual.')
+    } catch (error) {
+      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel informar o pagamento.')
+    } finally {
+      setSubmittingId('')
+    }
+  }
 
   return (
-    <Card title="Meus pagamentos">
-      <DataTable
-        columns={[
-          { header: 'Tipo', cell: (payment) => payment.type.replace('_', ' ') },
-          { header: 'Valor', cell: (payment) => formatCurrency(payment.amount) },
-          {
-            header: 'Status',
-            cell: (payment) => (
-              <Badge className="bg-white/8 text-slate-200 ring-white/10">{payment.status.replaceAll('_', ' ')}</Badge>
-            ),
-          },
-          { header: 'Pix usado', cell: (payment) => payment.pixKeyUsed || '-' },
-        ]}
-        data={payments}
-        emptyDescription="Pagamentos aparecem quando um orcamento aprovado gera entrada ou restante."
-        emptyTitle="Nenhum pagamento gerado"
-        getRowKey={(payment) => payment.id}
-        loading={loading}
-      />
-    </Card>
+    <div className="space-y-6">
+      <Card description="Informe aqui pagamentos de entrada, restante ou valores adicionais." title="Meus pagamentos">
+        {loading ? (
+          <p className="text-sm text-slate-400">Carregando pagamentos...</p>
+        ) : payments.length === 0 ? (
+          <p className="text-sm text-slate-400">Pagamentos aparecem quando um orcamento aprovado gera entrada ou restante.</p>
+        ) : (
+          <div className="grid gap-4">
+            {payments.map((payment) => (
+              <div className="grid gap-4 rounded-lg border border-white/10 bg-white/[0.04] p-4 lg:grid-cols-[1fr_1.2fr]" key={payment.id}>
+                <div>
+                  <div className="mb-3 flex flex-wrap items-center gap-2">
+                    <h3 className="font-semibold text-white">{paymentLabel(payment.type)}</h3>
+                    <Badge className="bg-white/8 text-slate-200 ring-white/10">{payment.status.replaceAll('_', ' ')}</Badge>
+                  </div>
+                  <p className="text-2xl font-semibold text-gold-300">{formatCurrency(payment.amount)}</p>
+                  <p className="mt-3 text-sm text-slate-400">Chave Pix</p>
+                  <p className="break-all font-semibold text-white">{payment.pixKeyUsed || '-'}</p>
+                </div>
+                <div className="space-y-4">
+                  <Textarea
+                    disabled={payment.status === 'confirmado'}
+                    label="Observacao ou referencia do comprovante"
+                    onChange={(event) => setMessages((current) => ({ ...current, [payment.id]: event.target.value }))}
+                    value={messages[payment.id] || payment.clientMessage || ''}
+                  />
+                  <div className="flex flex-col gap-3 sm:flex-row">
+                    <Button icon={<Copy className="h-4 w-4" />} onClick={() => copyPixKey(payment.pixKeyUsed)} variant="secondary">
+                      Copiar chave Pix
+                    </Button>
+                    <Button
+                      disabled={payment.status === 'confirmado' || payment.status === 'informado_pelo_cliente'}
+                      icon={<Send className="h-4 w-4" />}
+                      isLoading={submittingId === payment.id}
+                      onClick={() => informPayment(payment)}
+                    >
+                      Ja realizei o pagamento
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
+
+      {feedback && <p className="rounded-md bg-white/8 p-3 text-sm text-slate-200">{feedback}</p>}
+    </div>
   )
 }
 
@@ -11754,47 +12346,72 @@ FIM DO ARQUIVO: src\pages\client\ClientPaymentsPage.tsx
 ----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: src\pages\client\ClientQuoteDetailPage.tsx
 ----------------------------------------------------------------------------------------------------
+import { where } from 'firebase/firestore'
 import { Copy, Send } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Button, Card, Loading, StatusBadge, Textarea } from '../../components/ui'
+import { Badge, Button, Card, Loading, StatusBadge, Textarea } from '../../components/ui'
+import { useCollection } from '../../hooks/useCollection'
 import { useDocument } from '../../hooks/useDocument'
-import { informDepositPayment } from '../../services/quoteService'
-import { getSettings } from '../../services/settingsService'
-import type { Quote, Settings } from '../../types'
+import { clientMarkPaymentAsPaid } from '../../services/paymentService'
+import { getPublicSettings } from '../../services/settingsService'
+import type { ClientQuoteView, Payment, PublicSettings } from '../../types'
 import { formatCurrency, formatDate } from '../../utils/format'
+
+function paymentLabel(type: Payment['type']) {
+  if (type === 'entrada' || type === 'entrada_50') return 'Entrada'
+  if (type === 'restante' || type === 'restante_50') return 'Restante'
+  return 'Outro pagamento'
+}
+
+function statusMessage(status: ClientQuoteView['status']) {
+  const messages: Record<ClientQuoteView['status'], string> = {
+    em_analise: 'Seu orcamento esta em analise.',
+    aprovado_aguardando_entrada: 'Seu orcamento foi aprovado. Agora realize o pagamento da entrada.',
+    entrada_informada_pelo_cliente: 'Pagamento informado. Aguarde confirmacao do Grupo Dvanera.',
+    agendado: 'Entrada confirmada. Seu evento esta agendado.',
+    realizado: 'Evento realizado. Obrigado por escolher o Grupo Dvanera.',
+    recusado: 'Este orcamento foi recusado.',
+    cancelado: 'Este evento foi cancelado.',
+  }
+
+  return messages[status]
+}
 
 export function ClientQuoteDetailPage() {
   const { id } = useParams()
-  const { data: quote, loading } = useDocument<Quote>('quotes', id)
-  const [settings, setSettings] = useState<Settings | null>(null)
-  const [message, setMessage] = useState('')
+  const { data: quote, loading } = useDocument<ClientQuoteView>('clientQuoteViews', id)
+  const paymentConstraints = useMemo(() => [where('quoteId', '==', id || '')], [id])
+  const { data: payments } = useCollection<Payment>('payments', paymentConstraints)
+  const [settings, setSettings] = useState<PublicSettings | null>(null)
+  const [messages, setMessages] = useState<Record<string, string>>({})
   const [feedback, setFeedback] = useState('')
-  const [submitting, setSubmitting] = useState(false)
+  const [submittingId, setSubmittingId] = useState('')
 
   useEffect(() => {
-    getSettings().then(setSettings).catch(() => setSettings(null))
+    getPublicSettings().then(setSettings).catch(() => setSettings(null))
   }, [])
 
   if (loading) return <Loading />
   if (!quote) return <Card title="Orcamento nao encontrado" />
 
-  async function copyPixKey() {
-    if (!settings?.pixKey) return
-    await navigator.clipboard.writeText(settings.pixKey)
+  async function copyPixKey(pixKey?: string) {
+    const key = pixKey || settings?.pixKey
+    if (!key) return
+    await navigator.clipboard.writeText(key)
     setFeedback('Chave Pix copiada.')
   }
 
-  async function informPayment() {
-    if (!quote) return
-    setSubmitting(true)
+  async function informPayment(payment: Payment) {
+    setSubmittingId(payment.id)
+    setFeedback('')
     try {
-      await informDepositPayment(quote, message)
-      setFeedback('Pagamento informado. O admin fara a conferencia manual.')
+      await clientMarkPaymentAsPaid(payment, messages[payment.id] || '')
+      setFeedback('Pagamento informado. O Grupo Dvanera fara a conferencia manual.')
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : 'Nao foi possivel informar o pagamento.')
     } finally {
-      setSubmitting(false)
+      setSubmittingId('')
     }
   }
 
@@ -11805,23 +12422,34 @@ export function ClientQuoteDetailPage() {
         description={`${quote.event.type} em ${formatDate(quote.event.date)} - ${quote.event.city}/${quote.event.state}`}
         title={`Orcamento de ${quote.clientSnapshot.name}`}
       >
+        <p className="mb-5 rounded-md bg-white/8 p-3 text-sm text-slate-200">{statusMessage(quote.status)}</p>
         <div className="grid gap-4 md:grid-cols-4">
           <div>
             <p className="text-sm text-slate-400">Total aprovado/estimado</p>
             <p className="text-2xl font-semibold text-white">{formatCurrency(quote.total)}</p>
           </div>
           <div>
-            <p className="text-sm text-slate-400">Entrada 50%</p>
+            <p className="text-sm text-slate-400">Entrada de {quote.depositPercent}%</p>
             <p className="text-2xl font-semibold text-gold-300">{formatCurrency(quote.depositAmount)}</p>
           </div>
           <div>
-            <p className="text-sm text-slate-400">Restante 50%</p>
+            <p className="text-sm text-slate-400">Restante de {100 - quote.depositPercent}%</p>
             <p className="text-2xl font-semibold text-white">{formatCurrency(quote.remainingAmount)}</p>
           </div>
           <div>
             <p className="text-sm text-slate-400">Servicos</p>
             <p className="text-2xl font-semibold text-white">{quote.items.length}</p>
           </div>
+        </div>
+      </Card>
+
+      <Card title="Dados do evento">
+        <div className="grid gap-3 text-sm text-slate-300 md:grid-cols-2">
+          <p><strong className="text-white">Data:</strong> {formatDate(quote.event.date)} as {quote.event.time}</p>
+          <p><strong className="text-white">Tipo:</strong> {quote.event.type}</p>
+          <p><strong className="text-white">Local:</strong> {quote.event.venueName}</p>
+          <p><strong className="text-white">Cidade:</strong> {quote.event.city}/{quote.event.state}</p>
+          <p className="md:col-span-2"><strong className="text-white">Endereco:</strong> {quote.event.address}</p>
         </div>
       </Card>
 
@@ -11839,35 +12467,52 @@ export function ClientQuoteDetailPage() {
         </div>
       </Card>
 
-      {quote.status === 'aprovado_aguardando_entrada' && (
-        <Card description="A confirmacao e feita manualmente pela administracao apos conferencia." title="Pagamento de entrada via Pix">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-lg bg-white/[0.04] p-4">
-              <p className="text-sm text-slate-400">Recebedor</p>
-              <p className="font-semibold text-white">{settings?.pixReceiverName || 'Nao configurado'}</p>
-              <p className="mt-3 text-sm text-slate-400">Chave Pix</p>
-              <p className="break-all font-semibold text-gold-300">{settings?.pixKey || 'Nao configurada'}</p>
-              <p className="mt-3 text-sm text-slate-400">Banco</p>
-              <p className="font-semibold text-white">{settings?.bankName || '-'}</p>
-            </div>
-            <div className="space-y-4">
-              <Textarea
-                label="Observacao ou referencia do comprovante"
-                onChange={(event) => setMessage(event.target.value)}
-                value={message}
-              />
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <Button icon={<Copy className="h-4 w-4" />} onClick={copyPixKey} variant="secondary">
-                  Copiar chave Pix
-                </Button>
-                <Button icon={<Send className="h-4 w-4" />} isLoading={submitting} onClick={informPayment}>
-                  Ja realizei o pagamento
-                </Button>
+      <Card description="A confirmacao e feita manualmente pela administracao apos conferencia." title="Pagamentos">
+        <div className="space-y-4">
+          {payments.length === 0 ? (
+            <p className="text-sm text-slate-400">Os pagamentos aparecem quando o orcamento for aprovado.</p>
+          ) : (
+            payments.map((payment) => (
+              <div className="grid gap-4 rounded-lg border border-white/10 bg-white/[0.04] p-4 lg:grid-cols-[1fr_1.1fr]" key={payment.id}>
+                <div>
+                  <div className="mb-3 flex flex-wrap items-center gap-2">
+                    <h3 className="font-semibold text-white">{paymentLabel(payment.type)}</h3>
+                    <Badge className="bg-white/8 text-slate-200 ring-white/10">{payment.status.replaceAll('_', ' ')}</Badge>
+                  </div>
+                  <p className="text-2xl font-semibold text-gold-300">{formatCurrency(payment.amount)}</p>
+                  <p className="mt-3 text-sm text-slate-400">Recebedor</p>
+                  <p className="font-semibold text-white">{settings?.pixReceiverName || 'Nao configurado'}</p>
+                  <p className="mt-3 text-sm text-slate-400">Chave Pix</p>
+                  <p className="break-all font-semibold text-gold-300">{payment.pixKeyUsed || settings?.pixKey || 'Nao configurada'}</p>
+                  <p className="mt-3 text-sm text-slate-400">Banco</p>
+                  <p className="font-semibold text-white">{settings?.bankName || '-'}</p>
+                </div>
+                <div className="space-y-4">
+                  <Textarea
+                    disabled={payment.status === 'confirmado'}
+                    label="Observacao ou referencia do comprovante"
+                    onChange={(event) => setMessages((current) => ({ ...current, [payment.id]: event.target.value }))}
+                    value={messages[payment.id] || payment.clientMessage || ''}
+                  />
+                  <div className="flex flex-col gap-3 sm:flex-row">
+                    <Button icon={<Copy className="h-4 w-4" />} onClick={() => copyPixKey(payment.pixKeyUsed)} variant="secondary">
+                      Copiar chave Pix
+                    </Button>
+                    <Button
+                      disabled={payment.status === 'confirmado' || payment.status === 'informado_pelo_cliente'}
+                      icon={<Send className="h-4 w-4" />}
+                      isLoading={submittingId === payment.id}
+                      onClick={() => informPayment(payment)}
+                    >
+                      Ja realizei o pagamento
+                    </Button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </Card>
-      )}
+            ))
+          )}
+        </div>
+      </Card>
 
       {feedback && <p className="rounded-md bg-white/8 p-3 text-sm text-slate-200">{feedback}</p>}
     </div>
@@ -11886,13 +12531,13 @@ import { Link } from 'react-router-dom'
 import { Card, DataTable, StatusBadge } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
-import type { Quote } from '../../types'
+import type { ClientQuoteView } from '../../types'
 import { formatCurrency, formatDate } from '../../utils/format'
 
 export function ClientQuotesPage() {
   const { user } = useAuth()
   const constraints = useMemo(() => [where('clientUserId', '==', user?.uid || '')], [user?.uid])
-  const { data: quotes, loading } = useCollection<Quote>('quotes', constraints)
+  const { data: quotes, loading } = useCollection<ClientQuoteView>('clientQuoteViews', constraints)
 
   return (
     <Card title="Meus orcamentos">
@@ -11914,7 +12559,7 @@ export function ClientQuotesPage() {
           {
             header: 'Acao',
             cell: (quote) => (
-              <Link className="font-semibold text-gold-300 hover:text-gold-100" to={`/cliente/orcamentos/${quote.id}`}>
+              <Link className="font-semibold text-gold-300 hover:text-gold-100" to={`/cliente/orcamentos/${quote.quoteId}`}>
                 Ver detalhes
               </Link>
             ),
@@ -11936,7 +12581,7 @@ FIM DO ARQUIVO: src\pages\client\ClientQuotesPage.tsx
 ----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: src\pages\client\NewQuotePage.tsx
 ----------------------------------------------------------------------------------------------------
-import { addDoc, collection, doc, serverTimestamp, setDoc, where } from 'firebase/firestore'
+import { doc, serverTimestamp, setDoc, where } from 'firebase/firestore'
 import { ArrowLeft, ArrowRight, Check, Minus, Plus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -11945,12 +12590,13 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
 import { useDocument } from '../../hooks/useDocument'
 import { requireDb } from '../../lib/firebase'
-import type { Client, QuoteEvent, QuoteItem, Service } from '../../types'
+import { createClientQuote } from '../../services/quoteService'
+import type { Client, PublicService, QuoteEvent, QuoteItem } from '../../types'
 import { brazilianStates, eventTypes } from '../../utils/constants'
 import { formatCurrency } from '../../utils/format'
 
 type SelectedService = {
-  service: Service
+  service: PublicService
   quantity: number
 }
 
@@ -11989,7 +12635,7 @@ export function NewQuotePage() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const serviceConstraints = useMemo(() => [where('active', '==', true)], [])
-  const { data: services, loading: servicesLoading } = useCollection<Service>('services', serviceConstraints)
+  const { data: services, loading: servicesLoading } = useCollection<PublicService>('publicServices', serviceConstraints)
   const { data: client } = useDocument<Client>('clients', user?.uid)
 
   useEffect(() => {
@@ -12017,7 +12663,7 @@ export function NewQuotePage() {
     setEventForm((current) => ({ ...current, [key]: value }))
   }
 
-  function toggleService(service: Service) {
+  function toggleService(service: PublicService) {
     setSelected((current) => {
       if (current[service.id]) {
         const copy = { ...current }
@@ -12071,6 +12717,17 @@ export function NewQuotePage() {
         notes: clientForm.notes || '',
         updatedAt: serverTimestamp(),
       }
+      const clientQuotePayload: Client = {
+        id: clientId,
+        userId: user.uid,
+        name: clientForm.name,
+        document: clientForm.document,
+        phone: clientForm.phone,
+        email: clientForm.email,
+        city: clientForm.city,
+        state: clientForm.state,
+        notes: clientForm.notes || '',
+      }
       const items: QuoteItem[] = selectedItems.map(({ service, quantity }) => ({
         serviceId: service.id,
         serviceName: service.name,
@@ -12080,8 +12737,6 @@ export function NewQuotePage() {
         totalPrice: service.basePrice * quantity,
         costSnapshot: [],
       }))
-      const total = items.reduce((sum, item) => sum + item.totalPrice, 0)
-
       await setDoc(
         doc(database, 'clients', clientId),
         {
@@ -12091,34 +12746,11 @@ export function NewQuotePage() {
         { merge: true },
       )
 
-      const quoteRef = await addDoc(collection(database, 'quotes'), {
-        clientId,
-        clientUserId: user.uid,
-        clientSnapshot: {
-          name: clientPayload.name,
-          document: clientPayload.document,
-          phone: clientPayload.phone,
-          email: clientPayload.email,
-          city: clientPayload.city,
-          state: clientPayload.state,
-        },
+      const quoteRef = await createClientQuote({
+        client: clientQuotePayload,
         event: eventForm,
         items,
-        manualCosts: [],
-        subtotal: total,
-        discount: 0,
-        travelFee: 0,
-        total,
-        totalCosts: 0,
-        estimatedProfit: total,
-        estimatedMargin: total > 0 ? 100 : 0,
-        depositAmount: total * 0.5,
-        remainingAmount: total * 0.5,
-        status: 'em_analise',
         clientNotes,
-        adminNotes: '',
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
       })
 
       navigate(`/cliente/orcamentos/${quoteRef.id}`)
@@ -12252,7 +12884,7 @@ export function NewQuotePage() {
           />
           <p className="mt-4 rounded-md bg-gold-300/10 p-4 text-sm leading-6 text-gold-50">
             Sua solicitacao sera enviada para analise do Grupo Dvanera. Apos aprovacao, sera
-            liberado o pagamento de 50% de entrada via Pix.
+            liberado o pagamento da entrada via Pix conforme percentual configurado.
           </p>
         </Card>
       )}
@@ -12303,7 +12935,7 @@ const highlights = [
   },
   {
     title: 'Pix com conferencia manual',
-    description: 'Entrada de 50%, chave Pix configuravel e confirmacao segura pelo admin.',
+    description: 'Entrada configuravel, chave Pix publica segura e confirmacao manual pelo admin.',
     icon: WalletCards,
   },
   {
@@ -12549,14 +13181,10 @@ INICIO DO ARQUIVO: src\services\adminAccountService.ts
 import {
   createUserWithEmailAndPassword,
   deleteUser,
-  EmailAuthProvider,
-  reauthenticateWithCredential,
 } from 'firebase/auth'
 import { doc, getDoc, serverTimestamp, writeBatch } from 'firebase/firestore'
 import { auth, db } from '../lib/firebase'
 import type { AppUser } from '../types'
-
-const MASTER_PASSWORD = '9331077093.Gui'
 
 const SYSTEM_COLLECTION = 'system'
 const ADMIN_SETUP_DOC = 'adminSetup'
@@ -12567,11 +13195,6 @@ export type RegisterAdminInput = {
   email: string
   phone?: string
   password: string
-}
-
-export type DeleteAdminAccountInput = {
-  masterPassword: string
-  accountPassword: string
 }
 
 export async function getAdminSetupStatus() {
@@ -12630,37 +13253,6 @@ export async function createPrimaryAdminAccount(data: RegisterAdminInput): Promi
   return profile
 }
 
-export async function deletePrimaryAdminAccount({ masterPassword, accountPassword }: DeleteAdminAccountInput) {
-  if (!auth?.currentUser || !db) throw new Error('Firebase nao configurado.')
-
-  if (masterPassword.trim() !== MASTER_PASSWORD) {
-    throw new Error('Senha mestre incorreta.')
-  }
-
-  const currentUser = auth.currentUser
-  if (!currentUser.email) {
-    throw new Error('A conta admin precisa ter e-mail para excluir o cadastro.')
-  }
-
-  const ownerRef = doc(db, SYSTEM_COLLECTION, ADMIN_OWNER_DOC)
-  const ownerSnapshot = await getDoc(ownerRef)
-  if (!ownerSnapshot.exists() || ownerSnapshot.data().uid !== currentUser.uid) {
-    throw new Error('Somente o primeiro admin pode excluir este cadastro.')
-  }
-
-  const credential = EmailAuthProvider.credential(currentUser.email, accountPassword)
-  await reauthenticateWithCredential(currentUser, credential)
-
-  const batch = writeBatch(db)
-
-  batch.delete(doc(db, 'users', currentUser.uid))
-  batch.delete(ownerRef)
-  batch.delete(doc(db, SYSTEM_COLLECTION, ADMIN_SETUP_DOC))
-
-  await batch.commit()
-  await deleteUser(currentUser)
-}
-
 ----------------------------------------------------------------------------------------------------
 FIM DO ARQUIVO: src\services\adminAccountService.ts
 
@@ -12677,6 +13269,7 @@ export async function createAuditLog(input: {
   entity: string
   entityId: string
   description: string
+  metadata?: Record<string, unknown>
 }) {
   const database = requireDb()
   await addDoc(collection(database, 'auditLogs'), {
@@ -12761,21 +13354,154 @@ export async function getEntity<T>(collectionName: string, id: string) {
 FIM DO ARQUIVO: src\services\firestoreService.ts
 
 ----------------------------------------------------------------------------------------------------
+INICIO DO ARQUIVO: src\services\paymentService.ts
+----------------------------------------------------------------------------------------------------
+import {
+  doc,
+  getDoc,
+  serverTimestamp,
+  updateDoc,
+  writeBatch,
+} from 'firebase/firestore'
+import { requireDb } from '../lib/firebase'
+import type { Payment, Quote } from '../types'
+import { createAuditLog } from './auditService'
+import { syncClientQuoteView } from './quoteService'
+
+type PaymentActor = {
+  userId?: string
+  userName?: string
+}
+
+function isDeposit(payment: Payment) {
+  return payment.type === 'entrada' || payment.type === 'entrada_50'
+}
+
+export async function clientMarkPaymentAsPaid(payment: Payment, message = '') {
+  const database = requireDb()
+  const batch = writeBatch(database)
+  const paymentRef = doc(database, 'payments', payment.id)
+  const quoteRef = doc(database, 'quotes', payment.quoteId)
+  const viewRef = doc(database, 'clientQuoteViews', payment.quoteId)
+
+  batch.update(paymentRef, {
+    status: 'informado_pelo_cliente',
+    clientMessage: message,
+    updatedAt: serverTimestamp(),
+  })
+
+  if (isDeposit(payment)) {
+    batch.update(quoteRef, {
+      status: 'entrada_informada_pelo_cliente',
+      updatedAt: serverTimestamp(),
+    })
+    batch.update(viewRef, {
+      status: 'entrada_informada_pelo_cliente',
+      paymentSummary: {
+        depositStatus: 'informado_pelo_cliente',
+      },
+      updatedAt: serverTimestamp(),
+    })
+  }
+
+  await batch.commit()
+}
+
+export async function confirmPayment(paymentId: string, actor: PaymentActor = {}) {
+  const database = requireDb()
+  const paymentSnapshot = await getDoc(doc(database, 'payments', paymentId))
+
+  if (!paymentSnapshot.exists()) {
+    throw new Error('Pagamento nao encontrado.')
+  }
+
+  const payment = { id: paymentSnapshot.id, ...paymentSnapshot.data() } as Payment
+  const quoteSnapshot = await getDoc(doc(database, 'quotes', payment.quoteId))
+  const quote = quoteSnapshot.exists() ? ({ id: quoteSnapshot.id, ...quoteSnapshot.data() } as Quote) : null
+  const batch = writeBatch(database)
+
+  batch.update(doc(database, 'payments', paymentId), {
+    status: 'confirmado',
+    confirmedBy: actor.userId || 'admin',
+    confirmedAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  })
+
+  if (quote && isDeposit(payment)) {
+    batch.update(doc(database, 'quotes', quote.id), {
+      status: 'agendado',
+      depositConfirmedAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    })
+  }
+
+  await batch.commit()
+
+  if (quote) {
+    await syncClientQuoteView(quote.id)
+  }
+
+  if (actor.userId) {
+    await createAuditLog({
+      userId: actor.userId,
+      userName: actor.userName || 'Admin',
+      action: 'payment_confirmed',
+      entity: 'payments',
+      entityId: paymentId,
+      description: `Pagamento ${payment.type.replace('_', ' ')} confirmado.`,
+      metadata: {
+        quoteId: payment.quoteId,
+        amount: payment.amount,
+      },
+    }).catch(() => undefined)
+  }
+}
+
+export async function markInternalPaymentAsPaid(
+  collectionName: 'memberPayments' | 'supplierPayments',
+  paymentId: string,
+) {
+  const database = requireDb()
+  await updateDoc(doc(database, collectionName, paymentId), {
+    status: 'pago',
+    paidAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  })
+}
+
+----------------------------------------------------------------------------------------------------
+FIM DO ARQUIVO: src\services\paymentService.ts
+
+----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: src\services\quoteService.ts
 ----------------------------------------------------------------------------------------------------
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
+  getDoc,
   getDocs,
   query,
   serverTimestamp,
+  setDoc,
   updateDoc,
   where,
+  writeBatch,
 } from 'firebase/firestore'
 import { requireDb } from '../lib/firebase'
-import type { Client, CostSnapshot, Quote, QuoteEvent, QuoteItem, Settings } from '../types'
+import type {
+  Client,
+  CostSnapshot,
+  Payment,
+  Quote,
+  QuoteEvent,
+  QuoteItem,
+  Settings,
+} from '../types'
 import { calculateQuoteTotals } from '../utils/calculations'
+import { defaultSettings } from '../utils/constants'
+import { createAuditLog } from './auditService'
 import { getSettings } from './settingsService'
 
 type CreateQuoteInput = {
@@ -12785,11 +13511,155 @@ type CreateQuoteInput = {
   clientNotes?: string
 }
 
+type AuditActor = {
+  userId?: string
+  userName?: string
+}
+
+function normalizeManualCosts(costs: CostSnapshot[] = []) {
+  return costs.map((cost) => ({
+    ...cost,
+    quantity: cost.quantity ?? 1,
+    totalCost: cost.totalCost ?? cost.cost * (cost.quantity ?? 1),
+  }))
+}
+
+function getDepositPercent(settings?: Settings, fallback: number = defaultSettings.defaultDepositPercent) {
+  return settings?.defaultDepositPercent || fallback
+}
+
+function publicItems(items: QuoteItem[]) {
+  return items.map((item) => ({
+    serviceId: item.serviceId,
+    serviceName: item.serviceName,
+    description: item.description,
+    quantity: item.quantity,
+    unitPrice: item.unitPrice,
+    totalPrice: item.totalPrice,
+  }))
+}
+
+function paymentIsDeposit(payment: Payment) {
+  return payment.type === 'entrada' || payment.type === 'entrada_50'
+}
+
+function paymentIsRemaining(payment: Payment) {
+  return payment.type === 'restante' || payment.type === 'restante_50'
+}
+
+async function audit(actor: AuditActor | undefined, action: string, entity: string, entityId: string, description: string) {
+  if (!actor?.userId) return
+
+  await createAuditLog({
+    userId: actor.userId,
+    userName: actor.userName || 'Admin',
+    action,
+    entity,
+    entityId,
+    description,
+  }).catch(() => undefined)
+}
+
+export async function buildQuoteCostSnapshot(items: QuoteItem[]) {
+  const database = requireDb()
+
+  return Promise.all(
+    items.map(async (item) => {
+      const serviceSnapshot = await getDoc(doc(database, 'services', item.serviceId))
+      if (!serviceSnapshot.exists()) return item
+
+      const service = serviceSnapshot.data()
+      const supplierCosts: CostSnapshot[] = (service.supplierLinks || []).map(
+        (link: { supplierId: string; supplierName: string; cost: number; description?: string }) => ({
+          type: 'supplier',
+          refId: link.supplierId,
+          name: link.supplierName,
+          cost: link.cost,
+          quantity: item.quantity,
+          totalCost: link.cost * item.quantity,
+          notes: link.description || `Fornecedor vinculado ao servico ${item.serviceName}`,
+        }),
+      )
+      const memberCosts: CostSnapshot[] = (service.memberCostLinks || []).map(
+        (link: { memberId: string; memberName: string; cost: number; description?: string }) => ({
+          type: 'member',
+          refId: link.memberId,
+          name: link.memberName,
+          cost: link.cost,
+          quantity: item.quantity,
+          totalCost: link.cost * item.quantity,
+          notes: link.description || `Integrante vinculado ao servico ${item.serviceName}`,
+        }),
+      )
+
+      return {
+        ...item,
+        costSnapshot: [...supplierCosts, ...memberCosts],
+      }
+    }),
+  )
+}
+
+export async function syncClientQuoteView(quoteId: string) {
+  const database = requireDb()
+  const quoteSnapshot = await getDoc(doc(database, 'quotes', quoteId))
+
+  if (!quoteSnapshot.exists()) {
+    await deleteDoc(doc(database, 'clientQuoteViews', quoteId))
+    return
+  }
+
+  const quote = { id: quoteSnapshot.id, ...quoteSnapshot.data() } as Quote
+  const paymentsSnapshot = await getDocs(
+    query(collection(database, 'payments'), where('quoteId', '==', quoteId)),
+  )
+  const payments = paymentsSnapshot.docs.map((paymentDoc) => ({
+    id: paymentDoc.id,
+    ...paymentDoc.data(),
+  }) as Payment)
+  const depositPayment = payments.find(paymentIsDeposit)
+  const remainingPayment = payments.find(paymentIsRemaining)
+
+  await setDoc(
+    doc(database, 'clientQuoteViews', quoteId),
+    {
+      quoteId,
+      clientId: quote.clientId,
+      clientUserId: quote.clientUserId,
+      clientSnapshot: quote.clientSnapshot,
+      event: quote.event,
+      items: publicItems(quote.items),
+      subtotal: quote.subtotal,
+      discount: quote.discount,
+      travelFee: quote.travelFee,
+      total: quote.total,
+      depositPercent: quote.depositPercent || defaultSettings.defaultDepositPercent,
+      depositAmount: quote.depositAmount,
+      remainingAmount: quote.remainingAmount,
+      status: quote.status,
+      clientNotes: quote.clientNotes || '',
+      rejectionReason: quote.rejectionReason || '',
+      paymentSummary: {
+        depositStatus: depositPayment?.status,
+        remainingStatus: remainingPayment?.status,
+      },
+      approvedAt: quote.approvedAt || null,
+      depositConfirmedAt: quote.depositConfirmedAt || null,
+      createdAt: quote.createdAt || serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true },
+  )
+}
+
 export async function createClientQuote({ client, event, items, clientNotes }: CreateQuoteInput) {
   const database = requireDb()
-  const totals = calculateQuoteTotals(items)
-
-  return addDoc(collection(database, 'quotes'), {
+  const quoteRef = doc(collection(database, 'quotes'))
+  const depositPercent = defaultSettings.defaultDepositPercent
+  const manualCosts: CostSnapshot[] = []
+  const totals = calculateQuoteTotals(items, 0, 0, manualCosts, depositPercent)
+  const now = serverTimestamp()
+  const quotePayload = {
     clientId: client.id,
     clientUserId: client.userId,
     clientSnapshot: {
@@ -12802,16 +13672,41 @@ export async function createClientQuote({ client, event, items, clientNotes }: C
     },
     event,
     items,
-    manualCosts: [],
+    manualCosts,
     discount: 0,
     travelFee: 0,
     status: 'em_analise',
     clientNotes: clientNotes || '',
     adminNotes: '',
     ...totals,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+    createdAt: now,
+    updatedAt: now,
+  }
+
+  const batch = writeBatch(database)
+  batch.set(quoteRef, quotePayload)
+  batch.set(doc(database, 'clientQuoteViews', quoteRef.id), {
+    quoteId: quoteRef.id,
+    clientId: client.id,
+    clientUserId: client.userId,
+    clientSnapshot: quotePayload.clientSnapshot,
+    event,
+    items: publicItems(items),
+    subtotal: totals.subtotal,
+    discount: 0,
+    travelFee: 0,
+    total: totals.total,
+    depositPercent: totals.depositPercent,
+    depositAmount: totals.depositAmount,
+    remainingAmount: totals.remainingAmount,
+    status: 'em_analise',
+    clientNotes: clientNotes || '',
+    createdAt: now,
+    updatedAt: now,
   })
+  await batch.commit()
+
+  return quoteRef
 }
 
 export async function updateQuoteFinancials(
@@ -12823,13 +13718,16 @@ export async function updateQuoteFinancials(
     travelFee?: number
     adminNotes?: string
   },
+  settings?: Settings,
+  actor?: AuditActor,
 ) {
   const database = requireDb()
-  const items = patch.items || quote.items
-  const manualCosts = patch.manualCosts || quote.manualCosts || []
+  const items = await buildQuoteCostSnapshot(patch.items || quote.items)
+  const manualCosts = normalizeManualCosts(patch.manualCosts || quote.manualCosts || [])
   const discount = patch.discount ?? quote.discount ?? 0
   const travelFee = patch.travelFee ?? quote.travelFee ?? 0
-  const totals = calculateQuoteTotals(items, discount, travelFee, manualCosts)
+  const depositPercent = getDepositPercent(settings, quote.depositPercent)
+  const totals = calculateQuoteTotals(items, discount, travelFee, manualCosts, depositPercent)
 
   await updateDoc(doc(database, 'quotes', quote.id), {
     items,
@@ -12840,33 +13738,63 @@ export async function updateQuoteFinancials(
     ...totals,
     updatedAt: serverTimestamp(),
   })
+  await syncClientQuoteView(quote.id)
+  await audit(actor, 'quote_financials_updated', 'quotes', quote.id, 'Orcamento recalculado.')
 }
 
-export async function approveQuote(quote: Quote, settings?: Settings) {
+export async function recalculateQuote(quoteId: string, settings?: Settings, actor?: AuditActor) {
+  const database = requireDb()
+  const snapshot = await getDoc(doc(database, 'quotes', quoteId))
+  if (!snapshot.exists()) throw new Error('Orcamento nao encontrado.')
+
+  const quote = { id: snapshot.id, ...snapshot.data() } as Quote
+  await updateQuoteFinancials(quote, {}, settings, actor)
+}
+
+export async function approveQuote(quote: Quote, settings?: Settings, actor?: AuditActor) {
   const database = requireDb()
   const paymentSettings = settings || (await getSettings())
-  const totals = calculateQuoteTotals(quote.items, quote.discount, quote.travelFee, quote.manualCosts)
+  const items = await buildQuoteCostSnapshot(quote.items)
+  const manualCosts = normalizeManualCosts(quote.manualCosts || [])
+  const totals = calculateQuoteTotals(
+    items,
+    quote.discount,
+    quote.travelFee,
+    manualCosts,
+    getDepositPercent(paymentSettings, quote.depositPercent),
+  )
+  const existingPayments = await getDocs(
+    query(collection(database, 'payments'), where('quoteId', '==', quote.id), where('type', 'in', ['entrada', 'entrada_50'])),
+  )
 
   await updateDoc(doc(database, 'quotes', quote.id), {
+    items,
+    manualCosts,
     ...totals,
     status: 'aprovado_aguardando_entrada',
     approvedAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   })
 
-  await addDoc(collection(database, 'payments'), {
-    quoteId: quote.id,
-    clientId: quote.clientId,
-    type: 'entrada_50',
-    amount: totals.depositAmount,
-    status: 'pendente',
-    pixKeyUsed: paymentSettings.pixKey || '',
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  })
+  if (existingPayments.empty) {
+    await addDoc(collection(database, 'payments'), {
+      quoteId: quote.id,
+      clientId: quote.clientId,
+      clientUserId: quote.clientUserId,
+      type: 'entrada',
+      amount: totals.depositAmount,
+      status: 'pendente',
+      pixKeyUsed: paymentSettings.pixKey || '',
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    })
+  }
+
+  await syncClientQuoteView(quote.id)
+  await audit(actor, 'quote_approved', 'quotes', quote.id, 'Orcamento aprovado e entrada gerada.')
 }
 
-export async function rejectQuote(quoteId: string, rejectionReason: string) {
+export async function rejectQuote(quoteId: string, rejectionReason: string, actor?: AuditActor) {
   const database = requireDb()
 
   await updateDoc(doc(database, 'quotes', quoteId), {
@@ -12874,116 +13802,138 @@ export async function rejectQuote(quoteId: string, rejectionReason: string) {
     rejectionReason,
     updatedAt: serverTimestamp(),
   })
+  await syncClientQuoteView(quoteId)
+  await audit(actor, 'quote_rejected', 'quotes', quoteId, 'Orcamento recusado.')
 }
 
-export async function cancelQuote(quoteId: string) {
+export async function cancelQuote(quoteId: string, actor?: AuditActor) {
   const database = requireDb()
 
   await updateDoc(doc(database, 'quotes', quoteId), {
     status: 'cancelado',
     updatedAt: serverTimestamp(),
   })
+  await syncClientQuoteView(quoteId)
+  await audit(actor, 'quote_cancelled', 'quotes', quoteId, 'Orcamento cancelado.')
 }
 
-export async function markQuoteAsDone(quoteId: string) {
+export async function markQuoteAsDone(quoteId: string, actor?: AuditActor) {
   const database = requireDb()
 
   await updateDoc(doc(database, 'quotes', quoteId), {
     status: 'realizado',
     updatedAt: serverTimestamp(),
   })
-}
-
-export async function informDepositPayment(quote: Quote, clientMessage?: string) {
-  const database = requireDb()
-  const paymentsSnapshot = await getDocs(
-    query(
-      collection(database, 'payments'),
-      where('quoteId', '==', quote.id),
-      where('type', '==', 'entrada_50'),
-    ),
-  )
-
-  await updateDoc(doc(database, 'quotes', quote.id), {
-    status: 'entrada_informada_pelo_cliente',
-    updatedAt: serverTimestamp(),
-  })
-
-  await Promise.all(
-    paymentsSnapshot.docs.map((paymentDoc) =>
-      updateDoc(paymentDoc.ref, {
-        status: 'informado_pelo_cliente',
-        clientMessage: clientMessage || '',
-        updatedAt: serverTimestamp(),
-      }),
-    ),
-  )
-}
-
-export async function confirmDepositPayment(quote: Quote, adminUserId: string) {
-  const database = requireDb()
-  const paymentsSnapshot = await getDocs(
-    query(
-      collection(database, 'payments'),
-      where('quoteId', '==', quote.id),
-      where('type', '==', 'entrada_50'),
-    ),
-  )
-
-  await updateDoc(doc(database, 'quotes', quote.id), {
-    status: 'agendado',
-    depositConfirmedAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  })
-
-  await Promise.all(
-    paymentsSnapshot.docs.map((paymentDoc) =>
-      updateDoc(paymentDoc.ref, {
-        status: 'confirmado',
-        confirmedBy: adminUserId,
-        confirmedAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      }),
-    ),
-  )
-}
-
-export async function confirmFinalPayment(paymentId: string, adminUserId: string) {
-  const database = requireDb()
-
-  await updateDoc(doc(database, 'payments', paymentId), {
-    status: 'confirmado',
-    confirmedBy: adminUserId,
-    confirmedAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  })
+  await syncClientQuoteView(quoteId)
+  await audit(actor, 'quote_done', 'quotes', quoteId, 'Evento marcado como realizado.')
 }
 
 export async function createFinalPayment(quote: Quote, settings?: Settings) {
   const database = requireDb()
   const paymentSettings = settings || (await getSettings())
+  const existingPayments = await getDocs(
+    query(collection(database, 'payments'), where('quoteId', '==', quote.id), where('type', 'in', ['restante', 'restante_50'])),
+  )
 
-  return addDoc(collection(database, 'payments'), {
+  if (!existingPayments.empty) return existingPayments.docs[0].ref
+
+  const reference = await addDoc(collection(database, 'payments'), {
     quoteId: quote.id,
     clientId: quote.clientId,
-    type: 'restante_50',
+    clientUserId: quote.clientUserId,
+    type: 'restante',
     amount: quote.remainingAmount,
     status: 'pendente',
     pixKeyUsed: paymentSettings.pixKey || '',
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   })
+  await syncClientQuoteView(quote.id)
+
+  return reference
 }
 
 ----------------------------------------------------------------------------------------------------
 FIM DO ARQUIVO: src\services\quoteService.ts
 
 ----------------------------------------------------------------------------------------------------
+INICIO DO ARQUIVO: src\services\serviceService.ts
+----------------------------------------------------------------------------------------------------
+import {
+  deleteDoc,
+  doc,
+  getDoc,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+} from 'firebase/firestore'
+import { requireDb } from '../lib/firebase'
+import type { Service } from '../types'
+import { addEntity } from './firestoreService'
+
+function publicServicePayload(serviceId: string, service: Omit<Service, 'id'> | Service) {
+  return {
+    serviceId,
+    name: service.name,
+    description: service.description,
+    category: service.category,
+    basePrice: service.basePrice,
+    active: service.active,
+    allowPriceEdit: service.allowPriceEdit,
+    updatedAt: serverTimestamp(),
+  }
+}
+
+export async function syncPublicService(serviceId: string) {
+  const database = requireDb()
+  const serviceSnapshot = await getDoc(doc(database, 'services', serviceId))
+
+  if (!serviceSnapshot.exists()) {
+    await deleteDoc(doc(database, 'publicServices', serviceId))
+    return
+  }
+
+  const service = serviceSnapshot.data() as Service
+  await setDoc(
+    doc(database, 'publicServices', serviceId),
+    {
+      ...publicServicePayload(serviceId, service),
+      createdAt: service.createdAt || serverTimestamp(),
+    },
+    { merge: true },
+  )
+}
+
+export async function createService(service: Omit<Service, 'id'>) {
+  const reference = await addEntity('services', service)
+  await syncPublicService(reference.id)
+  return reference
+}
+
+export async function updateService(serviceId: string, patch: Partial<Omit<Service, 'id'>>) {
+  const database = requireDb()
+  await updateDoc(doc(database, 'services', serviceId), {
+    ...patch,
+    updatedAt: serverTimestamp(),
+  })
+  await syncPublicService(serviceId)
+}
+
+export async function removeService(serviceId: string) {
+  const database = requireDb()
+  await deleteDoc(doc(database, 'services', serviceId))
+  await deleteDoc(doc(database, 'publicServices', serviceId))
+}
+
+----------------------------------------------------------------------------------------------------
+FIM DO ARQUIVO: src\services\serviceService.ts
+
+----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: src\services\settingsService.ts
 ----------------------------------------------------------------------------------------------------
 import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { requireDb } from '../lib/firebase'
-import type { Settings } from '../types'
+import type { PublicSettings, Settings } from '../types'
 import { defaultSettings } from '../utils/constants'
 
 export async function getSettings(): Promise<Settings> {
@@ -12999,14 +13949,52 @@ export async function getSettings(): Promise<Settings> {
 
 export async function saveSettings(settings: Settings) {
   const database = requireDb()
-  await setDoc(
-    doc(database, 'settings', 'main'),
-    {
-      ...settings,
-      updatedAt: serverTimestamp(),
-    },
-    { merge: true },
-  )
+  const updatedAt = serverTimestamp()
+  const publicSettings = toPublicSettings(settings)
+
+  await Promise.all([
+    setDoc(
+      doc(database, 'settings', 'main'),
+      {
+        ...settings,
+        updatedAt,
+      },
+      { merge: true },
+    ),
+    setDoc(
+      doc(database, 'publicSettings', 'main'),
+      {
+        ...publicSettings,
+        updatedAt,
+      },
+      { merge: true },
+    ),
+  ])
+}
+
+export async function getPublicSettings(): Promise<PublicSettings> {
+  const database = requireDb()
+  const snapshot = await getDoc(doc(database, 'publicSettings', 'main'))
+
+  if (!snapshot.exists()) {
+    return toPublicSettings(defaultSettings)
+  }
+
+  return { ...toPublicSettings(defaultSettings), ...snapshot.data() } as PublicSettings
+}
+
+export function toPublicSettings(settings: Settings): PublicSettings {
+  return {
+    bandName: settings.bandName,
+    pixReceiverName: settings.pixReceiverName,
+    pixKey: settings.pixKey,
+    pixKeyType: settings.pixKeyType,
+    bankName: settings.bankName,
+    paymentInstructions: settings.paymentInstructions,
+    whatsapp: settings.whatsapp,
+    email: settings.email,
+    updatedAt: settings.updatedAt,
+  }
 }
 
 ----------------------------------------------------------------------------------------------------
@@ -13022,11 +14010,9 @@ export type UserRole = 'admin' | 'client'
 export type PixKeyType = 'cpf' | 'cnpj' | 'email' | 'telefone' | 'aleatoria'
 
 export type QuoteStatus =
-  | 'rascunho'
   | 'em_analise'
   | 'aprovado_aguardando_entrada'
   | 'entrada_informada_pelo_cliente'
-  | 'entrada_confirmada'
   | 'agendado'
   | 'realizado'
   | 'recusado'
@@ -13068,6 +14054,8 @@ export type CostSnapshot = {
   refId?: string
   name: string
   cost: number
+  quantity?: number
+  totalCost?: number
   notes?: string
 }
 
@@ -13095,6 +14083,16 @@ export type Service = FirestoreEntity & {
   supplierLinks: SupplierLink[]
   memberCostLinks: MemberCostLink[]
   internalNotes?: string
+}
+
+export type PublicService = FirestoreEntity & {
+  serviceId: string
+  name: string
+  description: string
+  category: string
+  basePrice: number
+  active: boolean
+  allowPriceEdit: boolean
 }
 
 export type BandMember = FirestoreEntity & {
@@ -13166,6 +14164,7 @@ export type Quote = FirestoreEntity & {
   totalCosts: number
   estimatedProfit: number
   estimatedMargin: number
+  depositPercent: number
   depositAmount: number
   remainingAmount: number
   status: QuoteStatus
@@ -13176,10 +14175,38 @@ export type Quote = FirestoreEntity & {
   depositConfirmedAt?: DateLike
 }
 
+export type ClientQuoteViewItem = Omit<QuoteItem, 'costSnapshot'>
+
+export type ClientQuoteView = FirestoreEntity & {
+  quoteId: string
+  clientId: string
+  clientUserId: string
+  clientSnapshot: Quote['clientSnapshot']
+  event: QuoteEvent
+  items: ClientQuoteViewItem[]
+  subtotal: number
+  discount: number
+  travelFee: number
+  total: number
+  depositPercent: number
+  depositAmount: number
+  remainingAmount: number
+  status: QuoteStatus
+  clientNotes?: string
+  rejectionReason?: string
+  paymentSummary?: {
+    depositStatus?: PaymentStatus
+    remainingStatus?: PaymentStatus
+  }
+  approvedAt?: DateLike
+  depositConfirmedAt?: DateLike
+}
+
 export type Payment = FirestoreEntity & {
   quoteId: string
   clientId: string
-  type: 'entrada_50' | 'restante_50' | 'outro'
+  clientUserId?: string
+  type: 'entrada' | 'restante' | 'entrada_50' | 'restante_50' | 'outro'
   amount: number
   status: PaymentStatus
   pixKeyUsed: string
@@ -13223,6 +14250,18 @@ export type Settings = {
   updatedAt?: DateLike
 }
 
+export type PublicSettings = {
+  bandName: string
+  pixReceiverName: string
+  pixKey: string
+  pixKeyType: PixKeyType
+  bankName?: string
+  paymentInstructions?: string
+  whatsapp?: string
+  email?: string
+  updatedAt?: DateLike
+}
+
 export type AuditLog = FirestoreEntity & {
   userId: string
   userName: string
@@ -13230,6 +14269,7 @@ export type AuditLog = FirestoreEntity & {
   entity: string
   entityId: string
   description: string
+  metadata?: Record<string, unknown>
 }
 
 ----------------------------------------------------------------------------------------------------
@@ -13243,6 +14283,7 @@ import type { CostSnapshot, QuoteItem } from '../types'
 export type QuoteTotals = {
   subtotal: number
   total: number
+  depositPercent: number
   depositAmount: number
   remainingAmount: number
   totalCosts: number
@@ -13255,21 +14296,31 @@ export function calculateQuoteTotals(
   discount = 0,
   travelFee = 0,
   manualCosts: CostSnapshot[] = [],
+  depositPercent = 50,
 ): QuoteTotals {
   const subtotal = items.reduce((sum, item) => sum + item.totalPrice, 0)
   const total = Math.max(subtotal - discount + travelFee, 0)
   const itemCosts = items.reduce(
-    (sum, item) => sum + item.costSnapshot.reduce((itemSum, cost) => itemSum + cost.cost, 0),
+    (sum, item) =>
+      sum +
+      item.costSnapshot.reduce(
+        (itemSum, cost) => itemSum + (cost.totalCost ?? cost.cost * (cost.quantity ?? 1)),
+        0,
+      ),
     0,
   )
-  const totalCosts = itemCosts + manualCosts.reduce((sum, cost) => sum + cost.cost, 0)
+  const totalCosts =
+    itemCosts +
+    manualCosts.reduce((sum, cost) => sum + (cost.totalCost ?? cost.cost * (cost.quantity ?? 1)), 0)
   const estimatedProfit = total - totalCosts
   const estimatedMargin = total > 0 ? (estimatedProfit / total) * 100 : 0
-  const depositAmount = total * 0.5
+  const normalizedDepositPercent = Math.min(Math.max(depositPercent, 1), 100)
+  const depositAmount = total * (normalizedDepositPercent / 100)
 
   return {
     subtotal,
     total,
+    depositPercent: normalizedDepositPercent,
     depositAmount,
     remainingAmount: total - depositAmount,
     totalCosts,
@@ -13294,8 +14345,6 @@ INICIO DO ARQUIVO: src\utils\constants.ts
 import {
   BadgeCheck,
   CalendarDays,
-  CheckCircle2,
-  Clock3,
   Hourglass,
   Info,
   OctagonX,
@@ -13375,11 +14424,6 @@ export const quoteStatusMeta: Record<
     icon: typeof Hourglass
   }
 > = {
-  rascunho: {
-    label: 'Rascunho',
-    className: 'bg-slate-500/15 text-slate-200 ring-slate-400/20',
-    icon: Clock3,
-  },
   em_analise: {
     label: 'Em analise',
     className: 'bg-amber-400/15 text-amber-200 ring-amber-300/30',
@@ -13394,11 +14438,6 @@ export const quoteStatusMeta: Record<
     label: 'Entrada informada',
     className: 'bg-violet-400/15 text-violet-200 ring-violet-300/30',
     icon: Info,
-  },
-  entrada_confirmada: {
-    label: 'Entrada confirmada',
-    className: 'bg-emerald-400/15 text-emerald-200 ring-emerald-300/30',
-    icon: CheckCircle2,
   },
   agendado: {
     label: 'Agendado',
