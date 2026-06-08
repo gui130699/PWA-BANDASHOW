@@ -1,57 +1,194 @@
 # Grupo Dvanera - Gestao de Agenda e Orcamentos
 
-PWA profissional para administrar agenda, orcamentos, servicos, custos internos, integrantes, fornecedores, pagamentos Pix e configuracoes do Grupo Dvanera.
+PWA em React, TypeScript e Firebase para administrar agenda, orcamentos, servicos, custos internos, integrantes, fornecedores e pagamentos Pix.
+
+## Status de producao
+
+- GitHub Pages: validado em 8 de junho de 2026.
+- URL: https://gui130699.github.io/PWA-BANDASHOW/
+- Workflow final: `27172060702`.
+- Commit de producao validado: `08511aa`.
+- Manifest: sem erros.
+- Instalabilidade PWA: zero erros no Chrome DevTools Protocol.
+- Service worker: ativo, controlando `/PWA-BANDASHOW/`.
+- Rotas internas: refresh direto validado sem tela branca ou 404.
+- `npm run lint`: OK.
+- `npm run build`: OK.
+- `npm audit --omit=dev`: 0 vulnerabilidades.
 
 ## Stack
 
-- React + Vite + TypeScript
+- React 19, React Router e TypeScript
+- Vite 8 com code splitting
 - Tailwind CSS
 - Firebase Auth e Cloud Firestore
-- GitHub Pages como deploy principal
+- React Hook Form, Zod, Lucide React e Recharts
+- GitHub Actions e GitHub Pages
 - Firebase Hosting opcional
-- React Router
-- react-hook-form + zod
-- lucide-react
-- Recharts
 
-## Instalar
+## Instalar e rodar
 
 ```bash
 npm install
+npm run dev
 ```
 
-## Configurar ambiente
+Build local equivalente ao GitHub Pages:
 
-Copie `.env.example` para `.env.local` para o app web e preencha:
+```powershell
+$env:VITE_BASE_PATH='/PWA-BANDASHOW/'
+npm run build
+npm run preview -- --host 127.0.0.1 --port 4173
+```
+
+URL local:
+
+```txt
+http://127.0.0.1:4173/PWA-BANDASHOW/
+```
+
+## Variaveis Firebase
+
+Crie `.env.local` a partir de `.env.example`. Nunca versione esse arquivo.
 
 ```env
 VITE_FIREBASE_API_KEY=
 VITE_FIREBASE_AUTH_DOMAIN=pwa-bandashow.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=pwa-bandashow
-VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_STORAGE_BUCKET=pwa-bandashow.firebasestorage.app
 VITE_FIREBASE_MESSAGING_SENDER_ID=
 VITE_FIREBASE_APP_ID=
 ```
 
-Para scripts administrativos locais, use uma service account do Firebase:
+Secrets obrigatorias no GitHub:
 
-```env
-FIREBASE_SERVICE_ACCOUNT_PATH=C:\caminho\service-account.json
-FIREBASE_PROJECT_ID=pwa-bandashow
-ADMIN_EMAIL=admin@grupodvanera.com.br
-ADMIN_PASSWORD=sua-senha-forte
-ADMIN_NAME=Administrador Grupo Dvanera
+```txt
+VITE_FIREBASE_API_KEY
+VITE_FIREBASE_AUTH_DOMAIN
+VITE_FIREBASE_PROJECT_ID
+VITE_FIREBASE_STORAGE_BUCKET
+VITE_FIREBASE_MESSAGING_SENDER_ID
+VITE_FIREBASE_APP_ID
 ```
 
-Tambem e possivel usar `FIREBASE_SERVICE_ACCOUNT_JSON` com o JSON em uma unica linha.
+O workflow define diretamente:
+
+```env
+VITE_BASE_PATH=/PWA-BANDASHOW/
+```
+
+## Checklist GitHub Pages
+
+- [x] GitHub Pages habilitado.
+- [x] Source configurado para GitHub Actions.
+- [x] Secrets `VITE_FIREBASE_*` cadastradas.
+- [x] `gui130699.github.io` cadastrado em Firebase Authentication > Authorized domains.
+- [x] Workflow executado sem erro.
+- [x] URL publica abre normalmente.
+- [x] Refresh em `/login`, `/admin/acesso`, `/cliente`, `/admin/dashboard` e `/solicitar-orcamento` funciona.
+
+O `postbuild` executa `scripts/createGhPagesFallback.ts`, copiando `dist/index.html` para `dist/404.html`. Isso permite que o React Router recupere rotas acessadas diretamente no GitHub Pages.
+
+## PWA
+
+Arquivos centrais:
+
+```txt
+public/manifest.webmanifest
+public/sw.js
+public/icons/icon-192.png
+public/icons/icon-512.png
+public/icons/maskable-512.png
+src/main.tsx
+```
+
+O service worker `grupo-dvanera-v4`:
+
+- usa network-first para navegacao;
+- usa cache de runtime somente para assets locais;
+- ignora requisicoes nao GET e origens externas;
+- nao intercepta Firebase Auth ou Firestore;
+- executa `skipWaiting` e `clients.claim`;
+- apaga caches antigos na ativacao.
+
+Validacao executada na URL publica:
+
+- Manifest URL correta.
+- Nenhum erro de manifest.
+- Nenhum erro de instalabilidade.
+- Service worker `activated`.
+- Pagina controlada pelo service worker.
+
+Validacao manual complementar:
+
+1. Abra a URL no Chrome.
+2. Acesse DevTools > Application > Manifest.
+3. Confirme os icones 192, 512 e maskable.
+4. Em Service Workers, confirme `sw.js` ativo.
+5. Use a opcao Instalar aplicativo do Chrome.
+
+## Limpar service worker antigo
+
+Se um navegador mantiver uma versao antiga:
+
+1. DevTools > Application > Service Workers > Unregister.
+2. Application > Storage > Clear site data.
+3. Feche as abas do site.
+4. Abra novamente com `Ctrl+Shift+R`.
+
+Tambem e possivel executar no console:
+
+```js
+const registrations = await navigator.serviceWorker.getRegistrations()
+await Promise.all(registrations.map((registration) => registration.unregister()))
+const keys = await caches.keys()
+await Promise.all(keys.map((key) => caches.delete(key)))
+location.reload()
+```
+
+## Performance e bundle
+
+Todas as paginas sao carregadas com `React.lazy` e `Suspense`. Recharts so e baixado quando uma pagina administrativa com graficos e aberta. Firebase usa imports modulares.
+
+Principais chunks do build final:
+
+```txt
+index                    55.14 kB
+firebase-auth            85.71 kB
+forms-vendor             87.43 kB
+firebase-firestore      266.77 kB
+react-vendor            283.70 kB
+charts-vendor           343.60 kB
+```
+
+Nao existe chunk acima de 500 kB e o Vite nao emite mais esse aviso. A imagem principal foi reduzida de aproximadamente 2,05 MB em PNG para 273,51 kB em JPEG, sem alterar suas dimensoes.
+
+## NPM audit
+
+Comandos:
+
+```bash
+npm audit
+npm audit --omit=dev
+```
+
+Resultado final:
+
+- Dependencias de producao: 0 vulnerabilidades.
+- Auditoria completa: 8 moderadas em dependencias transitivas de desenvolvimento do `firebase-admin`.
+- Cadeia: `firebase-admin` > Google Cloud SDKs > `uuid` 9.
+- O `firebase-admin` e usado apenas por scripts locais administrativos e nao entra no bundle web.
+- `npm audit fix --force` nao foi aplicado porque exige downgrade com breaking change para `firebase-admin@10.3.0`.
+
+Recomendacao: acompanhar novas versoes de `firebase-admin`, `@google-cloud/firestore` e `@google-cloud/storage`. Nao usar `--force` sem repetir todos os testes.
 
 ## Firebase obrigatorio
 
-No Firebase Console do projeto `pwa-bandashow`:
+No projeto `pwa-bandashow`:
 
 1. Ative Authentication.
-2. Habilite o provedor Email/Password.
-3. Em Authorized domains, adicione `gui130699.github.io`.
+2. Habilite Email/Password.
+3. Mantenha `gui130699.github.io` em Authorized domains.
 4. Crie o Cloud Firestore.
 5. Publique regras e indices:
 
@@ -60,169 +197,78 @@ firebase login
 firebase deploy --only firestore --project pwa-bandashow
 ```
 
-## Rodar localmente
+## Primeiro admin
 
-```bash
-npm run dev
-```
-
-## Validar
-
-```bash
-npm run lint
-npm run build
-```
-
-## Deploy principal - GitHub Pages
-
-O deploy principal e feito por GitHub Actions a cada push na branch `main`.
-
-```bash
-git push origin main
-```
-
-O workflow `.github/workflows/deploy-pages.yml` injeta as secrets `VITE_FIREBASE_*` e define:
-
-```env
-VITE_BASE_PATH=/PWA-BANDASHOW/
-```
-
-URL publica:
-
-```txt
-https://gui130699.github.io/PWA-BANDASHOW/
-```
-
-## Deploy Firebase Hosting opcional
-
-```bash
-npm run deploy
-```
-
-## Criar primeiro admin
-
-Opcao via navegador:
+Pelo navegador:
 
 1. Abra `/admin/acesso`.
-2. Se ainda nao existir admin, crie o primeiro cadastro.
-3. Depois disso, a tela passa a ser apenas login admin.
+2. Crie o primeiro e unico cadastro admin.
+3. Depois da criacao, a rota passa a oferecer somente login.
 
-Opcao via script local:
+Pelo script local:
 
 ```bash
 npm run create-admin
 ```
 
-O script usa Firebase Admin SDK, cria o usuario no Auth e grava:
+O script exige service account e grava:
 
-- `users/{uid}` com `role: "admin"`
-- `system/adminSetup`
-- `system/adminOwner`
+- `users/{uid}` com `role: "admin"`;
+- `system/adminSetup`;
+- `system/adminOwner`.
 
-## Resetar admin com seguranca
+## Resetar admin
 
-Nao existe segredo administrativo no front-end. Para remover o admin primario e liberar novo cadastro, rode localmente:
+Nao existe senha mestre no front-end. O reset seguro e local:
 
 ```bash
 npm run reset-admin
 ```
 
-O script:
+Configure uma destas opcoes sem versionar credenciais:
 
-- exige service account local;
-- localiza `system/adminOwner`;
-- pede confirmacao digitando `RESETAR`;
-- remove `users/{uid}`;
-- remove `system/adminOwner`;
-- remove `system/adminSetup`;
-- remove o usuario do Firebase Auth, se existir;
-- registra auditoria em `auditLogs`.
-
-## Popular dados iniciais
-
-```bash
-npm run seed
+```env
+FIREBASE_SERVICE_ACCOUNT_PATH=C:\caminho\service-account.json
 ```
 
-O seed cria dados internos e tambem espelhos publicos:
+ou:
 
-- `services` e `publicServices`
-- `settings/main` e `publicSettings/main`
+```env
+FIREBASE_SERVICE_ACCOUNT_JSON={"type":"service_account",...}
+```
 
-## Rotas
+O script exige a confirmacao `RESETAR`, remove Auth e documentos de controle e registra auditoria.
 
-Publicas:
+## Dados e seguranca
 
-- `/`
-- `/login`
-- `/cadastro`
-- `/admin/acesso`
-- `/solicitar-orcamento`
+Colecoes internas:
 
-Cliente:
+```txt
+users
+clients
+services
+bandMembers
+suppliers
+quotes
+payments
+memberPayments
+supplierPayments
+settings
+auditLogs
+system
+```
 
-- `/cliente`
-- `/cliente/novo-orcamento`
-- `/cliente/orcamentos`
-- `/cliente/orcamentos/:id`
-- `/cliente/pagamentos`
+Colecoes sanitizadas:
 
-Admin:
+```txt
+publicServices
+clientQuoteViews
+publicSettings
+```
 
-- `/admin/dashboard`
-- `/admin/agenda`
-- `/admin/orcamentos`
-- `/admin/orcamentos/:id`
-- `/admin/servicos`
-- `/admin/integrantes`
-- `/admin/fornecedores`
-- `/admin/pagamentos`
-- `/admin/clientes`
-- `/admin/configuracoes`
+O cliente nao consegue ler `quotes`, `services`, `suppliers`, `bandMembers`, `settings`, `auditLogs` ou `system/adminOwner`. A visao `clientQuoteViews` remove custos, lucro, margem, notas administrativas e `costSnapshot`.
 
-## Colecoes Firestore
-
-Internas:
-
-- `users`: perfis e roles.
-- `clients`: dados cadastrais do cliente.
-- `services`: servicos internos com custos, fornecedores, integrantes e observacoes internas.
-- `bandMembers`: integrantes, Pix e valores padrao.
-- `suppliers`: fornecedores, Pix e custos padrao.
-- `quotes`: orcamentos internos com custos, lucro, margem e notas admin.
-- `payments`: pagamentos de cliente.
-- `memberPayments`: pagamentos para integrantes.
-- `supplierPayments`: pagamentos para fornecedores.
-- `settings/main`: configuracoes completas do admin.
-- `auditLogs`: auditoria administrativa.
-- `system/adminSetup` e `system/adminOwner`: controle de admin unico.
-
-Publicas/sanitizadas:
-
-- `publicServices`: catalogo de servicos sem custos internos.
-- `clientQuoteViews`: versao segura do orcamento para cliente, sem `totalCosts`, `estimatedProfit`, `estimatedMargin`, `manualCosts`, `costSnapshot` e `adminNotes`.
-- `publicSettings/main`: Pix, recebedor, instrucoes e contatos publicos.
-
-## Separacao de dados sensiveis
-
-O cliente nao le:
-
-- `quotes`
-- `services`
-- `suppliers`
-- `bandMembers`
-- `settings`
-
-O cliente le:
-
-- seus documentos em `clientQuoteViews`
-- seus documentos em `payments`
-- `publicServices` ativos
-- `publicSettings/main`
-
-Essa separacao existe porque Firestore nao mascara campos de um documento. Por isso dados internos e dados publicos ficam em documentos diferentes.
-
-## Fluxo oficial do orcamento
+## Fluxo validado
 
 ```txt
 em_analise
@@ -230,116 +276,59 @@ aprovado_aguardando_entrada
 entrada_informada_pelo_cliente
 agendado
 realizado
-recusado
-cancelado
 ```
 
-1. Cliente solicita orcamento.
-2. O sistema cria `quotes/{quoteId}` e `clientQuoteViews/{quoteId}`.
-3. Admin revisa valores e recalcula custos internos.
-4. Admin aprova ou recusa.
-5. Ao aprovar, o sistema gera pagamento de entrada.
-6. Cliente informa pagamento.
-7. Admin confirma pagamento.
-8. Evento entra na agenda como `agendado`.
-9. Admin pode gerar pagamento restante.
-10. Cliente informa restante.
-11. Admin confirma restante.
-12. Admin marca evento como `realizado`.
+O teste final criou fornecedor, integrante, servico, cliente, orcamento, entrada e restante. Custos de R$ 800 e R$ 500 foram consolidados em `costSnapshot`; o cliente recebeu somente a visao sanitizada. Os dois pagamentos foram informados pelo cliente e confirmados pelo admin. O evento entrou na agenda e foi marcado como realizado.
 
-## Calculos financeiros
+Todos os usuarios, documentos, configuracoes e logs temporarios foram removidos ao final. O Firebase voltou a conter somente o usuario original e nenhum primeiro admin configurado.
 
-O percentual de entrada vem de `settings/main.defaultDepositPercent` no momento da aprovacao/recalculo.
+## Tratamento de erros
 
-```ts
-depositAmount = total * (depositPercent / 100)
-remainingAmount = total - depositAmount
-```
+Mensagens amigaveis cobrem:
 
-O campo `depositPercent` fica salvo no orcamento para preservar o historico caso a configuracao mude no futuro.
+- Auth desabilitado ou configuracao ausente;
+- dominio nao autorizado;
+- permissao negada;
+- indisponibilidade e falha de rede;
+- excesso de tentativas;
+- Pix ausente;
+- servicos ou pagamentos vazios;
+- orcamento ou perfil inexistente.
 
-Custos internos sao copiados para `costSnapshot` no momento da aprovacao/recalculo. Assim, alteracoes futuras em fornecedores ou integrantes nao alteram orcamentos antigos.
-
-## Pagamentos
-
-Tipos novos:
-
-- `entrada`
-- `restante`
-- `outro`
-
-Tipos legados ainda sao reconhecidos para compatibilidade:
-
-- `entrada_50`
-- `restante_50`
-
-Funcoes centrais:
-
-- `clientMarkPaymentAsPaid(payment, message)`: cliente informa pagamento.
-- `confirmPayment(paymentId, actor)`: admin confirma entrada/restante e sincroniza agenda/cliente.
-- `createFinalPayment(quote, settings)`: gera pagamento restante.
-
-## Auditoria
-
-Acoes administrativas importantes registram `auditLogs`, incluindo:
-
-- servico criado/editado;
-- fornecedor criado/editado/desativado;
-- integrante criado/editado/desativado;
-- orcamento aprovado/recusado/cancelado/recalculado/realizado;
-- pagamento confirmado;
-- configuracoes alteradas;
-- reset admin via script.
-
-Os ultimos logs aparecem em `/admin/configuracoes`.
-
-## Checklist de seguranca
-
-- Cliente nao le `quotes`.
-- Cliente nao le `services`.
-- Cliente nao le `suppliers`.
-- Cliente nao le `bandMembers`.
-- Cliente nao le `settings`.
-- Cliente so informa pagamento, nunca confirma.
-- Admin confirma pagamentos.
-- Senha mestre removida do front-end.
-- Regras Firestore protegem colecoes internas.
-- Dados publicos sao sincronizados em colecoes proprias.
-
-## Restauracao Git
-
-Ver commits:
+## Testes e documentacao
 
 ```bash
-git log --oneline
+npm run lint
+npm run build
+npm run docs
 ```
 
-Voltar para um commit mantendo historico:
+Consulte:
 
-```bash
-git revert <hash-do-commit>
-```
+- `CHECKLIST_PRODUCAO.md`
+- `TESTES_MANUAIS_PRODUCAO.md`
+- `RELATORIO_FINAL_PRODUCAO.md`
+- `DOCUMENTACAO_COMPLETA_PROJETO.txt`
 
-Inspecionar um commit:
+## Solucao de tela branca
 
-```bash
-git switch --detach <hash-do-commit>
-```
+1. Confira o ultimo workflow em GitHub Actions.
+2. Confirme as seis secrets Firebase.
+3. Confirme `VITE_BASE_PATH=/PWA-BANDASHOW/`.
+4. Confirme o dominio autorizado no Firebase Auth.
+5. Abra a aba Network e procure assets com 404.
+6. Limpe o service worker e o cache conforme a secao acima.
 
-Retornar:
-
-```bash
-git switch main
-```
-
-## Comandos uteis
+## Comandos principais
 
 ```bash
 npm install
+npm audit
+npm audit --omit=dev
 npm run lint
 npm run build
-npm run dev
 npm run preview
+npm run docs
 npm run create-admin
 npm run reset-admin
 npm run seed

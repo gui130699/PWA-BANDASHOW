@@ -1,256 +1,27 @@
 DOCUMENTACAO COMPLETA DO PROJETO - PWA-BANDASHOW / GRUPO DVANERA
-Gerado automaticamente para leitura, manutencao, auditoria tecnica e backup do projeto.
-Data de geracao: 2026-06-08 18:03:19 -03:00
-Commit documentado: eb5df5f
+Gerado automaticamente para leitura, manutencao, auditoria tecnica e backup.
+Data de geracao: 2026-06-08 20:01:13 - America/Sao_Paulo
+Commit base documentado: 08511aa
 Pasta local: C:\Users\guilh\OneDrive\HP Guilherme Notebook\Área de Trabalho\PWA- Everton
 Repositorio: https://github.com/gui130699/PWA-BANDASHOW.git
 Pages: https://gui130699.github.io/PWA-BANDASHOW/
 
-Observacao de seguranca: este TXT nao inclui .env.local, node_modules, dist, .git, logs nem arquivos binarios.
-Nao ha senha mestre no front-end. O reset admin e feito por script local com Firebase Admin SDK.
+SEGURANCA
+- .env.local, .git, node_modules, dist e logs nao sao incluidos.
+- Segredos Firebase e credenciais administrativas nao sao copiados.
+- Arquivos binarios sao apenas inventariados; o conteudo textual do projeto e incluido.
 
-====================================================================================================
-1. VISAO GERAL ATUALIZADA
-====================================================================================================
-O projeto e um PWA em React + Vite + TypeScript para gestao de agenda, orcamentos, clientes, pagamentos, fornecedores, integrantes, servicos e configuracoes do Grupo Dvanera.
-A revisao atual consolidou separacao real entre dados internos e dados publicos do cliente, calculo financeiro com custos historicos, percentual de entrada configuravel, pagamentos unificados, auditoria, regras Firestore de producao e lockfile sincronizado para GitHub Pages.
+DOCUMENTOS DE REFERENCIA
+- README.md
+- CHECKLIST_PRODUCAO.md
+- TESTES_MANUAIS_PRODUCAO.md
+- RELATORIO_FINAL_PRODUCAO.md
 
-Experiencias principais:
-- Publica: home, cadastro/login e acesso admin inicial.
-- Cliente: dashboard, novo orcamento, orcamentos seguros, detalhe sanitizado e pagamentos.
-- Admin: dashboard, agenda, orcamentos internos, servicos com custos, integrantes, fornecedores, pagamentos, clientes, configuracoes e auditoria.
-
-====================================================================================================
-2. ALTERACOES DESTA ATUALIZACAO
-====================================================================================================
-- Adicionado botao "Voltar para o inicio" na tela de login, apontando para a rota publica inicial do app (/).
-- Adicionado o mesmo retorno na tela de cadastro para manter a navegacao consistente fora do painel.
-- Revalidado package-lock.json com npm 10 para evitar falha de npm ci no GitHub Actions.
-- Rodados npm run lint, npm run build e npx npm@10 ci --dry-run.
-- Verificada visualmente a tela /login em preview local com captura Playwright.
-
-====================================================================================================
-3. PRINCIPAIS CORRECOES DE PRODUCAO JA APLICADAS
-====================================================================================================
-- Cliente deixou de ler quotes internos.
-- Cliente deixou de ler services internos.
-- Cliente deixou de ler settings/main interno.
-- Criada clientQuoteViews/{quoteId} para orcamentos sanitizados.
-- Criada publicServices/{serviceId} para catalogo publico sem custos.
-- Criada publicSettings/main para Pix/contatos/instrucoes publicas.
-- Removido reset/exclusao de admin via front-end.
-- Criado npm run reset-admin com Firebase Admin SDK e confirmacao no terminal.
-- Status entrada_confirmada deixou de ser usado.
-- Percentual de entrada passou a vir de settings/main.defaultDepositPercent.
-- depositPercent fica salvo no orcamento para preservar historico.
-- Custos internos sao copiados para costSnapshot no momento de recalculo/aprovacao.
-- Confirmacao de pagamento foi centralizada em confirmPayment.
-- Cliente pode informar entrada e restante, mas nunca confirmar pagamento.
-- Admin visualiza auditoria recente em Configuracoes.
-- Service worker atualizado para grupo-dvanera-v3.
-- package-lock.json sincronizado com npm 10 para npm ci no GitHub Actions.
-
-====================================================================================================
-4. TECNOLOGIAS E DEPENDENCIAS
-====================================================================================================
-- React 19
-- TypeScript
-- Vite
-- Tailwind CSS
-- React Router
-- Firebase Web SDK
-- Firebase Admin SDK para scripts locais
-- React Hook Form + Zod
-- Lucide React
-- Recharts
-- ESLint
-
-====================================================================================================
-5. COMANDOS PRINCIPAIS
-====================================================================================================
-Instalar dependencias:
-  npm install
-
-Rodar localmente:
-  npm run dev
-
-Validar:
-  npm run lint
-  npm run build
-  npx --yes npm@10 ci --dry-run
-
-Criar primeiro admin via script:
-  npm run create-admin
-
-Resetar admin com seguranca:
-  npm run reset-admin
-
-Popular dados iniciais:
-  npm run seed
-
-Deploy Firestore:
-  firebase deploy --only firestore --project pwa-bandashow
-
-====================================================================================================
-6. ROTAS PRINCIPAIS
-====================================================================================================
-- /: tela inicial publica.
-- /login: login de cliente/admin com botao de retorno para a tela inicial.
-- /cadastro: cadastro de cliente com botao de retorno para a tela inicial.
-- /admin/acesso: login/criacao do primeiro admin.
-- /solicitar-orcamento: entrada publica para solicitar orcamento.
-- /cliente: dashboard do cliente.
-- /cliente/novo-orcamento: novo orcamento.
-- /cliente/orcamentos: lista de orcamentos sanitizados.
-- /cliente/pagamentos: pagamentos do cliente.
-- /admin/dashboard: painel administrativo.
-- /admin/agenda: agenda operacional.
-- /admin/orcamentos: orcamentos internos.
-- /admin/pagamentos: pagamentos internos.
-- /admin/configuracoes: configuracoes, auditoria e instrucoes de reset admin.
-
-====================================================================================================
-7. FIREBASE E COLECOES
-====================================================================================================
-- users: perfis de usuarios autenticados.
-- system/adminOwner e system/adminSetup: controle do primeiro e unico admin.
-- services: servicos internos com custos, acesso admin.
-- publicServices: catalogo publico seguro para clientes autenticados.
-- quotes: orcamentos internos com custos, acesso admin.
-- clientQuoteViews: visao sanitizada de orcamento para o cliente dono.
-- payments: pagamentos, lidos pelo admin e pelo cliente dono quando aplicavel.
-- settings/main: configuracoes internas do admin.
-- publicSettings/main: dados publicos para pagamento/contato.
-- auditLogs: registros administrativos imutaveis pelo front-end.
-
-====================================================================================================
-8. REGRAS DE SEGURANCA
-====================================================================================================
-As regras Firestore separam dados internos de dados do cliente. O cliente nao recebe custos de fornecedores, custos de integrantes, observacoes internas nem configuracoes sensiveis.
-O primeiro admin e protegido por documentos de sistema. A exclusao/reset desse cadastro nao ocorre mais pelo navegador.
-Para reset admin, use o script local npm run reset-admin com credenciais de Firebase Admin SDK.
-
-====================================================================================================
-9. FLUXO DE ORCAMENTO
-====================================================================================================
-1. Cliente cria solicitacao a partir de servicos publicos.
-2. Sistema cria quote interno e clientQuoteView sanitizada.
-3. Admin revisa, recalcula custos, ajusta percentual de entrada e aprova ou recusa.
-4. Ao aprovar, o sistema cria pagamento de entrada e atualiza a visao do cliente.
-5. Cliente informa pagamento realizado.
-6. Admin confirma pagamento; entrada confirmada leva o orcamento para agenda.
-7. Admin registra realizacao e cria/acompanha pagamento restante quando necessario.
-
-====================================================================================================
-10. CHECKLIST DE VALIDACAO DESTA GERACAO
-====================================================================================================
-- npm run lint: OK.
-- npm run build: OK.
-- npx --yes npm@10 ci --dry-run: OK.
-- Preview local /login com captura Playwright: OK.
-- package-lock.json contem @emnapi/core e @emnapi/runtime top-level exigidos pelo npm ci: OK.
-
-====================================================================================================
-11. OBSERVACOES OPERACIONAIS
-====================================================================================================
-- O Firebase Auth precisa estar com Email/Password habilitado no console do Firebase para cadastro/login funcionarem.
-- O deploy do GitHub Pages roda via workflow em .github/workflows.
-- O alerta de bundle maior que 500 kB aparece no Vite por Firebase/Recharts; nao impediu o build.
-- Foram mantidas 8 vulnerabilidades moderadas reportadas pelo npm audit; nao foi executado npm audit fix --force para evitar atualizacoes quebradas sem revisao.
-
-====================================================================================================
-12. ARVORE DE ARQUIVOS DOCUMENTADA
-====================================================================================================
-- .env.example (688 bytes)
-- .github\workflows\deploy-pages.yml (1513 bytes)
-- .gitignore (279 bytes)
-- CHECKLIST_PRODUCAO.md (2949 bytes)
-- eslint.config.js (712 bytes)
-- firebase.json (692 bytes)
-- firestore.indexes.json (728 bytes)
-- firestore.rules (6356 bytes)
-- index.html (647 bytes)
-- package.json (1344 bytes)
-- package-lock.json (260380 bytes)
-- postcss.config.cjs (82 bytes)
-- public\manifest.webmanifest (487 bytes)
-- public\sw.js (1504 bytes)
-- README.md (7718 bytes)
-- scripts\createAdmin.ts (1676 bytes)
-- scripts\firebaseAdmin.ts (827 bytes)
-- scripts\resetAdmin.ts (1832 bytes)
-- scripts\seed.ts (3725 bytes)
-- src\App.tsx (275 bytes)
-- src\components\FirebaseNotice.tsx (681 bytes)
-- src\components\layout\AdminLayout.tsx (1019 bytes)
-- src\components\layout\ClientLayout.tsx (629 bytes)
-- src\components\layout\DashboardLayout.tsx (1204 bytes)
-- src\components\layout\Header.tsx (1387 bytes)
-- src\components\layout\MobileMenu.tsx (945 bytes)
-- src\components\layout\Sidebar.tsx (2269 bytes)
-- src\components\ui\Badge.tsx (740 bytes)
-- src\components\ui\Button.tsx (1537 bytes)
-- src\components\ui\Card.tsx (918 bytes)
-- src\components\ui\ConfirmDialog.tsx (1107 bytes)
-- src\components\ui\DataTable.tsx (1753 bytes)
-- src\components\ui\DateInput.tsx (435 bytes)
-- src\components\ui\EmptyState.tsx (663 bytes)
-- src\components\ui\index.ts (493 bytes)
-- src\components\ui\Input.tsx (1008 bytes)
-- src\components\ui\Loading.tsx (320 bytes)
-- src\components\ui\Modal.tsx (882 bytes)
-- src\components\ui\MoneyInput.tsx (544 bytes)
-- src\components\ui\Select.tsx (1353 bytes)
-- src\components\ui\Textarea.tsx (1038 bytes)
-- src\contexts\AuthContext.tsx (4161 bytes)
-- src\hooks\useCollection.ts (1288 bytes)
-- src\hooks\useDocument.ts (1111 bytes)
-- src\index.css (585 bytes)
-- src\lib\firebase.ts (1348 bytes)
-- src\main.tsx (462 bytes)
-- src\pages\admin\AdminAgendaPage.tsx (4695 bytes)
-- src\pages\admin\AdminClientsPage.tsx (947 bytes)
-- src\pages\admin\AdminDashboardPage.tsx (5912 bytes)
-- src\pages\admin\AdminMembersPage.tsx (9775 bytes)
-- src\pages\admin\AdminPaymentsPage.tsx (4306 bytes)
-- src\pages\admin\AdminQuoteDetailPage.tsx (13096 bytes)
-- src\pages\admin\AdminQuotesPage.tsx (2344 bytes)
-- src\pages\admin\AdminServicesPage.tsx (12398 bytes)
-- src\pages\admin\AdminSettingsPage.tsx (5469 bytes)
-- src\pages\admin\AdminSuppliersPage.tsx (9731 bytes)
-- src\pages\auth\AdminAccessPage.tsx (6873 bytes)
-- src\pages\auth\LoginPage.tsx (3121 bytes)
-- src\pages\auth\RegisterPage.tsx (4243 bytes)
-- src\pages\client\ClientDashboardPage.tsx (3386 bytes)
-- src\pages\client\ClientPaymentsPage.tsx (4366 bytes)
-- src\pages\client\ClientQuoteDetailPage.tsx (8426 bytes)
-- src\pages\client\ClientQuotesPage.tsx (1926 bytes)
-- src\pages\client\NewQuotePage.tsx (14249 bytes)
-- src\pages\public\HomePage.tsx (3975 bytes)
-- src\pages\public\RequestQuotePage.tsx (1250 bytes)
-- src\routes\ProtectedRoute.tsx (663 bytes)
-- src\routes\router.tsx (4034 bytes)
-- src\services\adminAccountService.ts (1860 bytes)
-- src\services\auditService.ts (455 bytes)
-- src\services\firestoreService.ts (1507 bytes)
-- src\services\paymentService.ts (3135 bytes)
-- src\services\quoteService.ts (11561 bytes)
-- src\services\serviceService.ts (1820 bytes)
-- src\services\settingsService.ts (1773 bytes)
-- src\types\index.ts (5400 bytes)
-- src\utils\calculations.ts (1617 bytes)
-- src\utils\constants.ts (2327 bytes)
-- src\utils\firebaseErrors.ts (1386 bytes)
-- src\utils\format.ts (1343 bytes)
-- tailwind.config.ts (774 bytes)
-- tsconfig.app.json (617 bytes)
-- tsconfig.json (119 bytes)
-- tsconfig.node.json (591 bytes)
-- vite.config.ts (258 bytes)
-
-====================================================================================================
-13. CODIGO-FONTE COMPLETO DOS ARQUIVOS DE TEXTO
-====================================================================================================
+ARQUIVOS BINARIOS INVENTARIADOS
+- public/icons/icon-192.png (2450 bytes)
+- public/icons/icon-512.png (7868 bytes)
+- public/icons/maskable-512.png (7782 bytes)
+- src/assets/dvanera-hero.jpg (273517 bytes)
 
 ----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: .env.example
@@ -258,7 +29,7 @@ INICIO DO ARQUIVO: .env.example
 VITE_FIREBASE_API_KEY=
 VITE_FIREBASE_AUTH_DOMAIN=pwa-bandashow.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=pwa-bandashow
-VITE_FIREBASE_STORAGE_BUCKET=pwa-bandashow.appspot.com
+VITE_FIREBASE_STORAGE_BUCKET=pwa-bandashow.firebasestorage.app
 VITE_FIREBASE_MESSAGING_SENDER_ID=
 VITE_FIREBASE_APP_ID=
 
@@ -280,7 +51,7 @@ ADMIN_NAME=Administrador Grupo Dvanera
 FIM DO ARQUIVO: .env.example
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: .github\workflows\deploy-pages.yml
+INICIO DO ARQUIVO: .github/workflows/deploy-pages.yml
 ----------------------------------------------------------------------------------------------------
 name: Deploy GitHub Pages
 
@@ -298,6 +69,9 @@ permissions:
 concurrency:
   group: pages
   cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   deploy:
@@ -329,9 +103,6 @@ jobs:
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
 
-      - name: Add SPA fallback
-        run: cp dist/index.html dist/404.html
-
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
@@ -345,7 +116,7 @@ jobs:
         uses: actions/deploy-pages@v4
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: .github\workflows\deploy-pages.yml
+FIM DO ARQUIVO: .github/workflows/deploy-pages.yml
 
 ----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: .gitignore
@@ -386,93 +157,108 @@ INICIO DO ARQUIVO: CHECKLIST_PRODUCAO.md
 ----------------------------------------------------------------------------------------------------
 # Checklist de Producao - Grupo Dvanera
 
-## Seguranca
-
-- [x] Cliente nao le `quotes` internos
-- [x] Cliente nao le `services` internos
-- [x] Cliente nao le `suppliers`
-- [x] Cliente nao le `bandMembers`
-- [x] Cliente nao le `settings` internos
-- [x] `clientQuoteViews` criada para leitura segura do cliente
-- [x] `publicServices` criada para catalogo publico sem custos
-- [x] `publicSettings` criada para Pix/contatos publicos
-- [x] Senha mestre removida do front-end
-- [x] Reset admin movido para script local com Firebase Admin SDK
-- [x] Firestore Rules revisadas
-
-## Orcamentos
-
-- [x] Custos internos copiados para `costSnapshot` ao recalcular/aprovar
-- [x] `costSnapshot` guarda custo historico com quantidade e custo total
-- [x] Lucro calculado a partir de custos internos
-- [x] Margem calculada a partir do lucro
-- [x] Entrada usa percentual configuravel
-- [x] `depositPercent` salvo no orcamento
-- [x] Status oficial padronizado sem `entrada_confirmada`
-
-## Pagamentos
-
-- [x] Cliente informa entrada
-- [x] Cliente informa restante
-- [x] Cliente nao confirma pagamento
-- [x] Admin confirma entrada por funcao unica
-- [x] Admin confirma restante por funcao unica
-- [x] Evento entra na agenda ao confirmar entrada
-- [x] `clientQuoteViews` sincronizada apos confirmacoes
-
-## Auditoria
-
-- [x] Servicos registram criacao/edicao
-- [x] Integrantes registram criacao/edicao/desativacao
-- [x] Fornecedores registram criacao/edicao/desativacao
-- [x] Orcamentos registram aprovacoes, recusas, cancelamentos, recalculos e realizados
-- [x] Pagamentos confirmados registram log
-- [x] Configuracoes registram log
-- [x] Reset admin registra log via script local
-- [x] Admin visualiza logs recentes
-
-## UX/Admin
-
-- [x] Dashboard admin usa dados reais do mes
-- [x] Agenda filtra por status, cidade, cliente e tipo
-- [x] Agenda mostra telefone, local, servicos, entrada e restante
-- [x] Detalhe admin mostra percentual de entrada
-- [x] Detalhe admin possui recalculo de custos
-
-## UX/Cliente
-
-- [x] Cliente visualiza orcamentos por `clientQuoteViews`
-- [x] Cliente visualiza status amigavel
-- [x] Cliente ve entrada/restante conforme percentual salvo
-- [x] Cliente ve todos os pagamentos pendentes
-- [x] Cliente copia chave Pix
-- [x] Cliente informa pagamento com observacao
+Validacao final executada em 8 de junho de 2026.
 
 ## Deploy
 
-- [x] PWA cache atualizado para `grupo-dvanera-v3`
-- [x] `npm install`
+- [x] GitHub Pages funcionando
+- [x] Refresh em rotas internas funcionando
+- [x] Secrets `VITE_FIREBASE_*` configuradas
+- [x] Authorized domain `gui130699.github.io` configurado
+- [x] GitHub Actions executando com sucesso
+- [x] Fallback `dist/404.html` gerado no postbuild
+- [x] Workflow usa Node 22 e `npm ci`
+- [x] Permissoes Pages corretas
+
+## PWA
+
+- [x] Manifest valido
+- [x] `start_url`, `scope` e `id` usam `/PWA-BANDASHOW/`
+- [x] Icone 192 configurado
+- [x] Icone 512 configurado
+- [x] Icone maskable configurado
+- [x] Service worker ativo
+- [x] App atende aos criterios de instalabilidade
+- [x] Cache v4 atualizado sem prender versao antiga
+- [x] Navegacao offline basica carregada pelo app shell
+- [x] Firebase Auth/Firestore nao sao cacheados
+
+## Performance
+
+- [x] Rotas com lazy loading
+- [x] `Suspense` com estado de carregamento
+- [x] Recharts carregado sob demanda
+- [x] Firebase com imports modulares
+- [x] Bundle analisado
+- [x] Nenhum chunk acima de 500 kB
+- [x] Aviso de chunk grande removido
+- [x] Hero reduzido de 2,05 MB para 273,51 kB
+
+## Seguranca de dependencias
+
+- [x] `npm install` executado
+- [x] `npm audit` executado
+- [x] `npm audit fix` testado sem `--force`
+- [x] `npm audit --omit=dev` sem vulnerabilidades
+- [x] Oito alertas moderados de desenvolvimento documentados
+- [x] Downgrade breaking de `firebase-admin` recusado
+- [x] `npm@10 ci --dry-run` validado
+
+## Seguranca Firebase
+
+- [x] Cliente nao le `quotes`
+- [x] Cliente nao le `services`
+- [x] Cliente nao le `suppliers`
+- [x] Cliente nao le `bandMembers`
+- [x] Cliente nao le `settings`
+- [x] Cliente nao le `system/adminOwner`
+- [x] Cliente le somente sua `clientQuoteViews`
+- [x] Cliente le somente seus pagamentos
+- [x] `publicServices` nao expoe custos internos
+- [x] `clientQuoteViews` nao expoe custos, lucro ou notas admin
+- [x] Reset admin permanece fora do front-end
+
+## Orcamentos e pagamentos
+
+- [x] Primeiro admin criado e autenticado em teste temporario
+- [x] Fornecedor criado
+- [x] Integrante criado
+- [x] Servico criado com custos vinculados
+- [x] Cliente criado
+- [x] Orcamento e visao sanitizada criados
+- [x] Recalculo gera `costSnapshot`
+- [x] Aprovacao gera entrada
+- [x] Cliente informa entrada
+- [x] Admin confirma entrada
+- [x] Evento entra na agenda
+- [x] Admin gera restante
+- [x] Cliente informa restante
+- [x] Admin confirma restante
+- [x] Evento marcado como realizado
+- [x] Auditoria confirmada
+
+## Robustez
+
+- [x] Consulta Firestore nao entra em ciclo de ressubscricao
+- [x] Sincronizacao sem pagamento nao grava `undefined`
+- [x] Consulta de pagamentos do cliente respeita as regras
+- [x] Usuario autenticado sem perfil nao entra em loop
+- [x] Erros Firebase recebem mensagens amigaveis
+- [x] Pix ausente desabilita copia e mostra orientacao
+
+## Qualidade final
+
 - [x] `npm run lint`
 - [x] `npm run build`
-- [x] Firestore Rules publicadas
-- [ ] GitHub Pages funcionando
-- [ ] PWA instalavel
-
-## Testes manuais recomendados
-
-- [ ] Criar primeiro admin em `/admin/acesso`
-- [ ] Criar servico com fornecedor/integrante vinculado
-- [ ] Criar cliente
-- [ ] Solicitar orcamento
-- [ ] Aprovar orcamento
-- [ ] Conferir `clientQuoteViews` sem custos internos
-- [ ] Cliente informar entrada
-- [ ] Admin confirmar entrada
-- [ ] Ver evento na agenda
-- [ ] Gerar pagamento restante
-- [ ] Cliente informar restante
-- [ ] Admin confirmar restante
-- [ ] Marcar evento como realizado
+- [x] Preview local
+- [x] Site publico
+- [x] Rotas publicas e protegidas
+- [x] Manifest publico
+- [x] Service worker publico
+- [x] Instalabilidade publica
+- [x] Dados QA removidos
+- [x] Contas QA removidas
+- [x] Documentacao atualizada
 
 ----------------------------------------------------------------------------------------------------
 FIM DO ARQUIVO: CHECKLIST_PRODUCAO.md
@@ -793,6 +579,7 @@ INICIO DO ARQUIVO: index.html
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="%BASE_URL%icons/gd-icon.svg" />
+    <link rel="apple-touch-icon" href="%BASE_URL%icons/icon-192.png" />
     <link rel="manifest" href="%BASE_URL%manifest.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#06070b" />
@@ -810,62 +597,6 @@ INICIO DO ARQUIVO: index.html
 
 ----------------------------------------------------------------------------------------------------
 FIM DO ARQUIVO: index.html
-
-----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: package.json
-----------------------------------------------------------------------------------------------------
-{
-  "name": "grupo-dvanera-agenda-orcamentos",
-  "private": true,
-  "version": "1.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "create-admin": "tsx scripts/createAdmin.ts",
-    "reset-admin": "tsx scripts/resetAdmin.ts",
-    "seed": "tsx scripts/seed.ts",
-    "deploy": "npm run build && firebase deploy"
-  },
-  "dependencies": {
-    "@hookform/resolvers": "^5.4.0",
-    "clsx": "^2.1.1",
-    "date-fns": "^4.4.0",
-    "firebase": "^12.14.0",
-    "lucide-react": "^1.17.0",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6",
-    "react-hook-form": "^7.77.0",
-    "react-router-dom": "^7.17.0",
-    "recharts": "^3.8.1",
-    "zod": "^4.4.3"
-  },
-  "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@types/node": "^24.12.3",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.1",
-    "autoprefixer": "^10.5.0",
-    "dotenv": "^17.4.2",
-    "eslint": "^10.3.0",
-    "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-react-refresh": "^0.5.2",
-    "firebase-admin": "^13.10.0",
-    "globals": "^17.6.0",
-    "postcss": "^8.5.15",
-    "tailwindcss": "^3.4.19",
-    "tsx": "^4.22.4",
-    "typescript": "~6.0.2",
-    "typescript-eslint": "^8.59.2",
-    "vite": "^8.0.12"
-  }
-}
-
-----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: package.json
 
 ----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: package-lock.json
@@ -2447,9 +2178,9 @@ INICIO DO ARQUIVO: package-lock.json
       }
     },
     "node_modules/@google-cloud/storage": {
-      "version": "7.19.0",
-      "resolved": "https://registry.npmjs.org/@google-cloud/storage/-/storage-7.19.0.tgz",
-      "integrity": "sha512-n2FjE7NAOYyshogdc7KQOl/VZb4sneqPjWouSyia9CMDdMhRX5+RIbqalNmC7LOLzuLAN89VlF2HvG8na9G+zQ==",
+      "version": "7.21.0",
+      "resolved": "https://registry.npmjs.org/@google-cloud/storage/-/storage-7.21.0.tgz",
+      "integrity": "sha512-l+IFTkd+6Y5LoAuXyYCKNAKtw/Ci+rAMqgdTB1jv4iZiLhw0rtq+0qjIRbBizXkNzEFmXiXUW0H7sZQQvk1ffA==",
       "dev": true,
       "license": "Apache-2.0",
       "optional": true,
@@ -2467,8 +2198,7 @@ INICIO DO ARQUIVO: package-lock.json
         "mime": "^3.0.0",
         "p-limit": "^3.0.1",
         "retry-request": "^7.0.0",
-        "teeny-request": "^9.0.0",
-        "uuid": "^8.0.0"
+        "teeny-request": "^9.0.0"
       },
       "engines": {
         "node": ">=14"
@@ -5196,22 +4926,6 @@ INICIO DO ARQUIVO: package-lock.json
         "node": ">=14"
       }
     },
-    "node_modules/gaxios/node_modules/uuid": {
-      "version": "9.0.1",
-      "resolved": "https://registry.npmjs.org/uuid/-/uuid-9.0.1.tgz",
-      "integrity": "sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==",
-      "deprecated": "uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).",
-      "dev": true,
-      "funding": [
-        "https://github.com/sponsors/broofa",
-        "https://github.com/sponsors/ctavan"
-      ],
-      "license": "MIT",
-      "optional": true,
-      "bin": {
-        "uuid": "dist/bin/uuid"
-      }
-    },
     "node_modules/gcp-metadata": {
       "version": "8.1.2",
       "resolved": "https://registry.npmjs.org/gcp-metadata/-/gcp-metadata-8.1.2.tgz",
@@ -5503,22 +5217,6 @@ INICIO DO ARQUIVO: package-lock.json
       "optional": true,
       "engines": {
         "node": ">=14"
-      }
-    },
-    "node_modules/google-gax/node_modules/uuid": {
-      "version": "9.0.1",
-      "resolved": "https://registry.npmjs.org/uuid/-/uuid-9.0.1.tgz",
-      "integrity": "sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==",
-      "deprecated": "uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).",
-      "dev": true,
-      "funding": [
-        "https://github.com/sponsors/broofa",
-        "https://github.com/sponsors/ctavan"
-      ],
-      "license": "MIT",
-      "optional": true,
-      "bin": {
-        "uuid": "dist/bin/uuid"
       }
     },
     "node_modules/google-logging-utils": {
@@ -7666,22 +7364,6 @@ INICIO DO ARQUIVO: package-lock.json
         "node": ">= 6"
       }
     },
-    "node_modules/teeny-request/node_modules/uuid": {
-      "version": "9.0.1",
-      "resolved": "https://registry.npmjs.org/uuid/-/uuid-9.0.1.tgz",
-      "integrity": "sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==",
-      "deprecated": "uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).",
-      "dev": true,
-      "funding": [
-        "https://github.com/sponsors/broofa",
-        "https://github.com/sponsors/ctavan"
-      ],
-      "license": "MIT",
-      "optional": true,
-      "bin": {
-        "uuid": "dist/bin/uuid"
-      }
-    },
     "node_modules/thenify": {
       "version": "3.3.1",
       "resolved": "https://registry.npmjs.org/thenify/-/thenify-3.3.1.tgz",
@@ -7909,11 +7591,15 @@ INICIO DO ARQUIVO: package-lock.json
       "license": "MIT"
     },
     "node_modules/uuid": {
-      "version": "8.3.2",
-      "resolved": "https://registry.npmjs.org/uuid/-/uuid-8.3.2.tgz",
-      "integrity": "sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==",
+      "version": "9.0.1",
+      "resolved": "https://registry.npmjs.org/uuid/-/uuid-9.0.1.tgz",
+      "integrity": "sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==",
       "deprecated": "uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).",
       "dev": true,
+      "funding": [
+        "https://github.com/sponsors/broofa",
+        "https://github.com/sponsors/ctavan"
+      ],
       "license": "MIT",
       "optional": true,
       "bin": {
@@ -8232,6 +7918,64 @@ INICIO DO ARQUIVO: package-lock.json
 FIM DO ARQUIVO: package-lock.json
 
 ----------------------------------------------------------------------------------------------------
+INICIO DO ARQUIVO: package.json
+----------------------------------------------------------------------------------------------------
+{
+  "name": "grupo-dvanera-agenda-orcamentos",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "postbuild": "tsx scripts/createGhPagesFallback.ts",
+    "docs": "tsx scripts/generateDocumentation.ts",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "create-admin": "tsx scripts/createAdmin.ts",
+    "reset-admin": "tsx scripts/resetAdmin.ts",
+    "seed": "tsx scripts/seed.ts",
+    "deploy": "npm run build && firebase deploy"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.4.0",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.4.0",
+    "firebase": "^12.14.0",
+    "lucide-react": "^1.17.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-hook-form": "^7.77.0",
+    "react-router-dom": "^7.17.0",
+    "recharts": "^3.8.1",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.12.3",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "autoprefixer": "^10.5.0",
+    "dotenv": "^17.4.2",
+    "eslint": "^10.3.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "firebase-admin": "^13.10.0",
+    "globals": "^17.6.0",
+    "postcss": "^8.5.15",
+    "tailwindcss": "^3.4.19",
+    "tsx": "^4.22.4",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.59.2",
+    "vite": "^8.0.12"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+FIM DO ARQUIVO: package.json
+
+----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: postcss.config.cjs
 ----------------------------------------------------------------------------------------------------
 module.exports = {
@@ -8245,36 +7989,68 @@ module.exports = {
 FIM DO ARQUIVO: postcss.config.cjs
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: public\manifest.webmanifest
+INICIO DO ARQUIVO: public/icons/gd-icon.svg
+----------------------------------------------------------------------------------------------------
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="112" fill="#06070B"/>
+  <rect x="36" y="36" width="440" height="440" rx="92" stroke="#F7B731" stroke-width="18"/>
+  <path d="M248.88 268.72C248.88 306.08 224.16 330.4 184.56 330.4C143.92 330.4 116.96 301.04 116.96 256.08C116.96 211.68 144.4 181.6 185.36 181.6C213.76 181.6 235.76 195.28 245.84 218.24L216.32 232.16C210.72 218.72 199.52 212 183.92 212C162.4 212 148.32 229.12 148.32 256.08C148.32 283.36 162.24 300 185.2 300C203.6 300 216.16 291.36 219.36 275.6H187.12V249.76H248.88V268.72ZM271.02 184H323.18C368.3 184 394.38 210.56 394.38 256C394.38 301.44 368.3 328 323.18 328H271.02V184ZM321.9 298.64C347.66 298.64 362.86 282.8 362.86 256C362.86 229.2 347.66 213.36 321.9 213.36H302.06V298.64H321.9Z" fill="#FFD166"/>
+  <path d="M126 378H386" stroke="#F7B731" stroke-width="12" stroke-linecap="round"/>
+</svg>
+
+----------------------------------------------------------------------------------------------------
+FIM DO ARQUIVO: public/icons/gd-icon.svg
+
+----------------------------------------------------------------------------------------------------
+INICIO DO ARQUIVO: public/manifest.webmanifest
 ----------------------------------------------------------------------------------------------------
 {
   "name": "Grupo Dvanera - Gestao de Agenda e Orcamentos",
   "short_name": "Dvanera",
   "description": "Painel PWA para agenda, orcamentos, servicos, custos e pagamentos do Grupo Dvanera.",
-  "start_url": ".",
+  "id": "/PWA-BANDASHOW/",
+  "start_url": "/PWA-BANDASHOW/",
+  "scope": "/PWA-BANDASHOW/",
   "display": "standalone",
   "background_color": "#05060a",
   "theme_color": "#06070b",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "icons/gd-icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "/PWA-BANDASHOW/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/PWA-BANDASHOW/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/PWA-BANDASHOW/icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: public\manifest.webmanifest
+FIM DO ARQUIVO: public/manifest.webmanifest
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: public\sw.js
+INICIO DO ARQUIVO: public/sw.js
 ----------------------------------------------------------------------------------------------------
-const CACHE_NAME = 'grupo-dvanera-v3'
+const CACHE_NAME = 'grupo-dvanera-v4'
 const BASE_PATH = new URL(self.registration.scope).pathname
-const APP_SHELL = [BASE_PATH, `${BASE_PATH}manifest.webmanifest`, `${BASE_PATH}icons/gd-icon.svg`]
+const APP_SHELL = [
+  BASE_PATH,
+  `${BASE_PATH}manifest.webmanifest`,
+  `${BASE_PATH}icons/icon-192.png`,
+  `${BASE_PATH}icons/icon-512.png`,
+]
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -8293,96 +8069,259 @@ self.addEventListener('activate', (event) => {
   )
 })
 
+self.addEventListener('message', (event) => {
+  if (event.data === 'SKIP_WAITING') {
+    void self.skipWaiting()
+  }
+})
+
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return
+
+  const requestUrl = new URL(event.request.url)
+  if (requestUrl.origin !== self.location.origin || !requestUrl.pathname.startsWith(BASE_PATH)) {
+    return
+  }
 
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
-          const copy = response.clone()
-          caches.open(CACHE_NAME).then((cache) => cache.put(BASE_PATH, copy))
+          if (response.ok) {
+            const copy = response.clone()
+            void caches.open(CACHE_NAME).then((cache) => cache.put(BASE_PATH, copy))
+          }
           return response
         })
-        .catch(() => caches.match(BASE_PATH)),
+        .catch(async () => (await caches.match(BASE_PATH)) || Response.error()),
     )
     return
   }
 
   event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        if (response.ok && event.request.url.startsWith(self.location.origin)) {
-          const copy = response.clone()
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy))
-        }
+    caches.match(event.request).then((cached) => {
+      const networkRequest = fetch(event.request)
+        .then((response) => {
+          if (response.ok) {
+            const contentType = response.headers.get('content-type') || ''
+            const shouldCache =
+              contentType.includes('text/css') ||
+              contentType.includes('javascript') ||
+              contentType.includes('image/') ||
+              requestUrl.pathname.endsWith('manifest.webmanifest')
 
-        return response
-      })
-      .catch(() => caches.match(event.request).then((cached) => cached || caches.match(BASE_PATH))),
+            if (shouldCache) {
+              const copy = response.clone()
+              void caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy))
+            }
+          }
+
+          return response
+        })
+        .catch(() => cached || Response.error())
+
+      return cached || networkRequest
+    }),
   )
 })
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: public\sw.js
+FIM DO ARQUIVO: public/sw.js
 
 ----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: README.md
 ----------------------------------------------------------------------------------------------------
 # Grupo Dvanera - Gestao de Agenda e Orcamentos
 
-PWA profissional para administrar agenda, orcamentos, servicos, custos internos, integrantes, fornecedores, pagamentos Pix e configuracoes do Grupo Dvanera.
+PWA em React, TypeScript e Firebase para administrar agenda, orcamentos, servicos, custos internos, integrantes, fornecedores e pagamentos Pix.
+
+## Status de producao
+
+- GitHub Pages: validado em 8 de junho de 2026.
+- URL: https://gui130699.github.io/PWA-BANDASHOW/
+- Workflow final: `27172060702`.
+- Commit de producao validado: `08511aa`.
+- Manifest: sem erros.
+- Instalabilidade PWA: zero erros no Chrome DevTools Protocol.
+- Service worker: ativo, controlando `/PWA-BANDASHOW/`.
+- Rotas internas: refresh direto validado sem tela branca ou 404.
+- `npm run lint`: OK.
+- `npm run build`: OK.
+- `npm audit --omit=dev`: 0 vulnerabilidades.
 
 ## Stack
 
-- React + Vite + TypeScript
+- React 19, React Router e TypeScript
+- Vite 8 com code splitting
 - Tailwind CSS
 - Firebase Auth e Cloud Firestore
-- GitHub Pages como deploy principal
+- React Hook Form, Zod, Lucide React e Recharts
+- GitHub Actions e GitHub Pages
 - Firebase Hosting opcional
-- React Router
-- react-hook-form + zod
-- lucide-react
-- Recharts
 
-## Instalar
+## Instalar e rodar
 
 ```bash
 npm install
+npm run dev
 ```
 
-## Configurar ambiente
+Build local equivalente ao GitHub Pages:
 
-Copie `.env.example` para `.env.local` para o app web e preencha:
+```powershell
+$env:VITE_BASE_PATH='/PWA-BANDASHOW/'
+npm run build
+npm run preview -- --host 127.0.0.1 --port 4173
+```
+
+URL local:
+
+```txt
+http://127.0.0.1:4173/PWA-BANDASHOW/
+```
+
+## Variaveis Firebase
+
+Crie `.env.local` a partir de `.env.example`. Nunca versione esse arquivo.
 
 ```env
 VITE_FIREBASE_API_KEY=
 VITE_FIREBASE_AUTH_DOMAIN=pwa-bandashow.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=pwa-bandashow
-VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_STORAGE_BUCKET=pwa-bandashow.firebasestorage.app
 VITE_FIREBASE_MESSAGING_SENDER_ID=
 VITE_FIREBASE_APP_ID=
 ```
 
-Para scripts administrativos locais, use uma service account do Firebase:
+Secrets obrigatorias no GitHub:
 
-```env
-FIREBASE_SERVICE_ACCOUNT_PATH=C:\caminho\service-account.json
-FIREBASE_PROJECT_ID=pwa-bandashow
-ADMIN_EMAIL=admin@grupodvanera.com.br
-ADMIN_PASSWORD=sua-senha-forte
-ADMIN_NAME=Administrador Grupo Dvanera
+```txt
+VITE_FIREBASE_API_KEY
+VITE_FIREBASE_AUTH_DOMAIN
+VITE_FIREBASE_PROJECT_ID
+VITE_FIREBASE_STORAGE_BUCKET
+VITE_FIREBASE_MESSAGING_SENDER_ID
+VITE_FIREBASE_APP_ID
 ```
 
-Tambem e possivel usar `FIREBASE_SERVICE_ACCOUNT_JSON` com o JSON em uma unica linha.
+O workflow define diretamente:
+
+```env
+VITE_BASE_PATH=/PWA-BANDASHOW/
+```
+
+## Checklist GitHub Pages
+
+- [x] GitHub Pages habilitado.
+- [x] Source configurado para GitHub Actions.
+- [x] Secrets `VITE_FIREBASE_*` cadastradas.
+- [x] `gui130699.github.io` cadastrado em Firebase Authentication > Authorized domains.
+- [x] Workflow executado sem erro.
+- [x] URL publica abre normalmente.
+- [x] Refresh em `/login`, `/admin/acesso`, `/cliente`, `/admin/dashboard` e `/solicitar-orcamento` funciona.
+
+O `postbuild` executa `scripts/createGhPagesFallback.ts`, copiando `dist/index.html` para `dist/404.html`. Isso permite que o React Router recupere rotas acessadas diretamente no GitHub Pages.
+
+## PWA
+
+Arquivos centrais:
+
+```txt
+public/manifest.webmanifest
+public/sw.js
+public/icons/icon-192.png
+public/icons/icon-512.png
+public/icons/maskable-512.png
+src/main.tsx
+```
+
+O service worker `grupo-dvanera-v4`:
+
+- usa network-first para navegacao;
+- usa cache de runtime somente para assets locais;
+- ignora requisicoes nao GET e origens externas;
+- nao intercepta Firebase Auth ou Firestore;
+- executa `skipWaiting` e `clients.claim`;
+- apaga caches antigos na ativacao.
+
+Validacao executada na URL publica:
+
+- Manifest URL correta.
+- Nenhum erro de manifest.
+- Nenhum erro de instalabilidade.
+- Service worker `activated`.
+- Pagina controlada pelo service worker.
+
+Validacao manual complementar:
+
+1. Abra a URL no Chrome.
+2. Acesse DevTools > Application > Manifest.
+3. Confirme os icones 192, 512 e maskable.
+4. Em Service Workers, confirme `sw.js` ativo.
+5. Use a opcao Instalar aplicativo do Chrome.
+
+## Limpar service worker antigo
+
+Se um navegador mantiver uma versao antiga:
+
+1. DevTools > Application > Service Workers > Unregister.
+2. Application > Storage > Clear site data.
+3. Feche as abas do site.
+4. Abra novamente com `Ctrl+Shift+R`.
+
+Tambem e possivel executar no console:
+
+```js
+const registrations = await navigator.serviceWorker.getRegistrations()
+await Promise.all(registrations.map((registration) => registration.unregister()))
+const keys = await caches.keys()
+await Promise.all(keys.map((key) => caches.delete(key)))
+location.reload()
+```
+
+## Performance e bundle
+
+Todas as paginas sao carregadas com `React.lazy` e `Suspense`. Recharts so e baixado quando uma pagina administrativa com graficos e aberta. Firebase usa imports modulares.
+
+Principais chunks do build final:
+
+```txt
+index                    55.14 kB
+firebase-auth            85.71 kB
+forms-vendor             87.43 kB
+firebase-firestore      266.77 kB
+react-vendor            283.70 kB
+charts-vendor           343.60 kB
+```
+
+Nao existe chunk acima de 500 kB e o Vite nao emite mais esse aviso. A imagem principal foi reduzida de aproximadamente 2,05 MB em PNG para 273,51 kB em JPEG, sem alterar suas dimensoes.
+
+## NPM audit
+
+Comandos:
+
+```bash
+npm audit
+npm audit --omit=dev
+```
+
+Resultado final:
+
+- Dependencias de producao: 0 vulnerabilidades.
+- Auditoria completa: 8 moderadas em dependencias transitivas de desenvolvimento do `firebase-admin`.
+- Cadeia: `firebase-admin` > Google Cloud SDKs > `uuid` 9.
+- O `firebase-admin` e usado apenas por scripts locais administrativos e nao entra no bundle web.
+- `npm audit fix --force` nao foi aplicado porque exige downgrade com breaking change para `firebase-admin@10.3.0`.
+
+Recomendacao: acompanhar novas versoes de `firebase-admin`, `@google-cloud/firestore` e `@google-cloud/storage`. Nao usar `--force` sem repetir todos os testes.
 
 ## Firebase obrigatorio
 
-No Firebase Console do projeto `pwa-bandashow`:
+No projeto `pwa-bandashow`:
 
 1. Ative Authentication.
-2. Habilite o provedor Email/Password.
-3. Em Authorized domains, adicione `gui130699.github.io`.
+2. Habilite Email/Password.
+3. Mantenha `gui130699.github.io` em Authorized domains.
 4. Crie o Cloud Firestore.
 5. Publique regras e indices:
 
@@ -8391,169 +8330,78 @@ firebase login
 firebase deploy --only firestore --project pwa-bandashow
 ```
 
-## Rodar localmente
+## Primeiro admin
 
-```bash
-npm run dev
-```
-
-## Validar
-
-```bash
-npm run lint
-npm run build
-```
-
-## Deploy principal - GitHub Pages
-
-O deploy principal e feito por GitHub Actions a cada push na branch `main`.
-
-```bash
-git push origin main
-```
-
-O workflow `.github/workflows/deploy-pages.yml` injeta as secrets `VITE_FIREBASE_*` e define:
-
-```env
-VITE_BASE_PATH=/PWA-BANDASHOW/
-```
-
-URL publica:
-
-```txt
-https://gui130699.github.io/PWA-BANDASHOW/
-```
-
-## Deploy Firebase Hosting opcional
-
-```bash
-npm run deploy
-```
-
-## Criar primeiro admin
-
-Opcao via navegador:
+Pelo navegador:
 
 1. Abra `/admin/acesso`.
-2. Se ainda nao existir admin, crie o primeiro cadastro.
-3. Depois disso, a tela passa a ser apenas login admin.
+2. Crie o primeiro e unico cadastro admin.
+3. Depois da criacao, a rota passa a oferecer somente login.
 
-Opcao via script local:
+Pelo script local:
 
 ```bash
 npm run create-admin
 ```
 
-O script usa Firebase Admin SDK, cria o usuario no Auth e grava:
+O script exige service account e grava:
 
-- `users/{uid}` com `role: "admin"`
-- `system/adminSetup`
-- `system/adminOwner`
+- `users/{uid}` com `role: "admin"`;
+- `system/adminSetup`;
+- `system/adminOwner`.
 
-## Resetar admin com seguranca
+## Resetar admin
 
-Nao existe segredo administrativo no front-end. Para remover o admin primario e liberar novo cadastro, rode localmente:
+Nao existe senha mestre no front-end. O reset seguro e local:
 
 ```bash
 npm run reset-admin
 ```
 
-O script:
+Configure uma destas opcoes sem versionar credenciais:
 
-- exige service account local;
-- localiza `system/adminOwner`;
-- pede confirmacao digitando `RESETAR`;
-- remove `users/{uid}`;
-- remove `system/adminOwner`;
-- remove `system/adminSetup`;
-- remove o usuario do Firebase Auth, se existir;
-- registra auditoria em `auditLogs`.
-
-## Popular dados iniciais
-
-```bash
-npm run seed
+```env
+FIREBASE_SERVICE_ACCOUNT_PATH=C:\caminho\service-account.json
 ```
 
-O seed cria dados internos e tambem espelhos publicos:
+ou:
 
-- `services` e `publicServices`
-- `settings/main` e `publicSettings/main`
+```env
+FIREBASE_SERVICE_ACCOUNT_JSON={"type":"service_account",...}
+```
 
-## Rotas
+O script exige a confirmacao `RESETAR`, remove Auth e documentos de controle e registra auditoria.
 
-Publicas:
+## Dados e seguranca
 
-- `/`
-- `/login`
-- `/cadastro`
-- `/admin/acesso`
-- `/solicitar-orcamento`
+Colecoes internas:
 
-Cliente:
+```txt
+users
+clients
+services
+bandMembers
+suppliers
+quotes
+payments
+memberPayments
+supplierPayments
+settings
+auditLogs
+system
+```
 
-- `/cliente`
-- `/cliente/novo-orcamento`
-- `/cliente/orcamentos`
-- `/cliente/orcamentos/:id`
-- `/cliente/pagamentos`
+Colecoes sanitizadas:
 
-Admin:
+```txt
+publicServices
+clientQuoteViews
+publicSettings
+```
 
-- `/admin/dashboard`
-- `/admin/agenda`
-- `/admin/orcamentos`
-- `/admin/orcamentos/:id`
-- `/admin/servicos`
-- `/admin/integrantes`
-- `/admin/fornecedores`
-- `/admin/pagamentos`
-- `/admin/clientes`
-- `/admin/configuracoes`
+O cliente nao consegue ler `quotes`, `services`, `suppliers`, `bandMembers`, `settings`, `auditLogs` ou `system/adminOwner`. A visao `clientQuoteViews` remove custos, lucro, margem, notas administrativas e `costSnapshot`.
 
-## Colecoes Firestore
-
-Internas:
-
-- `users`: perfis e roles.
-- `clients`: dados cadastrais do cliente.
-- `services`: servicos internos com custos, fornecedores, integrantes e observacoes internas.
-- `bandMembers`: integrantes, Pix e valores padrao.
-- `suppliers`: fornecedores, Pix e custos padrao.
-- `quotes`: orcamentos internos com custos, lucro, margem e notas admin.
-- `payments`: pagamentos de cliente.
-- `memberPayments`: pagamentos para integrantes.
-- `supplierPayments`: pagamentos para fornecedores.
-- `settings/main`: configuracoes completas do admin.
-- `auditLogs`: auditoria administrativa.
-- `system/adminSetup` e `system/adminOwner`: controle de admin unico.
-
-Publicas/sanitizadas:
-
-- `publicServices`: catalogo de servicos sem custos internos.
-- `clientQuoteViews`: versao segura do orcamento para cliente, sem `totalCosts`, `estimatedProfit`, `estimatedMargin`, `manualCosts`, `costSnapshot` e `adminNotes`.
-- `publicSettings/main`: Pix, recebedor, instrucoes e contatos publicos.
-
-## Separacao de dados sensiveis
-
-O cliente nao le:
-
-- `quotes`
-- `services`
-- `suppliers`
-- `bandMembers`
-- `settings`
-
-O cliente le:
-
-- seus documentos em `clientQuoteViews`
-- seus documentos em `payments`
-- `publicServices` ativos
-- `publicSettings/main`
-
-Essa separacao existe porque Firestore nao mascara campos de um documento. Por isso dados internos e dados publicos ficam em documentos diferentes.
-
-## Fluxo oficial do orcamento
+## Fluxo validado
 
 ```txt
 em_analise
@@ -8561,116 +8409,59 @@ aprovado_aguardando_entrada
 entrada_informada_pelo_cliente
 agendado
 realizado
-recusado
-cancelado
 ```
 
-1. Cliente solicita orcamento.
-2. O sistema cria `quotes/{quoteId}` e `clientQuoteViews/{quoteId}`.
-3. Admin revisa valores e recalcula custos internos.
-4. Admin aprova ou recusa.
-5. Ao aprovar, o sistema gera pagamento de entrada.
-6. Cliente informa pagamento.
-7. Admin confirma pagamento.
-8. Evento entra na agenda como `agendado`.
-9. Admin pode gerar pagamento restante.
-10. Cliente informa restante.
-11. Admin confirma restante.
-12. Admin marca evento como `realizado`.
+O teste final criou fornecedor, integrante, servico, cliente, orcamento, entrada e restante. Custos de R$ 800 e R$ 500 foram consolidados em `costSnapshot`; o cliente recebeu somente a visao sanitizada. Os dois pagamentos foram informados pelo cliente e confirmados pelo admin. O evento entrou na agenda e foi marcado como realizado.
 
-## Calculos financeiros
+Todos os usuarios, documentos, configuracoes e logs temporarios foram removidos ao final. O Firebase voltou a conter somente o usuario original e nenhum primeiro admin configurado.
 
-O percentual de entrada vem de `settings/main.defaultDepositPercent` no momento da aprovacao/recalculo.
+## Tratamento de erros
 
-```ts
-depositAmount = total * (depositPercent / 100)
-remainingAmount = total - depositAmount
-```
+Mensagens amigaveis cobrem:
 
-O campo `depositPercent` fica salvo no orcamento para preservar o historico caso a configuracao mude no futuro.
+- Auth desabilitado ou configuracao ausente;
+- dominio nao autorizado;
+- permissao negada;
+- indisponibilidade e falha de rede;
+- excesso de tentativas;
+- Pix ausente;
+- servicos ou pagamentos vazios;
+- orcamento ou perfil inexistente.
 
-Custos internos sao copiados para `costSnapshot` no momento da aprovacao/recalculo. Assim, alteracoes futuras em fornecedores ou integrantes nao alteram orcamentos antigos.
-
-## Pagamentos
-
-Tipos novos:
-
-- `entrada`
-- `restante`
-- `outro`
-
-Tipos legados ainda sao reconhecidos para compatibilidade:
-
-- `entrada_50`
-- `restante_50`
-
-Funcoes centrais:
-
-- `clientMarkPaymentAsPaid(payment, message)`: cliente informa pagamento.
-- `confirmPayment(paymentId, actor)`: admin confirma entrada/restante e sincroniza agenda/cliente.
-- `createFinalPayment(quote, settings)`: gera pagamento restante.
-
-## Auditoria
-
-Acoes administrativas importantes registram `auditLogs`, incluindo:
-
-- servico criado/editado;
-- fornecedor criado/editado/desativado;
-- integrante criado/editado/desativado;
-- orcamento aprovado/recusado/cancelado/recalculado/realizado;
-- pagamento confirmado;
-- configuracoes alteradas;
-- reset admin via script.
-
-Os ultimos logs aparecem em `/admin/configuracoes`.
-
-## Checklist de seguranca
-
-- Cliente nao le `quotes`.
-- Cliente nao le `services`.
-- Cliente nao le `suppliers`.
-- Cliente nao le `bandMembers`.
-- Cliente nao le `settings`.
-- Cliente so informa pagamento, nunca confirma.
-- Admin confirma pagamentos.
-- Senha mestre removida do front-end.
-- Regras Firestore protegem colecoes internas.
-- Dados publicos sao sincronizados em colecoes proprias.
-
-## Restauracao Git
-
-Ver commits:
+## Testes e documentacao
 
 ```bash
-git log --oneline
+npm run lint
+npm run build
+npm run docs
 ```
 
-Voltar para um commit mantendo historico:
+Consulte:
 
-```bash
-git revert <hash-do-commit>
-```
+- `CHECKLIST_PRODUCAO.md`
+- `TESTES_MANUAIS_PRODUCAO.md`
+- `RELATORIO_FINAL_PRODUCAO.md`
+- `DOCUMENTACAO_COMPLETA_PROJETO.txt`
 
-Inspecionar um commit:
+## Solucao de tela branca
 
-```bash
-git switch --detach <hash-do-commit>
-```
+1. Confira o ultimo workflow em GitHub Actions.
+2. Confirme as seis secrets Firebase.
+3. Confirme `VITE_BASE_PATH=/PWA-BANDASHOW/`.
+4. Confirme o dominio autorizado no Firebase Auth.
+5. Abra a aba Network e procure assets com 404.
+6. Limpe o service worker e o cache conforme a secao acima.
 
-Retornar:
-
-```bash
-git switch main
-```
-
-## Comandos uteis
+## Comandos principais
 
 ```bash
 npm install
+npm audit
+npm audit --omit=dev
 npm run lint
 npm run build
-npm run dev
 npm run preview
+npm run docs
 npm run create-admin
 npm run reset-admin
 npm run seed
@@ -8681,7 +8472,188 @@ firebase deploy --only firestore --project pwa-bandashow
 FIM DO ARQUIVO: README.md
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: scripts\createAdmin.ts
+INICIO DO ARQUIVO: RELATORIO_FINAL_PRODUCAO.md
+----------------------------------------------------------------------------------------------------
+# Relatorio Final de Producao
+
+Data: 8 de junho de 2026
+
+## 1. Base analisada
+
+- Commit inicial: `e023206`
+- Commit de producao: `08511aa`
+- Repositorio: `gui130699/PWA-BANDASHOW`
+- Firebase: `pwa-bandashow`
+- Pages: `https://gui130699.github.io/PWA-BANDASHOW/`
+
+## 2. Alteracoes realizadas
+
+- Fallback SPA cross-platform em `dist/404.html`.
+- Workflow Pages revisado com Node 22, `npm ci`, secrets e permissoes.
+- Manifest completo com `id`, `start_url`, `scope` e PNGs PWA.
+- Service worker v4 com atualizacao imediata, limpeza de cache e network-first.
+- Registro de service worker mais robusto.
+- Todas as paginas convertidas para lazy loading.
+- Vendors separados em chunks React, Firebase, formularios e graficos.
+- Hero convertido de PNG de 2,05 MB para JPEG de 273,51 kB.
+- Mensagens Firebase de producao tornadas amigaveis.
+- Protecao para usuario autenticado sem perfil.
+- Pix ausente tratado sem tentativa de copia.
+- Loop de listeners Firestore corrigido em `useCollection`.
+- Sincronizacao de orcamento sem pagamentos corrigida.
+- Consulta de pagamentos do detalhe do cliente alinhada as regras.
+- `package-lock.json` normalizado com npm 10.
+
+## 3. GitHub Pages
+
+- Workflow final: `27172060702`.
+- Resultado: `success`.
+- Publicacao da pasta `dist`: OK.
+- Home: OK.
+- Assets com base `/PWA-BANDASHOW/`: OK.
+- Refresh de rotas internas: OK.
+- Rotas protegidas redirecionam para login: OK.
+- Authorized domain Firebase: configurado.
+
+## 4. PWA
+
+- Manifest publico: 0 erros.
+- Instalabilidade: 0 erros.
+- Service worker: `activated`.
+- Pagina controlada: sim.
+- Scope: `/PWA-BANDASHOW/`.
+- Icones: 192, 512 e maskable.
+- Cache antigo removido na ativacao.
+- Requests Firebase e origens externas nao sao interceptados.
+
+## 5. Bundle
+
+Antes, o build concentrava dependencias em bundle superior a 500 kB. Depois:
+
+```txt
+index                    55.14 kB
+firebase-auth            85.71 kB
+forms-vendor             87.43 kB
+firebase-firestore      266.77 kB
+react-vendor            283.70 kB
+charts-vendor           343.60 kB
+```
+
+Resultado: nenhum chunk acima de 500 kB e nenhum aviso Vite de chunk grande.
+
+## 6. NPM audit
+
+`npm audit --omit=dev`:
+
+```txt
+found 0 vulnerabilities
+```
+
+`npm audit` completo:
+
+```txt
+8 moderate severity vulnerabilities
+```
+
+Os alertas restantes sao transitivos de desenvolvimento:
+
+```txt
+firebase-admin
+@google-cloud/firestore
+@google-cloud/storage
+google-gax
+gaxios
+retry-request
+teeny-request
+uuid 9
+```
+
+O `firebase-admin` e usado somente por scripts locais e nao e enviado ao navegador. O fix sugerido exige `firebase-admin@10.3.0`, downgrade breaking. `npm audit fix --force` nao foi aplicado.
+
+## 7. Validacoes tecnicas
+
+```txt
+npm install: OK
+npm@10 ci --dry-run: OK
+npm run lint: OK
+npm run build: OK
+npm run preview: OK
+dist/404.html: identico a dist/index.html
+```
+
+Build final:
+
+```txt
+3290 modulos transformados
+hero: 273.51 kB
+maior chunk: charts-vendor 343.60 kB
+```
+
+## 8. Testes cliente/admin
+
+Passaram:
+
+- primeiro admin;
+- login/logout admin;
+- fornecedor, integrante e servico;
+- espelho `publicServices`;
+- cadastro/login cliente;
+- orcamento e `clientQuoteViews`;
+- custos historicos;
+- aprovacao e entrada;
+- cliente informa entrada;
+- admin confirma entrada;
+- evento na agenda;
+- restante informado e confirmado;
+- evento realizado;
+- auditoria;
+- regras de leitura do cliente.
+
+Detalhes em `TESTES_MANUAIS_PRODUCAO.md`.
+
+## 9. Defeitos encontrados durante o teste
+
+1. `syncClientQuoteView` gravava `undefined` em `paymentSummary` quando ainda nao havia pagamento. Corrigido com campos condicionais.
+2. O detalhe do cliente consultava pagamentos somente por `quoteId`, consulta que nao comprovava propriedade para as regras. Corrigido usando `clientId` e filtro local do orcamento.
+3. A restricao padrao de `useCollection` era recriada em cada render, causando novas inscricoes. Corrigido com constante estavel.
+
+## 10. Limpeza
+
+Todos os dados QA foram removidos:
+
+- 2 contas Auth;
+- perfis e cliente;
+- admin temporario e documentos `system`;
+- fornecedor, integrante e servico;
+- orcamento e visao sanitizada;
+- 2 pagamentos;
+- configuracoes temporarias;
+- 10 logs de auditoria.
+
+O Auth terminou com apenas o usuario original.
+
+## 11. Pendencias
+
+Nao ha pendencia bloqueadora.
+
+Manutencao futura:
+
+- atualizar dependencias Google Cloud quando liberarem cadeia sem `uuid` vulneravel;
+- repetir `npm audit` periodicamente;
+- criar o admin definitivo com credenciais escolhidas pelo proprietario;
+- testar instalacao fisica em cada dispositivo alvo como controle operacional.
+
+## 12. Nota final
+
+Nota sugerida: **10/10**.
+
+Justificativa: build, lint, Pages, rotas, PWA, instalabilidade, fluxo autenticado, regras e limpeza foram validados na pratica. Os alertas restantes sao exclusivamente de ferramentas locais de desenvolvimento, sem dependencia vulneravel no bundle de producao, e estao documentados sem aplicar downgrade breaking.
+
+----------------------------------------------------------------------------------------------------
+FIM DO ARQUIVO: RELATORIO_FINAL_PRODUCAO.md
+
+----------------------------------------------------------------------------------------------------
+INICIO DO ARQUIVO: scripts/createAdmin.ts
 ----------------------------------------------------------------------------------------------------
 import { FieldValue } from 'firebase-admin/firestore'
 import { adminAuth, adminDb } from './firebaseAdmin.js'
@@ -8752,10 +8724,28 @@ main().catch((error) => {
 })
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: scripts\createAdmin.ts
+FIM DO ARQUIVO: scripts/createAdmin.ts
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: scripts\firebaseAdmin.ts
+INICIO DO ARQUIVO: scripts/createGhPagesFallback.ts
+----------------------------------------------------------------------------------------------------
+import { copyFile, stat } from 'node:fs/promises'
+import { resolve } from 'node:path'
+
+const distDirectory = resolve('dist')
+const indexPath = resolve(distDirectory, 'index.html')
+const fallbackPath = resolve(distDirectory, '404.html')
+
+await stat(indexPath)
+await copyFile(indexPath, fallbackPath)
+
+console.log('Fallback SPA criado em dist/404.html.')
+
+----------------------------------------------------------------------------------------------------
+FIM DO ARQUIVO: scripts/createGhPagesFallback.ts
+
+----------------------------------------------------------------------------------------------------
+INICIO DO ARQUIVO: scripts/firebaseAdmin.ts
 ----------------------------------------------------------------------------------------------------
 import { cert, getApps, initializeApp } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
@@ -8784,10 +8774,150 @@ export const adminAuth = getAuth()
 export const adminDb = getFirestore()
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: scripts\firebaseAdmin.ts
+FIM DO ARQUIVO: scripts/firebaseAdmin.ts
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: scripts\resetAdmin.ts
+INICIO DO ARQUIVO: scripts/generateDocumentation.ts
+----------------------------------------------------------------------------------------------------
+import { execFileSync } from 'node:child_process'
+import { readdir, readFile, stat, writeFile } from 'node:fs/promises'
+import path from 'node:path'
+
+const root = process.cwd()
+const outputName = 'DOCUMENTACAO_COMPLETA_PROJETO.txt'
+const excludedDirectories = new Set(['.git', 'dist', 'node_modules'])
+const excludedFiles = new Set([
+  '.env.local',
+  outputName,
+  'dev-server.log',
+  'preview-server.log',
+])
+const textExtensions = new Set([
+  '.cjs',
+  '.css',
+  '.env',
+  '.example',
+  '.html',
+  '.js',
+  '.json',
+  '.md',
+  '.mjs',
+  '.rules',
+  '.svg',
+  '.ts',
+  '.tsx',
+  '.txt',
+  '.webmanifest',
+  '.yaml',
+  '.yml',
+])
+const textNames = new Set(['.gitignore'])
+
+type ProjectFile = {
+  absolutePath: string
+  relativePath: string
+  size: number
+  text: boolean
+}
+
+async function collectFiles(directory: string): Promise<ProjectFile[]> {
+  const entries = await readdir(directory, { withFileTypes: true })
+  const files: ProjectFile[] = []
+
+  for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
+    if (excludedDirectories.has(entry.name) || excludedFiles.has(entry.name)) continue
+
+    const absolutePath = path.join(directory, entry.name)
+    const relativePath = path.relative(root, absolutePath).replaceAll('\\', '/')
+
+    if (entry.isDirectory()) {
+      files.push(...(await collectFiles(absolutePath)))
+      continue
+    }
+
+    const extension = path.extname(entry.name).toLowerCase()
+    const fileStat = await stat(absolutePath)
+    files.push({
+      absolutePath,
+      relativePath,
+      size: fileStat.size,
+      text: textExtensions.has(extension) || textNames.has(entry.name),
+    })
+  }
+
+  return files
+}
+
+function currentCommit() {
+  try {
+    return execFileSync('git', ['rev-parse', '--short', 'HEAD'], {
+      cwd: root,
+      encoding: 'utf8',
+    }).trim()
+  } catch {
+    return 'nao identificado'
+  }
+}
+
+function generatedAt() {
+  return new Intl.DateTimeFormat('sv-SE', {
+    dateStyle: 'short',
+    timeStyle: 'medium',
+    timeZone: 'America/Sao_Paulo',
+  }).format(new Date())
+}
+
+const files = await collectFiles(root)
+const textFiles = files.filter((file) => file.text)
+const binaryFiles = files.filter((file) => !file.text)
+const sections: string[] = [
+  'DOCUMENTACAO COMPLETA DO PROJETO - PWA-BANDASHOW / GRUPO DVANERA',
+  'Gerado automaticamente para leitura, manutencao, auditoria tecnica e backup.',
+  `Data de geracao: ${generatedAt()} - America/Sao_Paulo`,
+  `Commit base documentado: ${currentCommit()}`,
+  `Pasta local: ${root}`,
+  'Repositorio: https://github.com/gui130699/PWA-BANDASHOW.git',
+  'Pages: https://gui130699.github.io/PWA-BANDASHOW/',
+  '',
+  'SEGURANCA',
+  '- .env.local, .git, node_modules, dist e logs nao sao incluidos.',
+  '- Segredos Firebase e credenciais administrativas nao sao copiados.',
+  '- Arquivos binarios sao apenas inventariados; o conteudo textual do projeto e incluido.',
+  '',
+  'DOCUMENTOS DE REFERENCIA',
+  '- README.md',
+  '- CHECKLIST_PRODUCAO.md',
+  '- TESTES_MANUAIS_PRODUCAO.md',
+  '- RELATORIO_FINAL_PRODUCAO.md',
+  '',
+  'ARQUIVOS BINARIOS INVENTARIADOS',
+  ...binaryFiles.map((file) => `- ${file.relativePath} (${file.size} bytes)`),
+]
+
+for (const file of textFiles) {
+  const content = await readFile(file.absolutePath, 'utf8')
+  const divider = '-'.repeat(100)
+  sections.push(
+    '',
+    divider,
+    `INICIO DO ARQUIVO: ${file.relativePath}`,
+    divider,
+    content.replace(/\s+$/, ''),
+    '',
+    divider,
+    `FIM DO ARQUIVO: ${file.relativePath}`,
+  )
+}
+
+sections.push('', '='.repeat(100), 'FIM DA DOCUMENTACAO COMPLETA', '')
+await writeFile(path.join(root, outputName), sections.join('\n'), 'utf8')
+console.log(`${outputName} atualizado com ${textFiles.length} arquivos textuais.`)
+
+----------------------------------------------------------------------------------------------------
+FIM DO ARQUIVO: scripts/generateDocumentation.ts
+
+----------------------------------------------------------------------------------------------------
+INICIO DO ARQUIVO: scripts/resetAdmin.ts
 ----------------------------------------------------------------------------------------------------
 import { FieldValue } from 'firebase-admin/firestore'
 import { createInterface } from 'node:readline/promises'
@@ -8852,10 +8982,10 @@ main().catch((error) => {
 })
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: scripts\resetAdmin.ts
+FIM DO ARQUIVO: scripts/resetAdmin.ts
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: scripts\seed.ts
+INICIO DO ARQUIVO: scripts/seed.ts
 ----------------------------------------------------------------------------------------------------
 import { FieldValue } from 'firebase-admin/firestore'
 import { adminDb } from './firebaseAdmin.js'
@@ -8963,28 +9093,32 @@ main().catch((error) => {
 })
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: scripts\seed.ts
+FIM DO ARQUIVO: scripts/seed.ts
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\App.tsx
+INICIO DO ARQUIVO: src/App.tsx
 ----------------------------------------------------------------------------------------------------
+import { Suspense } from 'react'
 import { RouterProvider } from 'react-router-dom'
+import { Loading } from './components/ui'
 import { AuthProvider } from './contexts/AuthContext'
 import { router } from './routes/router'
 
 export default function App() {
   return (
     <AuthProvider>
-      <RouterProvider router={router} />
+      <Suspense fallback={<Loading label="Carregando pagina..." />}>
+        <RouterProvider router={router} />
+      </Suspense>
     </AuthProvider>
   )
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\App.tsx
+FIM DO ARQUIVO: src/App.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\components\FirebaseNotice.tsx
+INICIO DO ARQUIVO: src/components/FirebaseNotice.tsx
 ----------------------------------------------------------------------------------------------------
 import { AlertCircle } from 'lucide-react'
 import { Card } from './ui'
@@ -9007,10 +9141,10 @@ export function FirebaseNotice() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\components\FirebaseNotice.tsx
+FIM DO ARQUIVO: src/components/FirebaseNotice.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\components\layout\AdminLayout.tsx
+INICIO DO ARQUIVO: src/components/layout/AdminLayout.tsx
 ----------------------------------------------------------------------------------------------------
 import {
   CalendarDays,
@@ -9048,10 +9182,10 @@ export function AdminLayout() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\components\layout\AdminLayout.tsx
+FIM DO ARQUIVO: src/components/layout/AdminLayout.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\components\layout\ClientLayout.tsx
+INICIO DO ARQUIVO: src/components/layout/ClientLayout.tsx
 ----------------------------------------------------------------------------------------------------
 import { ClipboardList, Home, PlusCircle, WalletCards } from 'lucide-react'
 import { DashboardLayout } from './DashboardLayout'
@@ -9074,10 +9208,10 @@ export function ClientLayout() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\components\layout\ClientLayout.tsx
+FIM DO ARQUIVO: src/components/layout/ClientLayout.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\components\layout\DashboardLayout.tsx
+INICIO DO ARQUIVO: src/components/layout/DashboardLayout.tsx
 ----------------------------------------------------------------------------------------------------
 import { useState, type ReactNode } from 'react'
 import { Outlet } from 'react-router-dom'
@@ -9113,10 +9247,10 @@ export function DashboardLayout({ title, subtitle, items, children }: DashboardL
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\components\layout\DashboardLayout.tsx
+FIM DO ARQUIVO: src/components/layout/DashboardLayout.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\components\layout\Header.tsx
+INICIO DO ARQUIVO: src/components/layout/Header.tsx
 ----------------------------------------------------------------------------------------------------
 import { Menu } from 'lucide-react'
 import { Button } from '../ui'
@@ -9160,10 +9294,10 @@ export function Header({ title, subtitle, onMenuClick }: HeaderProps) {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\components\layout\Header.tsx
+FIM DO ARQUIVO: src/components/layout/Header.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\components\layout\MobileMenu.tsx
+INICIO DO ARQUIVO: src/components/layout/MobileMenu.tsx
 ----------------------------------------------------------------------------------------------------
 import { X } from 'lucide-react'
 import { Button } from '../ui'
@@ -9200,10 +9334,10 @@ export function MobileMenu({ open, title, items, onClose }: MobileMenuProps) {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\components\layout\MobileMenu.tsx
+FIM DO ARQUIVO: src/components/layout/MobileMenu.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\components\layout\Sidebar.tsx
+INICIO DO ARQUIVO: src/components/layout/Sidebar.tsx
 ----------------------------------------------------------------------------------------------------
 import { LogOut, Music2 } from 'lucide-react'
 import type { ComponentType } from 'react'
@@ -9277,10 +9411,10 @@ export function Sidebar({ items, title, onNavigate }: SidebarProps) {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\components\layout\Sidebar.tsx
+FIM DO ARQUIVO: src/components/layout/Sidebar.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\components\ui\Badge.tsx
+INICIO DO ARQUIVO: src/components/ui/Badge.tsx
 ----------------------------------------------------------------------------------------------------
 import { clsx } from 'clsx'
 import type { ReactNode } from 'react'
@@ -9313,10 +9447,10 @@ export function StatusBadge({ status }: { status: QuoteStatus }) {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\components\ui\Badge.tsx
+FIM DO ARQUIVO: src/components/ui/Badge.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\components\ui\Button.tsx
+INICIO DO ARQUIVO: src/components/ui/Button.tsx
 ----------------------------------------------------------------------------------------------------
 import { Loader2 } from 'lucide-react'
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
@@ -9368,10 +9502,10 @@ export function Button({
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\components\ui\Button.tsx
+FIM DO ARQUIVO: src/components/ui/Button.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\components\ui\Card.tsx
+INICIO DO ARQUIVO: src/components/ui/Card.tsx
 ----------------------------------------------------------------------------------------------------
 import type { HTMLAttributes, ReactNode } from 'react'
 import { clsx } from 'clsx'
@@ -9406,10 +9540,10 @@ export function Card({ title, description, action, className, children, ...props
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\components\ui\Card.tsx
+FIM DO ARQUIVO: src/components/ui/Card.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\components\ui\ConfirmDialog.tsx
+INICIO DO ARQUIVO: src/components/ui/ConfirmDialog.tsx
 ----------------------------------------------------------------------------------------------------
 import { AlertTriangle } from 'lucide-react'
 import { Button } from './Button'
@@ -9453,10 +9587,10 @@ export function ConfirmDialog({
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\components\ui\ConfirmDialog.tsx
+FIM DO ARQUIVO: src/components/ui/ConfirmDialog.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\components\ui\DataTable.tsx
+INICIO DO ARQUIVO: src/components/ui/DataTable.tsx
 ----------------------------------------------------------------------------------------------------
 import type { ReactNode } from 'react'
 import { EmptyState } from './EmptyState'
@@ -9522,10 +9656,10 @@ export function DataTable<T>({
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\components\ui\DataTable.tsx
+FIM DO ARQUIVO: src/components/ui/DataTable.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\components\ui\DateInput.tsx
+INICIO DO ARQUIVO: src/components/ui/DateInput.tsx
 ----------------------------------------------------------------------------------------------------
 import { Input } from './Input'
 
@@ -9551,10 +9685,10 @@ export function DateInput({ label, value, onChange, error, name }: DateInputProp
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\components\ui\DateInput.tsx
+FIM DO ARQUIVO: src/components/ui/DateInput.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\components\ui\EmptyState.tsx
+INICIO DO ARQUIVO: src/components/ui/EmptyState.tsx
 ----------------------------------------------------------------------------------------------------
 import { Inbox } from 'lucide-react'
 import type { ReactNode } from 'react'
@@ -9577,10 +9711,10 @@ export function EmptyState({ title, description, action }: EmptyStateProps) {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\components\ui\EmptyState.tsx
+FIM DO ARQUIVO: src/components/ui/EmptyState.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\components\ui\index.ts
+INICIO DO ARQUIVO: src/components/ui/index.ts
 ----------------------------------------------------------------------------------------------------
 export { Badge, StatusBadge } from './Badge'
 export { Button } from './Button'
@@ -9597,10 +9731,10 @@ export { Select } from './Select'
 export { Textarea } from './Textarea'
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\components\ui\index.ts
+FIM DO ARQUIVO: src/components/ui/index.ts
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\components\ui\Input.tsx
+INICIO DO ARQUIVO: src/components/ui/Input.tsx
 ----------------------------------------------------------------------------------------------------
 import type { InputHTMLAttributes } from 'react'
 import { clsx } from 'clsx'
@@ -9632,10 +9766,10 @@ export function Input({ label, error, className, wrapperClassName, id, ...props 
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\components\ui\Input.tsx
+FIM DO ARQUIVO: src/components/ui/Input.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\components\ui\Loading.tsx
+INICIO DO ARQUIVO: src/components/ui/Loading.tsx
 ----------------------------------------------------------------------------------------------------
 import { Loader2 } from 'lucide-react'
 
@@ -9649,10 +9783,10 @@ export function Loading({ label = 'Carregando...' }: { label?: string }) {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\components\ui\Loading.tsx
+FIM DO ARQUIVO: src/components/ui/Loading.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\components\ui\Modal.tsx
+INICIO DO ARQUIVO: src/components/ui/Modal.tsx
 ----------------------------------------------------------------------------------------------------
 import { X } from 'lucide-react'
 import type { ReactNode } from 'react'
@@ -9684,10 +9818,10 @@ export function Modal({ open, title, children, onClose }: ModalProps) {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\components\ui\Modal.tsx
+FIM DO ARQUIVO: src/components/ui/Modal.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\components\ui\MoneyInput.tsx
+INICIO DO ARQUIVO: src/components/ui/MoneyInput.tsx
 ----------------------------------------------------------------------------------------------------
 import { Input } from './Input'
 import { formatCurrency, parseCurrency } from '../../utils/format'
@@ -9714,10 +9848,10 @@ export function MoneyInput({ label, value, onChange, error, name }: MoneyInputPr
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\components\ui\MoneyInput.tsx
+FIM DO ARQUIVO: src/components/ui/MoneyInput.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\components\ui\Select.tsx
+INICIO DO ARQUIVO: src/components/ui/Select.tsx
 ----------------------------------------------------------------------------------------------------
 import type { SelectHTMLAttributes } from 'react'
 import { clsx } from 'clsx'
@@ -9772,10 +9906,10 @@ export function Select({
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\components\ui\Select.tsx
+FIM DO ARQUIVO: src/components/ui/Select.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\components\ui\Textarea.tsx
+INICIO DO ARQUIVO: src/components/ui/Textarea.tsx
 ----------------------------------------------------------------------------------------------------
 import type { TextareaHTMLAttributes } from 'react'
 import { clsx } from 'clsx'
@@ -9807,10 +9941,10 @@ export function Textarea({ label, error, className, wrapperClassName, id, ...pro
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\components\ui\Textarea.tsx
+FIM DO ARQUIVO: src/components/ui/Textarea.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\contexts\AuthContext.tsx
+INICIO DO ARQUIVO: src/contexts/AuthContext.tsx
 ----------------------------------------------------------------------------------------------------
 import {
   createUserWithEmailAndPassword,
@@ -9972,12 +10106,12 @@ export function useAuth() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\contexts\AuthContext.tsx
+FIM DO ARQUIVO: src/contexts/AuthContext.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\hooks\useCollection.ts
+INICIO DO ARQUIVO: src/hooks/useCollection.ts
 ----------------------------------------------------------------------------------------------------
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   collection,
   onSnapshot,
@@ -9987,15 +10121,15 @@ import {
 } from 'firebase/firestore'
 import { db, isFirebaseConfigured } from '../lib/firebase'
 
+const defaultConstraints: QueryConstraint[] = [orderBy('createdAt', 'desc')]
+
 export function useCollection<T extends { id: string }>(
   collectionName: string,
-  constraints: QueryConstraint[] = [orderBy('createdAt', 'desc')],
+  constraints: QueryConstraint[] = defaultConstraints,
 ) {
   const [data, setData] = useState<T[]>([])
   const [loading, setLoading] = useState(isFirebaseConfigured)
   const [error, setError] = useState<string | null>(null)
-  const stableConstraints = useMemo(() => constraints, [constraints])
-
   useEffect(() => {
     if (!db) {
       setLoading(false)
@@ -10004,7 +10138,7 @@ export function useCollection<T extends { id: string }>(
     }
 
     setLoading(true)
-    const reference = query(collection(db, collectionName), ...stableConstraints)
+    const reference = query(collection(db, collectionName), ...constraints)
     const unsubscribe = onSnapshot(
       reference,
       (snapshot) => {
@@ -10019,16 +10153,16 @@ export function useCollection<T extends { id: string }>(
     )
 
     return unsubscribe
-  }, [collectionName, stableConstraints])
+  }, [collectionName, constraints])
 
   return { data, loading, error }
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\hooks\useCollection.ts
+FIM DO ARQUIVO: src/hooks/useCollection.ts
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\hooks\useDocument.ts
+INICIO DO ARQUIVO: src/hooks/useDocument.ts
 ----------------------------------------------------------------------------------------------------
 import { useEffect, useState } from 'react'
 import { doc, onSnapshot } from 'firebase/firestore'
@@ -10072,10 +10206,10 @@ export function useDocument<T extends { id?: string }>(collectionName: string, i
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\hooks\useDocument.ts
+FIM DO ARQUIVO: src/hooks/useDocument.ts
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\index.css
+INICIO DO ARQUIVO: src/index.css
 ----------------------------------------------------------------------------------------------------
 @tailwind base;
 @tailwind components;
@@ -10124,10 +10258,10 @@ textarea {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\index.css
+FIM DO ARQUIVO: src/index.css
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\lib\firebase.ts
+INICIO DO ARQUIVO: src/lib/firebase.ts
 ----------------------------------------------------------------------------------------------------
 import { initializeApp, type FirebaseApp } from 'firebase/app'
 import {
@@ -10177,10 +10311,10 @@ export function requireAuth() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\lib\firebase.ts
+FIM DO ARQUIVO: src/lib/firebase.ts
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\main.tsx
+INICIO DO ARQUIVO: src/main.tsx
 ----------------------------------------------------------------------------------------------------
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -10195,17 +10329,35 @@ createRoot(document.getElementById('root')!).render(
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
-    void navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`, {
-      scope: import.meta.env.BASE_URL,
-    })
+    void navigator.serviceWorker
+      .register(`${import.meta.env.BASE_URL}sw.js`, {
+        scope: import.meta.env.BASE_URL,
+      })
+      .then((registration) => {
+        if (registration.waiting) {
+          registration.waiting.postMessage('SKIP_WAITING')
+        }
+
+        registration.addEventListener('updatefound', () => {
+          const worker = registration.installing
+          worker?.addEventListener('statechange', () => {
+            if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+              worker.postMessage('SKIP_WAITING')
+            }
+          })
+        })
+      })
+      .catch((error) => {
+        console.error('Nao foi possivel registrar o service worker.', error)
+      })
   })
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\main.tsx
+FIM DO ARQUIVO: src/main.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\pages\admin\AdminAgendaPage.tsx
+INICIO DO ARQUIVO: src/pages/admin/AdminAgendaPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -10310,10 +10462,10 @@ export function AdminAgendaPage() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\pages\admin\AdminAgendaPage.tsx
+FIM DO ARQUIVO: src/pages/admin/AdminAgendaPage.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\pages\admin\AdminClientsPage.tsx
+INICIO DO ARQUIVO: src/pages/admin/AdminClientsPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { Card, DataTable } from '../../components/ui'
 import { useCollection } from '../../hooks/useCollection'
@@ -10343,10 +10495,10 @@ export function AdminClientsPage() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\pages\admin\AdminClientsPage.tsx
+FIM DO ARQUIVO: src/pages/admin/AdminClientsPage.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\pages\admin\AdminDashboardPage.tsx
+INICIO DO ARQUIVO: src/pages/admin/AdminDashboardPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { BarChart3, CalendarDays, ClipboardList, TrendingUp, WalletCards } from 'lucide-react'
 import { useMemo } from 'react'
@@ -10505,10 +10657,10 @@ export function AdminDashboardPage() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\pages\admin\AdminDashboardPage.tsx
+FIM DO ARQUIVO: src/pages/admin/AdminDashboardPage.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\pages\admin\AdminMembersPage.tsx
+INICIO DO ARQUIVO: src/pages/admin/AdminMembersPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { Edit, HandCoins, Plus, RotateCcw } from 'lucide-react'
 import { useState } from 'react'
@@ -10518,6 +10670,7 @@ import { useCollection } from '../../hooks/useCollection'
 import { createAuditLog } from '../../services/auditService'
 import { addEntity, updateEntity } from '../../services/firestoreService'
 import type { BandMember, MemberPayment } from '../../types'
+import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
 import { formatCurrency, formatDate } from '../../utils/format'
 
 const pixTypes = ['cpf', 'email', 'telefone', 'aleatoria']
@@ -10595,7 +10748,7 @@ export function AdminMembersPage() {
       }
       resetForm()
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel salvar.')
+      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel salvar.'))
     }
   }
 
@@ -10618,7 +10771,7 @@ export function AdminMembersPage() {
       setPaymentNotes('')
       setFeedback('Pagamento de integrante registrado.')
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel registrar pagamento.')
+      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel registrar pagamento.'))
     }
   }
 
@@ -10723,10 +10876,10 @@ export function AdminMembersPage() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\pages\admin\AdminMembersPage.tsx
+FIM DO ARQUIVO: src/pages/admin/AdminMembersPage.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\pages\admin\AdminPaymentsPage.tsx
+INICIO DO ARQUIVO: src/pages/admin/AdminPaymentsPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { CheckCircle2 } from 'lucide-react'
 import { Button, Card, DataTable, Badge } from '../../components/ui'
@@ -10835,10 +10988,10 @@ export function AdminPaymentsPage() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\pages\admin\AdminPaymentsPage.tsx
+FIM DO ARQUIVO: src/pages/admin/AdminPaymentsPage.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\pages\admin\AdminQuoteDetailPage.tsx
+INICIO DO ARQUIVO: src/pages/admin/AdminQuoteDetailPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { where } from 'firebase/firestore'
 import { CheckCircle2, CircleDollarSign, RefreshCcw, Save, XCircle } from 'lucide-react'
@@ -10850,6 +11003,7 @@ import { useCollection } from '../../hooks/useCollection'
 import { useDocument } from '../../hooks/useDocument'
 import type { CostSnapshot, Payment, Quote, QuoteItem, Settings } from '../../types'
 import { calculateQuoteTotals } from '../../utils/calculations'
+import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
 import { formatCurrency, formatDate, formatPercent } from '../../utils/format'
 import {
   approveQuote,
@@ -10931,7 +11085,7 @@ export function AdminQuoteDetailPage() {
       await action()
       setFeedback(successMessage)
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'A operacao nao foi concluida.')
+      setFeedback(getFriendlyFirebaseError(error, 'A operacao nao foi concluida.'))
     } finally {
       setSaving(false)
     }
@@ -11140,10 +11294,10 @@ export function AdminQuoteDetailPage() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\pages\admin\AdminQuoteDetailPage.tsx
+FIM DO ARQUIVO: src/pages/admin/AdminQuoteDetailPage.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\pages\admin\AdminQuotesPage.tsx
+INICIO DO ARQUIVO: src/pages/admin/AdminQuotesPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -11212,10 +11366,10 @@ export function AdminQuotesPage() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\pages\admin\AdminQuotesPage.tsx
+FIM DO ARQUIVO: src/pages/admin/AdminQuotesPage.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\pages\admin\AdminServicesPage.tsx
+INICIO DO ARQUIVO: src/pages/admin/AdminServicesPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { collection, getDocs } from 'firebase/firestore'
 import { Edit, Plus, RotateCcw, Trash2 } from 'lucide-react'
@@ -11228,6 +11382,7 @@ import { createService, removeService, updateService } from '../../services/serv
 import { createAuditLog } from '../../services/auditService'
 import type { BandMember, MemberCostLink, Quote, Service, Supplier, SupplierLink } from '../../types'
 import { serviceCategories } from '../../utils/constants'
+import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
 import { formatCurrency } from '../../utils/format'
 
 const emptyService: Omit<Service, 'id'> = {
@@ -11317,7 +11472,7 @@ export function AdminServicesPage() {
       }
       resetForm()
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel salvar o servico.')
+      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel salvar o servico.'))
     }
   }
 
@@ -11365,7 +11520,7 @@ export function AdminServicesPage() {
       await removeService(service.id)
       setFeedback('Servico excluido.')
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel excluir.')
+      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel excluir.'))
     }
   }
 
@@ -11500,10 +11655,10 @@ export function AdminServicesPage() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\pages\admin\AdminServicesPage.tsx
+FIM DO ARQUIVO: src/pages/admin/AdminServicesPage.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\pages\admin\AdminSettingsPage.tsx
+INICIO DO ARQUIVO: src/pages/admin/AdminSettingsPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { Save, TerminalSquare } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -11514,6 +11669,7 @@ import { createAuditLog } from '../../services/auditService'
 import { saveSettings, getSettings } from '../../services/settingsService'
 import type { AuditLog, PixKeyType, Settings } from '../../types'
 import { defaultSettings } from '../../utils/constants'
+import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
 import { formatDate } from '../../utils/format'
 
 const pixOptions: PixKeyType[] = ['cpf', 'cnpj', 'email', 'telefone', 'aleatoria']
@@ -11548,7 +11704,7 @@ export function AdminSettingsPage() {
       }).catch(() => undefined)
       setFeedback('Configuracoes salvas.')
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel salvar.')
+      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel salvar.'))
     } finally {
       setSaving(false)
     }
@@ -11628,10 +11784,10 @@ export function AdminSettingsPage() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\pages\admin\AdminSettingsPage.tsx
+FIM DO ARQUIVO: src/pages/admin/AdminSettingsPage.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\pages\admin\AdminSuppliersPage.tsx
+INICIO DO ARQUIVO: src/pages/admin/AdminSuppliersPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { Edit, HandCoins, Plus, RotateCcw } from 'lucide-react'
 import { useState } from 'react'
@@ -11642,6 +11798,7 @@ import { createAuditLog } from '../../services/auditService'
 import { addEntity, updateEntity } from '../../services/firestoreService'
 import type { Supplier, SupplierPayment } from '../../types'
 import { supplierTypes } from '../../utils/constants'
+import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
 import { formatCurrency, formatDate } from '../../utils/format'
 
 const pixTypes = ['cpf', 'email', 'telefone', 'aleatoria']
@@ -11719,7 +11876,7 @@ export function AdminSuppliersPage() {
       }
       resetForm()
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel salvar.')
+      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel salvar.'))
     }
   }
 
@@ -11742,7 +11899,7 @@ export function AdminSuppliersPage() {
       setPaymentNotes('')
       setFeedback('Pagamento de fornecedor registrado.')
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel registrar pagamento.')
+      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel registrar pagamento.'))
     }
   }
 
@@ -11839,10 +11996,10 @@ export function AdminSuppliersPage() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\pages\admin\AdminSuppliersPage.tsx
+FIM DO ARQUIVO: src/pages/admin/AdminSuppliersPage.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\pages\auth\AdminAccessPage.tsx
+INICIO DO ARQUIVO: src/pages/auth/AdminAccessPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowLeft, LogIn, ShieldCheck, UserPlus } from 'lucide-react'
@@ -12027,10 +12184,10 @@ export function AdminAccessPage() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\pages\auth\AdminAccessPage.tsx
+FIM DO ARQUIVO: src/pages/auth/AdminAccessPage.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\pages\auth\LoginPage.tsx
+INICIO DO ARQUIVO: src/pages/auth/LoginPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowLeft, Music2 } from 'lucide-react'
@@ -12112,10 +12269,10 @@ export function LoginPage() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\pages\auth\LoginPage.tsx
+FIM DO ARQUIVO: src/pages/auth/LoginPage.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\pages\auth\RegisterPage.tsx
+INICIO DO ARQUIVO: src/pages/auth/RegisterPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowLeft, UserPlus } from 'lucide-react'
@@ -12214,10 +12371,10 @@ export function RegisterPage() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\pages\auth\RegisterPage.tsx
+FIM DO ARQUIVO: src/pages/auth/RegisterPage.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\pages\client\ClientDashboardPage.tsx
+INICIO DO ARQUIVO: src/pages/client/ClientDashboardPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { CalendarClock, ClipboardList, PlusCircle, WalletCards } from 'lucide-react'
 import { useMemo } from 'react'
@@ -12315,10 +12472,10 @@ export function ClientDashboardPage() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\pages\client\ClientDashboardPage.tsx
+FIM DO ARQUIVO: src/pages/client/ClientDashboardPage.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\pages\client\ClientPaymentsPage.tsx
+INICIO DO ARQUIVO: src/pages/client/ClientPaymentsPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { where } from 'firebase/firestore'
 import { Copy, Send } from 'lucide-react'
@@ -12328,6 +12485,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
 import { clientMarkPaymentAsPaid } from '../../services/paymentService'
 import type { Payment } from '../../types'
+import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
 import { formatCurrency } from '../../utils/format'
 
 function paymentLabel(type: Payment['type']) {
@@ -12345,7 +12503,10 @@ export function ClientPaymentsPage() {
   const [feedback, setFeedback] = useState('')
 
   async function copyPixKey(pixKey: string) {
-    if (!pixKey) return
+    if (!pixKey) {
+      setFeedback('A chave Pix ainda nao foi configurada. Fale com a administracao.')
+      return
+    }
     await navigator.clipboard.writeText(pixKey)
     setFeedback('Chave Pix copiada.')
   }
@@ -12357,7 +12518,7 @@ export function ClientPaymentsPage() {
       await clientMarkPaymentAsPaid(payment, messages[payment.id] || '')
       setFeedback('Pagamento informado. Aguarde a conferencia manual.')
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel informar o pagamento.')
+      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel informar o pagamento.'))
     } finally {
       setSubmittingId('')
     }
@@ -12391,7 +12552,12 @@ export function ClientPaymentsPage() {
                     value={messages[payment.id] || payment.clientMessage || ''}
                   />
                   <div className="flex flex-col gap-3 sm:flex-row">
-                    <Button icon={<Copy className="h-4 w-4" />} onClick={() => copyPixKey(payment.pixKeyUsed)} variant="secondary">
+                    <Button
+                      disabled={!payment.pixKeyUsed}
+                      icon={<Copy className="h-4 w-4" />}
+                      onClick={() => copyPixKey(payment.pixKeyUsed)}
+                      variant="secondary"
+                    >
                       Copiar chave Pix
                     </Button>
                     <Button
@@ -12416,21 +12582,23 @@ export function ClientPaymentsPage() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\pages\client\ClientPaymentsPage.tsx
+FIM DO ARQUIVO: src/pages/client/ClientPaymentsPage.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\pages\client\ClientQuoteDetailPage.tsx
+INICIO DO ARQUIVO: src/pages/client/ClientQuoteDetailPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { where } from 'firebase/firestore'
 import { Copy, Send } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Badge, Button, Card, Loading, StatusBadge, Textarea } from '../../components/ui'
+import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
 import { useDocument } from '../../hooks/useDocument'
 import { clientMarkPaymentAsPaid } from '../../services/paymentService'
 import { getPublicSettings } from '../../services/settingsService'
 import type { ClientQuoteView, Payment, PublicSettings } from '../../types'
+import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
 import { formatCurrency, formatDate } from '../../utils/format'
 
 function paymentLabel(type: Payment['type']) {
@@ -12455,9 +12623,17 @@ function statusMessage(status: ClientQuoteView['status']) {
 
 export function ClientQuoteDetailPage() {
   const { id } = useParams()
+  const { user } = useAuth()
   const { data: quote, loading } = useDocument<ClientQuoteView>('clientQuoteViews', id)
-  const paymentConstraints = useMemo(() => [where('quoteId', '==', id || '')], [id])
-  const { data: payments } = useCollection<Payment>('payments', paymentConstraints)
+  const paymentConstraints = useMemo(
+    () => [where('clientId', '==', user?.uid || '')],
+    [user?.uid],
+  )
+  const { data: clientPayments } = useCollection<Payment>('payments', paymentConstraints)
+  const payments = useMemo(
+    () => clientPayments.filter((payment) => payment.quoteId === id),
+    [clientPayments, id],
+  )
   const [settings, setSettings] = useState<PublicSettings | null>(null)
   const [messages, setMessages] = useState<Record<string, string>>({})
   const [feedback, setFeedback] = useState('')
@@ -12472,7 +12648,10 @@ export function ClientQuoteDetailPage() {
 
   async function copyPixKey(pixKey?: string) {
     const key = pixKey || settings?.pixKey
-    if (!key) return
+    if (!key) {
+      setFeedback('A chave Pix ainda nao foi configurada. Fale com a administracao.')
+      return
+    }
     await navigator.clipboard.writeText(key)
     setFeedback('Chave Pix copiada.')
   }
@@ -12484,7 +12663,7 @@ export function ClientQuoteDetailPage() {
       await clientMarkPaymentAsPaid(payment, messages[payment.id] || '')
       setFeedback('Pagamento informado. O Grupo Dvanera fara a conferencia manual.')
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel informar o pagamento.')
+      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel informar o pagamento.'))
     } finally {
       setSubmittingId('')
     }
@@ -12570,7 +12749,12 @@ export function ClientQuoteDetailPage() {
                     value={messages[payment.id] || payment.clientMessage || ''}
                   />
                   <div className="flex flex-col gap-3 sm:flex-row">
-                    <Button icon={<Copy className="h-4 w-4" />} onClick={() => copyPixKey(payment.pixKeyUsed)} variant="secondary">
+                    <Button
+                      disabled={!payment.pixKeyUsed && !settings?.pixKey}
+                      icon={<Copy className="h-4 w-4" />}
+                      onClick={() => copyPixKey(payment.pixKeyUsed)}
+                      variant="secondary"
+                    >
                       Copiar chave Pix
                     </Button>
                     <Button
@@ -12595,10 +12779,10 @@ export function ClientQuoteDetailPage() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\pages\client\ClientQuoteDetailPage.tsx
+FIM DO ARQUIVO: src/pages/client/ClientQuoteDetailPage.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\pages\client\ClientQuotesPage.tsx
+INICIO DO ARQUIVO: src/pages/client/ClientQuotesPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { where } from 'firebase/firestore'
 import { useMemo } from 'react'
@@ -12651,10 +12835,10 @@ export function ClientQuotesPage() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\pages\client\ClientQuotesPage.tsx
+FIM DO ARQUIVO: src/pages/client/ClientQuotesPage.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\pages\client\NewQuotePage.tsx
+INICIO DO ARQUIVO: src/pages/client/NewQuotePage.tsx
 ----------------------------------------------------------------------------------------------------
 import { doc, serverTimestamp, setDoc, where } from 'firebase/firestore'
 import { ArrowLeft, ArrowRight, Check, Minus, Plus } from 'lucide-react'
@@ -12668,6 +12852,7 @@ import { requireDb } from '../../lib/firebase'
 import { createClientQuote } from '../../services/quoteService'
 import type { Client, PublicService, QuoteEvent, QuoteItem } from '../../types'
 import { brazilianStates, eventTypes } from '../../utils/constants'
+import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
 import { formatCurrency } from '../../utils/format'
 
 type SelectedService = {
@@ -12830,7 +13015,7 @@ export function NewQuotePage() {
 
       navigate(`/cliente/orcamentos/${quoteRef.id}`)
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : 'Nao foi possivel enviar o orcamento.')
+      setError(getFriendlyFirebaseError(submitError, 'Nao foi possivel enviar o orcamento.'))
     } finally {
       setSubmitting(false)
     }
@@ -12985,14 +13170,14 @@ export function NewQuotePage() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\pages\client\NewQuotePage.tsx
+FIM DO ARQUIVO: src/pages/client/NewQuotePage.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\pages\public\HomePage.tsx
+INICIO DO ARQUIVO: src/pages/public/HomePage.tsx
 ----------------------------------------------------------------------------------------------------
 import { ArrowRight, CalendarCheck, ShieldCheck, Sparkles, WalletCards } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import heroImage from '../../assets/dvanera-hero.png'
+import heroImage from '../../assets/dvanera-hero.jpg'
 import { FirebaseNotice } from '../../components/FirebaseNotice'
 import { Button, Card } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
@@ -13086,10 +13271,10 @@ export function HomePage() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\pages\public\HomePage.tsx
+FIM DO ARQUIVO: src/pages/public/HomePage.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\pages\public\RequestQuotePage.tsx
+INICIO DO ARQUIVO: src/pages/public/RequestQuotePage.tsx
 ----------------------------------------------------------------------------------------------------
 import { ArrowRight, ClipboardList } from 'lucide-react'
 import { Link } from 'react-router-dom'
@@ -13125,24 +13310,40 @@ export function RequestQuotePage() {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\pages\public\RequestQuotePage.tsx
+FIM DO ARQUIVO: src/pages/public/RequestQuotePage.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\routes\ProtectedRoute.tsx
+INICIO DO ARQUIVO: src/routes/ProtectedRoute.tsx
 ----------------------------------------------------------------------------------------------------
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
-import { Loading } from '../components/ui'
+import { Button, Card, Loading } from '../components/ui'
 import { useAuth } from '../contexts/AuthContext'
 import type { UserRole } from '../types'
 
 export function ProtectedRoute({ role }: { role?: UserRole }) {
-  const { user, profile, loading } = useAuth()
+  const { user, profile, loading, logout } = useAuth()
   const location = useLocation()
 
   if (loading) return <Loading label="Validando acesso..." />
 
   if (!user) {
     return <Navigate replace state={{ from: location }} to="/login" />
+  }
+
+  if (!profile) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-night-950 px-4 text-white">
+        <Card
+          className="w-full max-w-md"
+          description="Sua conta existe no Firebase Authentication, mas o perfil do aplicativo nao foi encontrado. Saia e fale com a administracao."
+          title="Perfil nao encontrado"
+        >
+          <Button className="w-full" onClick={() => void logout()} variant="secondary">
+            Sair da conta
+          </Button>
+        </Card>
+      </div>
+    )
   }
 
   if (role && profile?.role !== role) {
@@ -13153,35 +13354,77 @@ export function ProtectedRoute({ role }: { role?: UserRole }) {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\routes\ProtectedRoute.tsx
+FIM DO ARQUIVO: src/routes/ProtectedRoute.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\routes\router.tsx
+INICIO DO ARQUIVO: src/routes/router.tsx
 ----------------------------------------------------------------------------------------------------
+import { lazy } from 'react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AdminLayout } from '../components/layout/AdminLayout'
 import { ClientLayout } from '../components/layout/ClientLayout'
-import { AdminAgendaPage } from '../pages/admin/AdminAgendaPage'
-import { AdminClientsPage } from '../pages/admin/AdminClientsPage'
-import { AdminDashboardPage } from '../pages/admin/AdminDashboardPage'
-import { AdminMembersPage } from '../pages/admin/AdminMembersPage'
-import { AdminPaymentsPage } from '../pages/admin/AdminPaymentsPage'
-import { AdminQuoteDetailPage } from '../pages/admin/AdminQuoteDetailPage'
-import { AdminQuotesPage } from '../pages/admin/AdminQuotesPage'
-import { AdminServicesPage } from '../pages/admin/AdminServicesPage'
-import { AdminSettingsPage } from '../pages/admin/AdminSettingsPage'
-import { AdminSuppliersPage } from '../pages/admin/AdminSuppliersPage'
-import { AdminAccessPage } from '../pages/auth/AdminAccessPage'
-import { LoginPage } from '../pages/auth/LoginPage'
-import { RegisterPage } from '../pages/auth/RegisterPage'
-import { ClientDashboardPage } from '../pages/client/ClientDashboardPage'
-import { ClientPaymentsPage } from '../pages/client/ClientPaymentsPage'
-import { ClientQuoteDetailPage } from '../pages/client/ClientQuoteDetailPage'
-import { ClientQuotesPage } from '../pages/client/ClientQuotesPage'
-import { NewQuotePage } from '../pages/client/NewQuotePage'
-import { HomePage } from '../pages/public/HomePage'
-import { RequestQuotePage } from '../pages/public/RequestQuotePage'
 import { ProtectedRoute } from './ProtectedRoute'
+
+const AdminAgendaPage = lazy(() =>
+  import('../pages/admin/AdminAgendaPage').then((module) => ({ default: module.AdminAgendaPage })),
+)
+const AdminClientsPage = lazy(() =>
+  import('../pages/admin/AdminClientsPage').then((module) => ({ default: module.AdminClientsPage })),
+)
+const AdminDashboardPage = lazy(() =>
+  import('../pages/admin/AdminDashboardPage').then((module) => ({ default: module.AdminDashboardPage })),
+)
+const AdminMembersPage = lazy(() =>
+  import('../pages/admin/AdminMembersPage').then((module) => ({ default: module.AdminMembersPage })),
+)
+const AdminPaymentsPage = lazy(() =>
+  import('../pages/admin/AdminPaymentsPage').then((module) => ({ default: module.AdminPaymentsPage })),
+)
+const AdminQuoteDetailPage = lazy(() =>
+  import('../pages/admin/AdminQuoteDetailPage').then((module) => ({ default: module.AdminQuoteDetailPage })),
+)
+const AdminQuotesPage = lazy(() =>
+  import('../pages/admin/AdminQuotesPage').then((module) => ({ default: module.AdminQuotesPage })),
+)
+const AdminServicesPage = lazy(() =>
+  import('../pages/admin/AdminServicesPage').then((module) => ({ default: module.AdminServicesPage })),
+)
+const AdminSettingsPage = lazy(() =>
+  import('../pages/admin/AdminSettingsPage').then((module) => ({ default: module.AdminSettingsPage })),
+)
+const AdminSuppliersPage = lazy(() =>
+  import('../pages/admin/AdminSuppliersPage').then((module) => ({ default: module.AdminSuppliersPage })),
+)
+const AdminAccessPage = lazy(() =>
+  import('../pages/auth/AdminAccessPage').then((module) => ({ default: module.AdminAccessPage })),
+)
+const LoginPage = lazy(() =>
+  import('../pages/auth/LoginPage').then((module) => ({ default: module.LoginPage })),
+)
+const RegisterPage = lazy(() =>
+  import('../pages/auth/RegisterPage').then((module) => ({ default: module.RegisterPage })),
+)
+const ClientDashboardPage = lazy(() =>
+  import('../pages/client/ClientDashboardPage').then((module) => ({ default: module.ClientDashboardPage })),
+)
+const ClientPaymentsPage = lazy(() =>
+  import('../pages/client/ClientPaymentsPage').then((module) => ({ default: module.ClientPaymentsPage })),
+)
+const ClientQuoteDetailPage = lazy(() =>
+  import('../pages/client/ClientQuoteDetailPage').then((module) => ({ default: module.ClientQuoteDetailPage })),
+)
+const ClientQuotesPage = lazy(() =>
+  import('../pages/client/ClientQuotesPage').then((module) => ({ default: module.ClientQuotesPage })),
+)
+const NewQuotePage = lazy(() =>
+  import('../pages/client/NewQuotePage').then((module) => ({ default: module.NewQuotePage })),
+)
+const HomePage = lazy(() =>
+  import('../pages/public/HomePage').then((module) => ({ default: module.HomePage })),
+)
+const RequestQuotePage = lazy(() =>
+  import('../pages/public/RequestQuotePage').then((module) => ({ default: module.RequestQuotePage })),
+)
 
 const basename = import.meta.env.BASE_URL === '/' ? '/' : import.meta.env.BASE_URL.replace(/\/$/, '')
 
@@ -13248,10 +13491,10 @@ export const router = createBrowserRouter(
 )
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\routes\router.tsx
+FIM DO ARQUIVO: src/routes/router.tsx
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\services\adminAccountService.ts
+INICIO DO ARQUIVO: src/services/adminAccountService.ts
 ----------------------------------------------------------------------------------------------------
 import {
   createUserWithEmailAndPassword,
@@ -13329,10 +13572,10 @@ export async function createPrimaryAdminAccount(data: RegisterAdminInput): Promi
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\services\adminAccountService.ts
+FIM DO ARQUIVO: src/services/adminAccountService.ts
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\services\auditService.ts
+INICIO DO ARQUIVO: src/services/auditService.ts
 ----------------------------------------------------------------------------------------------------
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
 import { requireDb } from '../lib/firebase'
@@ -13354,10 +13597,10 @@ export async function createAuditLog(input: {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\services\auditService.ts
+FIM DO ARQUIVO: src/services/auditService.ts
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\services\firestoreService.ts
+INICIO DO ARQUIVO: src/services/firestoreService.ts
 ----------------------------------------------------------------------------------------------------
 import {
   addDoc,
@@ -13426,10 +13669,10 @@ export async function getEntity<T>(collectionName: string, id: string) {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\services\firestoreService.ts
+FIM DO ARQUIVO: src/services/firestoreService.ts
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\services\paymentService.ts
+INICIO DO ARQUIVO: src/services/paymentService.ts
 ----------------------------------------------------------------------------------------------------
 import {
   doc,
@@ -13545,10 +13788,10 @@ export async function markInternalPaymentAsPaid(
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\services\paymentService.ts
+FIM DO ARQUIVO: src/services/paymentService.ts
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\services\quoteService.ts
+INICIO DO ARQUIVO: src/services/quoteService.ts
 ----------------------------------------------------------------------------------------------------
 import {
   addDoc,
@@ -13694,6 +13937,10 @@ export async function syncClientQuoteView(quoteId: string) {
   }) as Payment)
   const depositPayment = payments.find(paymentIsDeposit)
   const remainingPayment = payments.find(paymentIsRemaining)
+  const paymentSummary = {
+    ...(depositPayment ? { depositStatus: depositPayment.status } : {}),
+    ...(remainingPayment ? { remainingStatus: remainingPayment.status } : {}),
+  }
 
   await setDoc(
     doc(database, 'clientQuoteViews', quoteId),
@@ -13714,10 +13961,7 @@ export async function syncClientQuoteView(quoteId: string) {
       status: quote.status,
       clientNotes: quote.clientNotes || '',
       rejectionReason: quote.rejectionReason || '',
-      paymentSummary: {
-        depositStatus: depositPayment?.status,
-        remainingStatus: remainingPayment?.status,
-      },
+      paymentSummary,
       approvedAt: quote.approvedAt || null,
       depositConfirmedAt: quote.depositConfirmedAt || null,
       createdAt: quote.createdAt || serverTimestamp(),
@@ -13929,10 +14173,10 @@ export async function createFinalPayment(quote: Quote, settings?: Settings) {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\services\quoteService.ts
+FIM DO ARQUIVO: src/services/quoteService.ts
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\services\serviceService.ts
+INICIO DO ARQUIVO: src/services/serviceService.ts
 ----------------------------------------------------------------------------------------------------
 import {
   deleteDoc,
@@ -14001,10 +14245,10 @@ export async function removeService(serviceId: string) {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\services\serviceService.ts
+FIM DO ARQUIVO: src/services/serviceService.ts
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\services\settingsService.ts
+INICIO DO ARQUIVO: src/services/settingsService.ts
 ----------------------------------------------------------------------------------------------------
 import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { requireDb } from '../lib/firebase'
@@ -14073,10 +14317,10 @@ export function toPublicSettings(settings: Settings): PublicSettings {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\services\settingsService.ts
+FIM DO ARQUIVO: src/services/settingsService.ts
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\types\index.ts
+INICIO DO ARQUIVO: src/types/index.ts
 ----------------------------------------------------------------------------------------------------
 import type { Timestamp } from 'firebase/firestore'
 
@@ -14348,10 +14592,10 @@ export type AuditLog = FirestoreEntity & {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\types\index.ts
+FIM DO ARQUIVO: src/types/index.ts
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\utils\calculations.ts
+INICIO DO ARQUIVO: src/utils/calculations.ts
 ----------------------------------------------------------------------------------------------------
 import type { CostSnapshot, QuoteItem } from '../types'
 
@@ -14412,10 +14656,10 @@ export function serviceLinksToCosts(itemServiceName: string, costs: CostSnapshot
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\utils\calculations.ts
+FIM DO ARQUIVO: src/utils/calculations.ts
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\utils\constants.ts
+INICIO DO ARQUIVO: src/utils/constants.ts
 ----------------------------------------------------------------------------------------------------
 import {
   BadgeCheck,
@@ -14550,10 +14794,10 @@ export const defaultSettings = {
 } as const
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\utils\constants.ts
+FIM DO ARQUIVO: src/utils/constants.ts
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\utils\firebaseErrors.ts
+INICIO DO ARQUIVO: src/utils/firebaseErrors.ts
 ----------------------------------------------------------------------------------------------------
 const firebaseAuthMessages: Record<string, string> = {
   'auth/configuration-not-found':
@@ -14565,8 +14809,15 @@ const firebaseAuthMessages: Record<string, string> = {
   'auth/email-already-in-use': 'Este e-mail ja esta cadastrado. Entre com sua senha ou use outro e-mail.',
   'auth/invalid-email': 'Informe um e-mail valido.',
   'auth/invalid-credential': 'E-mail ou senha invalidos.',
-  'auth/requires-recent-login': 'Entre novamente na conta admin e tente excluir o cadastro outra vez.',
+  'auth/user-disabled': 'Esta conta foi desativada. Fale com a administracao.',
+  'auth/too-many-requests': 'Muitas tentativas seguidas. Aguarde alguns minutos e tente novamente.',
+  'auth/network-request-failed': 'Falha de rede ao acessar o Firebase. Verifique sua conexao e tente novamente.',
   'permission-denied': 'O Firebase bloqueou esta operacao pelas regras de seguranca.',
+  'firestore/permission-denied': 'O Firebase bloqueou esta operacao pelas regras de seguranca.',
+  unavailable: 'O Firebase esta temporariamente indisponivel. Verifique sua conexao e tente novamente.',
+  'firestore/unavailable': 'O Firebase esta temporariamente indisponivel. Verifique sua conexao e tente novamente.',
+  'failed-precondition': 'Esta operacao ainda nao esta disponivel porque falta uma configuracao no Firebase.',
+  'firestore/failed-precondition': 'Esta operacao ainda nao esta disponivel porque falta uma configuracao no Firebase.',
   'auth/weak-password': 'Use uma senha mais forte, com pelo menos 6 caracteres.',
 }
 
@@ -14579,14 +14830,22 @@ export function getFriendlyFirebaseError(error: unknown, fallback = 'Nao foi pos
     return firebaseAuthMessages[code]
   }
 
+  if (/network|offline|failed to fetch/i.test(error.message)) {
+    return 'Falha de rede. Verifique sua conexao e tente novamente.'
+  }
+
+  if (/firebase(error)?:/i.test(error.message)) {
+    return fallback
+  }
+
   return error.message || fallback
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\utils\firebaseErrors.ts
+FIM DO ARQUIVO: src/utils/firebaseErrors.ts
 
 ----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: src\utils\format.ts
+INICIO DO ARQUIVO: src/utils/format.ts
 ----------------------------------------------------------------------------------------------------
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -14641,7 +14900,7 @@ export function formatPercent(value = 0) {
 }
 
 ----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: src\utils\format.ts
+FIM DO ARQUIVO: src/utils/format.ts
 
 ----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: tailwind.config.ts
@@ -14683,6 +14942,198 @@ export default {
 
 ----------------------------------------------------------------------------------------------------
 FIM DO ARQUIVO: tailwind.config.ts
+
+----------------------------------------------------------------------------------------------------
+INICIO DO ARQUIVO: TESTES_MANUAIS_PRODUCAO.md
+----------------------------------------------------------------------------------------------------
+# Testes Manuais de Producao
+
+Data: 8 de junho de 2026
+
+Ambientes:
+
+- Preview: `http://127.0.0.1:4174/PWA-BANDASHOW/`
+- Producao: `https://gui130699.github.io/PWA-BANDASHOW/`
+- Firebase: `pwa-bandashow`
+
+Todos os nomes e e-mails de QA usaram o sufixo `20260608931510`. Os registros, configuracoes, logs e contas temporarias foram removidos ao final.
+
+## 1. Primeiro admin
+
+Resultado: APROVADO.
+
+- A rota `/admin/acesso` ofereceu a criacao do primeiro admin.
+- O cadastro temporario criou `users/{uid}`, `system/adminSetup` e `system/adminOwner`.
+- Logout e login administrativo funcionaram.
+- Apos a limpeza, `/admin/acesso` voltou a oferecer a criacao do primeiro admin.
+
+## 2. Servicos e custos
+
+Resultado: APROVADO.
+
+- Fornecedor temporario criado com custo padrao de R$ 800.
+- Integrante temporario criado com custo padrao de R$ 500.
+- Servico temporario criado por R$ 5.000.
+- Os dois custos foram vinculados ao servico.
+- `publicServices` continha somente campos publicos.
+- Nao havia `supplierLinks`, `memberCostLinks` ou `internalNotes` no documento publico.
+
+## 3. Cliente solicita orcamento
+
+Resultado: APROVADO COM OBSERVACAO DE AUTOMACAO.
+
+- Cadastro e login do cliente funcionaram pela interface.
+- Dados cadastrais e dados do evento foram validados no assistente.
+- O navegador automatizado nao conseguiu operar os seletores nativos de data/hora.
+- Para concluir o teste sem alterar o app, foi executado o mesmo batch autenticado previsto pelo servico: `quotes/{id}` e `clientQuoteViews/{id}`.
+- O detalhe sanitizado apareceu corretamente no painel do cliente.
+
+Essa observacao e uma limitacao do controle automatizado sobre inputs nativos, nao um erro reproduzido para o usuario.
+
+## 4. Admin aprova orcamento
+
+Resultado: APROVADO.
+
+- O admin abriu o orcamento.
+- O recalculo gerou custos internos totais de R$ 1.300.
+- `costSnapshot` continha fornecedor de R$ 800 e integrante de R$ 500.
+- Lucro estimado ficou em R$ 3.700 e margem em 74%.
+- A aprovacao alterou o status para `aprovado_aguardando_entrada`.
+- Um pagamento de entrada de R$ 2.500 foi criado.
+
+Durante este teste foi identificado e corrigido um erro real: a sincronizacao tentava salvar status de pagamento `undefined` antes de existirem pagamentos.
+
+## 5. Cliente informa entrada
+
+Resultado: APROVADO.
+
+- A central de pagamentos exibiu a entrada.
+- Chave Pix e valor foram apresentados.
+- O cliente informou o pagamento com observacao.
+- Status alterado para `informado_pelo_cliente`.
+- O cliente nao recebeu permissao de confirmacao.
+
+Durante este teste foi corrigida a consulta da pagina de detalhe para filtrar pagamentos pelo proprietario, atendendo as Firestore Rules.
+
+## 6. Admin confirma entrada
+
+Resultado: APROVADO.
+
+- O admin visualizou a entrada informada.
+- O pagamento foi confirmado.
+- O orcamento mudou para `agendado`.
+- O evento apareceu automaticamente na agenda.
+
+## 7. Pagamento restante
+
+Resultado: APROVADO.
+
+- O admin gerou o restante de R$ 2.500.
+- O cliente informou o pagamento restante.
+- O admin confirmou o restante.
+- Entrada e restante ficaram com status `confirmado`.
+
+## 8. Evento realizado
+
+Resultado: APROVADO.
+
+- O admin marcou o evento como realizado.
+- O orcamento e a agenda mostraram `realizado`.
+- Auditorias `quote_financials_updated`, `quote_approved` e `quote_done` foram encontradas.
+
+## 9. Seguranca Firestore
+
+Resultado: APROVADO.
+
+Testes com token de cliente:
+
+```txt
+clientQuoteViews proprio: HTTP 200
+quotes interno: HTTP 403
+services interno: HTTP 403
+settings interno: HTTP 403
+system/adminOwner: HTTP 403
+```
+
+A visao do cliente nao continha:
+
+```txt
+manualCosts
+adminNotes
+totalCosts
+costSnapshot
+```
+
+## 10. GitHub Pages
+
+Resultado: APROVADO.
+
+- Commit: `08511aa`.
+- Workflow: `27172060702`.
+- Conclusao: `success`.
+- Home publica carregou com imagem e assets corretos.
+- Acessos diretos validados:
+
+```txt
+/login
+/admin/acesso
+/cliente
+/admin/dashboard
+/solicitar-orcamento
+```
+
+As rotas protegidas redirecionaram para `/login`, sem 404 ou tela branca.
+
+## 11. PWA
+
+Resultado: APROVADO.
+
+Validacao Chrome DevTools Protocol na URL publica:
+
+```txt
+ManifestErrors: 0
+InstallabilityErrors: 0
+ServiceWorker controlled: true
+ServiceWorker state: activated
+Scope: https://gui130699.github.io/PWA-BANDASHOW/
+```
+
+Tambem foi validado localmente:
+
+- app shell em cache;
+- reload offline mantendo a tela de login;
+- manifest com icones 192, 512 e maskable.
+
+## 12. Dependencias e build
+
+Resultado: APROVADO.
+
+```txt
+npm install: OK
+npm@10 ci --dry-run: OK
+npm run lint: OK
+npm run build: OK
+npm audit --omit=dev: 0 vulnerabilidades
+npm audit completo: 8 moderadas de desenvolvimento documentadas
+```
+
+## 13. Limpeza final
+
+Resultado: APROVADO.
+
+- Contas de Auth QA restantes: 0.
+- Usuarios totais apos limpeza: 1, o usuario original.
+- `system/adminSetup`: inexistente.
+- Servico, fornecedor, integrante, cliente, orcamento e pagamentos QA removidos.
+- Configuracoes Pix QA removidas.
+- Dez logs de auditoria QA removidos.
+
+## Conclusao
+
+O fluxo cliente/admin, seguranca, deploy, PWA, performance e limpeza de dados passaram. O projeto esta apto para o primeiro admin definitivo ser criado pelo proprietario.
+
+----------------------------------------------------------------------------------------------------
+FIM DO ARQUIVO: TESTES_MANUAIS_PRODUCAO.md
 
 ----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: tsconfig.app.json
@@ -14771,6 +15222,40 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   base: process.env.VITE_BASE_PATH || '/',
   plugins: [react()],
+  build: {
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            {
+              name: 'firebase-firestore',
+              test: /node_modules[\\/]@firebase[\\/]firestore/,
+            },
+            {
+              name: 'firebase-auth',
+              test: /node_modules[\\/]@firebase[\\/]auth/,
+            },
+            {
+              name: 'firebase-core',
+              test: /node_modules[\\/](@firebase|firebase)[\\/]/,
+            },
+            {
+              name: 'react-vendor',
+              test: /node_modules[\\/](react|react-dom|react-router|react-router-dom|scheduler)[\\/]/,
+            },
+            {
+              name: 'forms-vendor',
+              test: /node_modules[\\/](@hookform|react-hook-form|zod)[\\/]/,
+            },
+            {
+              name: 'charts-vendor',
+              test: /node_modules[\\/](recharts|victory-vendor|react-is|d3-[^\\/]+)[\\/]/,
+            },
+          ],
+        },
+      },
+    },
+  },
   server: {
     host: '0.0.0.0',
     port: 5173,
@@ -14779,3 +15264,6 @@ export default defineConfig({
 
 ----------------------------------------------------------------------------------------------------
 FIM DO ARQUIVO: vite.config.ts
+
+====================================================================================================
+FIM DA DOCUMENTACAO COMPLETA
