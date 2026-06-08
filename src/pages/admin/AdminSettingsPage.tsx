@@ -7,6 +7,7 @@ import { createAuditLog } from '../../services/auditService'
 import { saveSettings, getSettings } from '../../services/settingsService'
 import type { AuditLog, PixKeyType, Settings } from '../../types'
 import { defaultSettings } from '../../utils/constants'
+import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
 import { formatDate } from '../../utils/format'
 
 const pixOptions: PixKeyType[] = ['cpf', 'cnpj', 'email', 'telefone', 'aleatoria']
@@ -41,7 +42,7 @@ export function AdminSettingsPage() {
       }).catch(() => undefined)
       setFeedback('Configuracoes salvas.')
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel salvar.')
+      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel salvar.'))
     } finally {
       setSaving(false)
     }

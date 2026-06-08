@@ -8,8 +8,15 @@ const firebaseAuthMessages: Record<string, string> = {
   'auth/email-already-in-use': 'Este e-mail ja esta cadastrado. Entre com sua senha ou use outro e-mail.',
   'auth/invalid-email': 'Informe um e-mail valido.',
   'auth/invalid-credential': 'E-mail ou senha invalidos.',
-  'auth/requires-recent-login': 'Entre novamente na conta admin e tente excluir o cadastro outra vez.',
+  'auth/user-disabled': 'Esta conta foi desativada. Fale com a administracao.',
+  'auth/too-many-requests': 'Muitas tentativas seguidas. Aguarde alguns minutos e tente novamente.',
+  'auth/network-request-failed': 'Falha de rede ao acessar o Firebase. Verifique sua conexao e tente novamente.',
   'permission-denied': 'O Firebase bloqueou esta operacao pelas regras de seguranca.',
+  'firestore/permission-denied': 'O Firebase bloqueou esta operacao pelas regras de seguranca.',
+  unavailable: 'O Firebase esta temporariamente indisponivel. Verifique sua conexao e tente novamente.',
+  'firestore/unavailable': 'O Firebase esta temporariamente indisponivel. Verifique sua conexao e tente novamente.',
+  'failed-precondition': 'Esta operacao ainda nao esta disponivel porque falta uma configuracao no Firebase.',
+  'firestore/failed-precondition': 'Esta operacao ainda nao esta disponivel porque falta uma configuracao no Firebase.',
   'auth/weak-password': 'Use uma senha mais forte, com pelo menos 6 caracteres.',
 }
 
@@ -20,6 +27,14 @@ export function getFriendlyFirebaseError(error: unknown, fallback = 'Nao foi pos
 
   if (code && firebaseAuthMessages[code]) {
     return firebaseAuthMessages[code]
+  }
+
+  if (/network|offline|failed to fetch/i.test(error.message)) {
+    return 'Falha de rede. Verifique sua conexao e tente novamente.'
+  }
+
+  if (/firebase(error)?:/i.test(error.message)) {
+    return fallback
   }
 
   return error.message || fallback

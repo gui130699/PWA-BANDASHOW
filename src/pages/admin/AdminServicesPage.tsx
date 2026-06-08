@@ -9,6 +9,7 @@ import { createService, removeService, updateService } from '../../services/serv
 import { createAuditLog } from '../../services/auditService'
 import type { BandMember, MemberCostLink, Quote, Service, Supplier, SupplierLink } from '../../types'
 import { serviceCategories } from '../../utils/constants'
+import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
 import { formatCurrency } from '../../utils/format'
 
 const emptyService: Omit<Service, 'id'> = {
@@ -98,7 +99,7 @@ export function AdminServicesPage() {
       }
       resetForm()
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel salvar o servico.')
+      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel salvar o servico.'))
     }
   }
 
@@ -146,7 +147,7 @@ export function AdminServicesPage() {
       await removeService(service.id)
       setFeedback('Servico excluido.')
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel excluir.')
+      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel excluir.'))
     }
   }
 

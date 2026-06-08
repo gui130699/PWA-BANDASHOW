@@ -1,6 +1,11 @@
-const CACHE_NAME = 'grupo-dvanera-v3'
+const CACHE_NAME = 'grupo-dvanera-v4'
 const BASE_PATH = new URL(self.registration.scope).pathname
-const APP_SHELL = [BASE_PATH, `${BASE_PATH}manifest.webmanifest`, `${BASE_PATH}icons/gd-icon.svg`]
+const APP_SHELL = [
+  BASE_PATH,
+  `${BASE_PATH}manifest.webmanifest`,
+  `${BASE_PATH}icons/icon-192.png`,
+  `${BASE_PATH}icons/icon-512.png`,
+]
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -19,32 +24,58 @@ self.addEventListener('activate', (event) => {
   )
 })
 
+self.addEventListener('message', (event) => {
+  if (event.data === 'SKIP_WAITING') {
+    void self.skipWaiting()
+  }
+})
+
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return
+
+  const requestUrl = new URL(event.request.url)
+  if (requestUrl.origin !== self.location.origin || !requestUrl.pathname.startsWith(BASE_PATH)) {
+    return
+  }
 
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
-          const copy = response.clone()
-          caches.open(CACHE_NAME).then((cache) => cache.put(BASE_PATH, copy))
+          if (response.ok) {
+            const copy = response.clone()
+            void caches.open(CACHE_NAME).then((cache) => cache.put(BASE_PATH, copy))
+          }
           return response
         })
-        .catch(() => caches.match(BASE_PATH)),
+        .catch(async () => (await caches.match(BASE_PATH)) || Response.error()),
     )
     return
   }
 
   event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        if (response.ok && event.request.url.startsWith(self.location.origin)) {
-          const copy = response.clone()
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy))
-        }
+    caches.match(event.request).then((cached) => {
+      const networkRequest = fetch(event.request)
+        .then((response) => {
+          if (response.ok) {
+            const contentType = response.headers.get('content-type') || ''
+            const shouldCache =
+              contentType.includes('text/css') ||
+              contentType.includes('javascript') ||
+              contentType.includes('image/') ||
+              requestUrl.pathname.endsWith('manifest.webmanifest')
 
-        return response
-      })
-      .catch(() => caches.match(event.request).then((cached) => cached || caches.match(BASE_PATH))),
+            if (shouldCache) {
+              const copy = response.clone()
+              void caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy))
+            }
+          }
+
+          return response
+        })
+        .catch(() => cached || Response.error())
+
+      return cached || networkRequest
+    }),
   )
 })

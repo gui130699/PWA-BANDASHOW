@@ -6,6 +6,7 @@ import { useCollection } from '../../hooks/useCollection'
 import { createAuditLog } from '../../services/auditService'
 import { addEntity, updateEntity } from '../../services/firestoreService'
 import type { BandMember, MemberPayment } from '../../types'
+import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
 import { formatCurrency, formatDate } from '../../utils/format'
 
 const pixTypes = ['cpf', 'email', 'telefone', 'aleatoria']
@@ -83,7 +84,7 @@ export function AdminMembersPage() {
       }
       resetForm()
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel salvar.')
+      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel salvar.'))
     }
   }
 
@@ -106,7 +107,7 @@ export function AdminMembersPage() {
       setPaymentNotes('')
       setFeedback('Pagamento de integrante registrado.')
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel registrar pagamento.')
+      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel registrar pagamento.'))
     }
   }
 

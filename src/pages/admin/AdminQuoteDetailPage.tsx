@@ -8,6 +8,7 @@ import { useCollection } from '../../hooks/useCollection'
 import { useDocument } from '../../hooks/useDocument'
 import type { CostSnapshot, Payment, Quote, QuoteItem, Settings } from '../../types'
 import { calculateQuoteTotals } from '../../utils/calculations'
+import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
 import { formatCurrency, formatDate, formatPercent } from '../../utils/format'
 import {
   approveQuote,
@@ -89,7 +90,7 @@ export function AdminQuoteDetailPage() {
       await action()
       setFeedback(successMessage)
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'A operacao nao foi concluida.')
+      setFeedback(getFriendlyFirebaseError(error, 'A operacao nao foi concluida.'))
     } finally {
       setSaving(false)
     }

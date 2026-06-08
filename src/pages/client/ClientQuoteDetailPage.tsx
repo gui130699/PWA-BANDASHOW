@@ -3,11 +3,13 @@ import { Copy, Send } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Badge, Button, Card, Loading, StatusBadge, Textarea } from '../../components/ui'
+import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
 import { useDocument } from '../../hooks/useDocument'
 import { clientMarkPaymentAsPaid } from '../../services/paymentService'
 import { getPublicSettings } from '../../services/settingsService'
 import type { ClientQuoteView, Payment, PublicSettings } from '../../types'
+import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
 import { formatCurrency, formatDate } from '../../utils/format'
 
 function paymentLabel(type: Payment['type']) {
@@ -32,9 +34,17 @@ function statusMessage(status: ClientQuoteView['status']) {
 
 export function ClientQuoteDetailPage() {
   const { id } = useParams()
+  const { user } = useAuth()
   const { data: quote, loading } = useDocument<ClientQuoteView>('clientQuoteViews', id)
-  const paymentConstraints = useMemo(() => [where('quoteId', '==', id || '')], [id])
-  const { data: payments } = useCollection<Payment>('payments', paymentConstraints)
+  const paymentConstraints = useMemo(
+    () => [where('clientId', '==', user?.uid || '')],
+    [user?.uid],
+  )
+  const { data: clientPayments } = useCollection<Payment>('payments', paymentConstraints)
+  const payments = useMemo(
+    () => clientPayments.filter((payment) => payment.quoteId === id),
+    [clientPayments, id],
+  )
   const [settings, setSettings] = useState<PublicSettings | null>(null)
   const [messages, setMessages] = useState<Record<string, string>>({})
   const [feedback, setFeedback] = useState('')
@@ -49,7 +59,10 @@ export function ClientQuoteDetailPage() {
 
   async function copyPixKey(pixKey?: string) {
     const key = pixKey || settings?.pixKey
-    if (!key) return
+    if (!key) {
+      setFeedback('A chave Pix ainda nao foi configurada. Fale com a administracao.')
+      return
+    }
     await navigator.clipboard.writeText(key)
     setFeedback('Chave Pix copiada.')
   }
@@ -61,7 +74,7 @@ export function ClientQuoteDetailPage() {
       await clientMarkPaymentAsPaid(payment, messages[payment.id] || '')
       setFeedback('Pagamento informado. O Grupo Dvanera fara a conferencia manual.')
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel informar o pagamento.')
+      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel informar o pagamento.'))
     } finally {
       setSubmittingId('')
     }
@@ -147,7 +160,12 @@ export function ClientQuoteDetailPage() {
                     value={messages[payment.id] || payment.clientMessage || ''}
                   />
                   <div className="flex flex-col gap-3 sm:flex-row">
-                    <Button icon={<Copy className="h-4 w-4" />} onClick={() => copyPixKey(payment.pixKeyUsed)} variant="secondary">
+                    <Button
+                      disabled={!payment.pixKeyUsed && !settings?.pixKey}
+                      icon={<Copy className="h-4 w-4" />}
+                      onClick={() => copyPixKey(payment.pixKeyUsed)}
+                      variant="secondary"
+                    >
                       Copiar chave Pix
                     </Button>
                     <Button

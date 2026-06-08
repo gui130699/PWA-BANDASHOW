@@ -7,6 +7,7 @@ import { createAuditLog } from '../../services/auditService'
 import { addEntity, updateEntity } from '../../services/firestoreService'
 import type { Supplier, SupplierPayment } from '../../types'
 import { supplierTypes } from '../../utils/constants'
+import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
 import { formatCurrency, formatDate } from '../../utils/format'
 
 const pixTypes = ['cpf', 'email', 'telefone', 'aleatoria']
@@ -84,7 +85,7 @@ export function AdminSuppliersPage() {
       }
       resetForm()
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel salvar.')
+      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel salvar.'))
     }
   }
 
@@ -107,7 +108,7 @@ export function AdminSuppliersPage() {
       setPaymentNotes('')
       setFeedback('Pagamento de fornecedor registrado.')
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel registrar pagamento.')
+      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel registrar pagamento.'))
     }
   }
 

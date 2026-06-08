@@ -1,27 +1,69 @@
+import { lazy } from 'react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AdminLayout } from '../components/layout/AdminLayout'
 import { ClientLayout } from '../components/layout/ClientLayout'
-import { AdminAgendaPage } from '../pages/admin/AdminAgendaPage'
-import { AdminClientsPage } from '../pages/admin/AdminClientsPage'
-import { AdminDashboardPage } from '../pages/admin/AdminDashboardPage'
-import { AdminMembersPage } from '../pages/admin/AdminMembersPage'
-import { AdminPaymentsPage } from '../pages/admin/AdminPaymentsPage'
-import { AdminQuoteDetailPage } from '../pages/admin/AdminQuoteDetailPage'
-import { AdminQuotesPage } from '../pages/admin/AdminQuotesPage'
-import { AdminServicesPage } from '../pages/admin/AdminServicesPage'
-import { AdminSettingsPage } from '../pages/admin/AdminSettingsPage'
-import { AdminSuppliersPage } from '../pages/admin/AdminSuppliersPage'
-import { AdminAccessPage } from '../pages/auth/AdminAccessPage'
-import { LoginPage } from '../pages/auth/LoginPage'
-import { RegisterPage } from '../pages/auth/RegisterPage'
-import { ClientDashboardPage } from '../pages/client/ClientDashboardPage'
-import { ClientPaymentsPage } from '../pages/client/ClientPaymentsPage'
-import { ClientQuoteDetailPage } from '../pages/client/ClientQuoteDetailPage'
-import { ClientQuotesPage } from '../pages/client/ClientQuotesPage'
-import { NewQuotePage } from '../pages/client/NewQuotePage'
-import { HomePage } from '../pages/public/HomePage'
-import { RequestQuotePage } from '../pages/public/RequestQuotePage'
 import { ProtectedRoute } from './ProtectedRoute'
+
+const AdminAgendaPage = lazy(() =>
+  import('../pages/admin/AdminAgendaPage').then((module) => ({ default: module.AdminAgendaPage })),
+)
+const AdminClientsPage = lazy(() =>
+  import('../pages/admin/AdminClientsPage').then((module) => ({ default: module.AdminClientsPage })),
+)
+const AdminDashboardPage = lazy(() =>
+  import('../pages/admin/AdminDashboardPage').then((module) => ({ default: module.AdminDashboardPage })),
+)
+const AdminMembersPage = lazy(() =>
+  import('../pages/admin/AdminMembersPage').then((module) => ({ default: module.AdminMembersPage })),
+)
+const AdminPaymentsPage = lazy(() =>
+  import('../pages/admin/AdminPaymentsPage').then((module) => ({ default: module.AdminPaymentsPage })),
+)
+const AdminQuoteDetailPage = lazy(() =>
+  import('../pages/admin/AdminQuoteDetailPage').then((module) => ({ default: module.AdminQuoteDetailPage })),
+)
+const AdminQuotesPage = lazy(() =>
+  import('../pages/admin/AdminQuotesPage').then((module) => ({ default: module.AdminQuotesPage })),
+)
+const AdminServicesPage = lazy(() =>
+  import('../pages/admin/AdminServicesPage').then((module) => ({ default: module.AdminServicesPage })),
+)
+const AdminSettingsPage = lazy(() =>
+  import('../pages/admin/AdminSettingsPage').then((module) => ({ default: module.AdminSettingsPage })),
+)
+const AdminSuppliersPage = lazy(() =>
+  import('../pages/admin/AdminSuppliersPage').then((module) => ({ default: module.AdminSuppliersPage })),
+)
+const AdminAccessPage = lazy(() =>
+  import('../pages/auth/AdminAccessPage').then((module) => ({ default: module.AdminAccessPage })),
+)
+const LoginPage = lazy(() =>
+  import('../pages/auth/LoginPage').then((module) => ({ default: module.LoginPage })),
+)
+const RegisterPage = lazy(() =>
+  import('../pages/auth/RegisterPage').then((module) => ({ default: module.RegisterPage })),
+)
+const ClientDashboardPage = lazy(() =>
+  import('../pages/client/ClientDashboardPage').then((module) => ({ default: module.ClientDashboardPage })),
+)
+const ClientPaymentsPage = lazy(() =>
+  import('../pages/client/ClientPaymentsPage').then((module) => ({ default: module.ClientPaymentsPage })),
+)
+const ClientQuoteDetailPage = lazy(() =>
+  import('../pages/client/ClientQuoteDetailPage').then((module) => ({ default: module.ClientQuoteDetailPage })),
+)
+const ClientQuotesPage = lazy(() =>
+  import('../pages/client/ClientQuotesPage').then((module) => ({ default: module.ClientQuotesPage })),
+)
+const NewQuotePage = lazy(() =>
+  import('../pages/client/NewQuotePage').then((module) => ({ default: module.NewQuotePage })),
+)
+const HomePage = lazy(() =>
+  import('../pages/public/HomePage').then((module) => ({ default: module.HomePage })),
+)
+const RequestQuotePage = lazy(() =>
+  import('../pages/public/RequestQuotePage').then((module) => ({ default: module.RequestQuotePage })),
+)
 
 const basename = import.meta.env.BASE_URL === '/' ? '/' : import.meta.env.BASE_URL.replace(/\/$/, '')
 

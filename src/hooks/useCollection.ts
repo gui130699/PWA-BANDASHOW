@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   collection,
   onSnapshot,
@@ -8,15 +8,15 @@ import {
 } from 'firebase/firestore'
 import { db, isFirebaseConfigured } from '../lib/firebase'
 
+const defaultConstraints: QueryConstraint[] = [orderBy('createdAt', 'desc')]
+
 export function useCollection<T extends { id: string }>(
   collectionName: string,
-  constraints: QueryConstraint[] = [orderBy('createdAt', 'desc')],
+  constraints: QueryConstraint[] = defaultConstraints,
 ) {
   const [data, setData] = useState<T[]>([])
   const [loading, setLoading] = useState(isFirebaseConfigured)
   const [error, setError] = useState<string | null>(null)
-  const stableConstraints = useMemo(() => constraints, [constraints])
-
   useEffect(() => {
     if (!db) {
       setLoading(false)
@@ -25,7 +25,7 @@ export function useCollection<T extends { id: string }>(
     }
 
     setLoading(true)
-    const reference = query(collection(db, collectionName), ...stableConstraints)
+    const reference = query(collection(db, collectionName), ...constraints)
     const unsubscribe = onSnapshot(
       reference,
       (snapshot) => {
@@ -40,7 +40,7 @@ export function useCollection<T extends { id: string }>(
     )
 
     return unsubscribe
-  }, [collectionName, stableConstraints])
+  }, [collectionName, constraints])
 
   return { data, loading, error }
 }

@@ -6,6 +6,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
 import { clientMarkPaymentAsPaid } from '../../services/paymentService'
 import type { Payment } from '../../types'
+import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
 import { formatCurrency } from '../../utils/format'
 
 function paymentLabel(type: Payment['type']) {
@@ -23,7 +24,10 @@ export function ClientPaymentsPage() {
   const [feedback, setFeedback] = useState('')
 
   async function copyPixKey(pixKey: string) {
-    if (!pixKey) return
+    if (!pixKey) {
+      setFeedback('A chave Pix ainda nao foi configurada. Fale com a administracao.')
+      return
+    }
     await navigator.clipboard.writeText(pixKey)
     setFeedback('Chave Pix copiada.')
   }
@@ -35,7 +39,7 @@ export function ClientPaymentsPage() {
       await clientMarkPaymentAsPaid(payment, messages[payment.id] || '')
       setFeedback('Pagamento informado. Aguarde a conferencia manual.')
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel informar o pagamento.')
+      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel informar o pagamento.'))
     } finally {
       setSubmittingId('')
     }
@@ -69,7 +73,12 @@ export function ClientPaymentsPage() {
                     value={messages[payment.id] || payment.clientMessage || ''}
                   />
                   <div className="flex flex-col gap-3 sm:flex-row">
-                    <Button icon={<Copy className="h-4 w-4" />} onClick={() => copyPixKey(payment.pixKeyUsed)} variant="secondary">
+                    <Button
+                      disabled={!payment.pixKeyUsed}
+                      icon={<Copy className="h-4 w-4" />}
+                      onClick={() => copyPixKey(payment.pixKeyUsed)}
+                      variant="secondary"
+                    >
                       Copiar chave Pix
                     </Button>
                     <Button

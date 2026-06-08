@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "postbuild": "tsx scripts/createGhPagesFallback.ts",
     "lint": "eslint .",
     "preview": "vite preview",
     "create-admin": "tsx scripts/createAdmin.ts",

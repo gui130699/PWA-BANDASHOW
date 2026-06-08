@@ -1,6 +1,6 @@
 import { ArrowRight, CalendarCheck, ShieldCheck, Sparkles, WalletCards } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import heroImage from '../../assets/dvanera-hero.png'
+import heroImage from '../../assets/dvanera-hero.jpg'
 import { FirebaseNotice } from '../../components/FirebaseNotice'
 import { Button, Card } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'

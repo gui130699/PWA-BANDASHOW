@@ -10,6 +10,7 @@ import { requireDb } from '../../lib/firebase'
 import { createClientQuote } from '../../services/quoteService'
 import type { Client, PublicService, QuoteEvent, QuoteItem } from '../../types'
 import { brazilianStates, eventTypes } from '../../utils/constants'
+import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
 import { formatCurrency } from '../../utils/format'
 
 type SelectedService = {
@@ -172,7 +173,7 @@ export function NewQuotePage() {
 
       navigate(`/cliente/orcamentos/${quoteRef.id}`)
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : 'Nao foi possivel enviar o orcamento.')
+      setError(getFriendlyFirebaseError(submitError, 'Nao foi possivel enviar o orcamento.'))
     } finally {
       setSubmitting(false)
     }

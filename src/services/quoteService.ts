@@ -142,6 +142,10 @@ export async function syncClientQuoteView(quoteId: string) {
   }) as Payment)
   const depositPayment = payments.find(paymentIsDeposit)
   const remainingPayment = payments.find(paymentIsRemaining)
+  const paymentSummary = {
+    ...(depositPayment ? { depositStatus: depositPayment.status } : {}),
+    ...(remainingPayment ? { remainingStatus: remainingPayment.status } : {}),
+  }
 
   await setDoc(
     doc(database, 'clientQuoteViews', quoteId),
@@ -162,10 +166,7 @@ export async function syncClientQuoteView(quoteId: string) {
       status: quote.status,
       clientNotes: quote.clientNotes || '',
       rejectionReason: quote.rejectionReason || '',
-      paymentSummary: {
-        depositStatus: depositPayment?.status,
-        remainingStatus: remainingPayment?.status,
-      },
+      paymentSummary,
       approvedAt: quote.approvedAt || null,
       depositConfirmedAt: quote.depositConfirmedAt || null,
       createdAt: quote.createdAt || serverTimestamp(),
