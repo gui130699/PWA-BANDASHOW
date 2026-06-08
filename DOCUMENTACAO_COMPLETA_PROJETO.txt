@@ -1,9 +1,9 @@
 DOCUMENTACAO COMPLETA DO PROJETO - PWA-BANDASHOW / GRUPO DVANERA
 Gerado automaticamente para leitura, manutencao, auditoria tecnica e backup do projeto.
-Data de geracao: 2026-06-08 10:43:18 -03:00
-Commit documentado: 59e53a2
+Data de geracao: 2026-06-08 18:03:19 -03:00
+Commit documentado: eb5df5f
 Pasta local: C:\Users\guilh\OneDrive\HP Guilherme Notebook\Área de Trabalho\PWA- Everton
-Repositorio: https://github.com/gui130699/PWA-BANDASHOW
+Repositorio: https://github.com/gui130699/PWA-BANDASHOW.git
 Pages: https://gui130699.github.io/PWA-BANDASHOW/
 
 Observacao de seguranca: este TXT nao inclui .env.local, node_modules, dist, .git, logs nem arquivos binarios.
@@ -21,28 +21,37 @@ Experiencias principais:
 - Admin: dashboard, agenda, orcamentos internos, servicos com custos, integrantes, fornecedores, pagamentos, clientes, configuracoes e auditoria.
 
 ====================================================================================================
-2. PRINCIPAIS CORRECOES DE PRODUCAO
+2. ALTERACOES DESTA ATUALIZACAO
 ====================================================================================================
-- Cliente deixou de ler `quotes` internos.
-- Cliente deixou de ler `services` internos.
-- Cliente deixou de ler `settings/main` interno.
-- Criada `clientQuoteViews/{quoteId}` para orcamentos sanitizados.
-- Criada `publicServices/{serviceId}` para catalogo publico sem custos.
-- Criada `publicSettings/main` para Pix/contatos/instrucoes publicas.
-- Removido reset/exclusao de admin via front-end.
-- Criado `npm run reset-admin` com Firebase Admin SDK e confirmacao no terminal.
-- Status `entrada_confirmada` deixou de ser usado.
-- Percentual de entrada passou a vir de `settings/main.defaultDepositPercent`.
-- `depositPercent` fica salvo no orcamento para preservar historico.
-- Custos internos sao copiados para `costSnapshot` no momento de recalculo/aprovacao.
-- Confirmacao de pagamento foi centralizada em `confirmPayment`.
-- Cliente pode informar entrada e restante, mas nunca confirmar pagamento.
-- Admin visualiza auditoria recente em Configuracoes.
-- Service worker atualizado para `grupo-dvanera-v3`.
-- `package-lock.json` sincronizado com npm 10 para `npm ci` no GitHub Actions.
+- Adicionado botao "Voltar para o inicio" na tela de login, apontando para a rota publica inicial do app (/).
+- Adicionado o mesmo retorno na tela de cadastro para manter a navegacao consistente fora do painel.
+- Revalidado package-lock.json com npm 10 para evitar falha de npm ci no GitHub Actions.
+- Rodados npm run lint, npm run build e npx npm@10 ci --dry-run.
+- Verificada visualmente a tela /login em preview local com captura Playwright.
 
 ====================================================================================================
-3. TECNOLOGIAS E DEPENDENCIAS
+3. PRINCIPAIS CORRECOES DE PRODUCAO JA APLICADAS
+====================================================================================================
+- Cliente deixou de ler quotes internos.
+- Cliente deixou de ler services internos.
+- Cliente deixou de ler settings/main interno.
+- Criada clientQuoteViews/{quoteId} para orcamentos sanitizados.
+- Criada publicServices/{serviceId} para catalogo publico sem custos.
+- Criada publicSettings/main para Pix/contatos/instrucoes publicas.
+- Removido reset/exclusao de admin via front-end.
+- Criado npm run reset-admin com Firebase Admin SDK e confirmacao no terminal.
+- Status entrada_confirmada deixou de ser usado.
+- Percentual de entrada passou a vir de settings/main.defaultDepositPercent.
+- depositPercent fica salvo no orcamento para preservar historico.
+- Custos internos sao copiados para costSnapshot no momento de recalculo/aprovacao.
+- Confirmacao de pagamento foi centralizada em confirmPayment.
+- Cliente pode informar entrada e restante, mas nunca confirmar pagamento.
+- Admin visualiza auditoria recente em Configuracoes.
+- Service worker atualizado para grupo-dvanera-v3.
+- package-lock.json sincronizado com npm 10 para npm ci no GitHub Actions.
+
+====================================================================================================
+4. TECNOLOGIAS E DEPENDENCIAS
 ====================================================================================================
 - React 19
 - TypeScript
@@ -57,7 +66,7 @@ Experiencias principais:
 - ESLint
 
 ====================================================================================================
-4. COMANDOS PRINCIPAIS
+5. COMANDOS PRINCIPAIS
 ====================================================================================================
 Instalar dependencias:
   npm install
@@ -68,6 +77,7 @@ Rodar localmente:
 Validar:
   npm run lint
   npm run build
+  npx --yes npm@10 ci --dry-run
 
 Criar primeiro admin via script:
   npm run create-admin
@@ -78,242 +88,168 @@ Resetar admin com seguranca:
 Popular dados iniciais:
   npm run seed
 
-Publicar Firestore Rules e indexes:
+Deploy Firestore:
   firebase deploy --only firestore --project pwa-bandashow
 
 ====================================================================================================
-5. VARIAVEIS DE AMBIENTE
+6. ROTAS PRINCIPAIS
 ====================================================================================================
-Frontend Vite:
-- VITE_FIREBASE_API_KEY
-- VITE_FIREBASE_AUTH_DOMAIN
-- VITE_FIREBASE_PROJECT_ID
-- VITE_FIREBASE_STORAGE_BUCKET
-- VITE_FIREBASE_MESSAGING_SENDER_ID
-- VITE_FIREBASE_APP_ID
-- VITE_BASE_PATH=/PWA-BANDASHOW/ no GitHub Pages
-
-Scripts locais com Firebase Admin SDK:
-- FIREBASE_PROJECT_ID
-- FIREBASE_SERVICE_ACCOUNT_PATH ou FIREBASE_SERVICE_ACCOUNT_JSON
-- ADMIN_EMAIL
-- ADMIN_PASSWORD
-- ADMIN_NAME
-
-====================================================================================================
-6. COLECOES FIRESTORE
-====================================================================================================
-Internas/admin:
-- users
-- clients
-- services
-- bandMembers
-- suppliers
-- quotes
-- payments
-- memberPayments
-- supplierPayments
-- settings/main
-- auditLogs
-- system/adminSetup
-- system/adminOwner
-
-Publicas/sanitizadas:
-- publicServices
-- clientQuoteViews
-- publicSettings/main
+- /: tela inicial publica.
+- /login: login de cliente/admin com botao de retorno para a tela inicial.
+- /cadastro: cadastro de cliente com botao de retorno para a tela inicial.
+- /admin/acesso: login/criacao do primeiro admin.
+- /solicitar-orcamento: entrada publica para solicitar orcamento.
+- /cliente: dashboard do cliente.
+- /cliente/novo-orcamento: novo orcamento.
+- /cliente/orcamentos: lista de orcamentos sanitizados.
+- /cliente/pagamentos: pagamentos do cliente.
+- /admin/dashboard: painel administrativo.
+- /admin/agenda: agenda operacional.
+- /admin/orcamentos: orcamentos internos.
+- /admin/pagamentos: pagamentos internos.
+- /admin/configuracoes: configuracoes, auditoria e instrucoes de reset admin.
 
 ====================================================================================================
-7. SEGURANCA DE DADOS
+7. FIREBASE E COLECOES
 ====================================================================================================
-Cliente nao le:
-- quotes
-- services
-- suppliers
-- bandMembers
-- settings
-
-Cliente le:
-- clientQuoteViews dele
-- payments dele
-- publicServices ativos
-- publicSettings/main
-
-Motivo: Firestore nao mascara campos em leitura de documento. Por isso dados internos e publicos ficam em documentos separados.
+- users: perfis de usuarios autenticados.
+- system/adminOwner e system/adminSetup: controle do primeiro e unico admin.
+- services: servicos internos com custos, acesso admin.
+- publicServices: catalogo publico seguro para clientes autenticados.
+- quotes: orcamentos internos com custos, acesso admin.
+- clientQuoteViews: visao sanitizada de orcamento para o cliente dono.
+- payments: pagamentos, lidos pelo admin e pelo cliente dono quando aplicavel.
+- settings/main: configuracoes internas do admin.
+- publicSettings/main: dados publicos para pagamento/contato.
+- auditLogs: registros administrativos imutaveis pelo front-end.
 
 ====================================================================================================
-8. FLUXO OFICIAL DE ORCAMENTO
+8. REGRAS DE SEGURANCA
 ====================================================================================================
-Status validos:
-- em_analise
-- aprovado_aguardando_entrada
-- entrada_informada_pelo_cliente
-- agendado
-- realizado
-- recusado
-- cancelado
-
-Fluxo:
-1. Cliente solicita orcamento.
-2. Sistema cria quotes/{quoteId} e clientQuoteViews/{quoteId}.
-3. Admin recalcula custos internos e aprova/recusa.
-4. Aprovacao gera pagamento de entrada.
-5. Cliente informa pagamento.
-6. Admin confirma pagamento.
-7. Evento vira agendado.
-8. Admin pode gerar restante e marcar realizado.
+As regras Firestore separam dados internos de dados do cliente. O cliente nao recebe custos de fornecedores, custos de integrantes, observacoes internas nem configuracoes sensiveis.
+O primeiro admin e protegido por documentos de sistema. A exclusao/reset desse cadastro nao ocorre mais pelo navegador.
+Para reset admin, use o script local npm run reset-admin com credenciais de Firebase Admin SDK.
 
 ====================================================================================================
-9. CALCULOS FINANCEIROS
+9. FLUXO DE ORCAMENTO
 ====================================================================================================
-Formula de entrada:
-  depositAmount = total * (depositPercent / 100)
-  remainingAmount = total - depositAmount
-
-Custos internos:
-- Fornecedores e integrantes vinculados ao servico sao copiados para costSnapshot.
-- Cada custo guarda cost, quantity e totalCost.
-- Orcamentos antigos mantem historico mesmo se o servico mudar depois.
-
-====================================================================================================
-10. PAGAMENTOS
-====================================================================================================
-Funcoes centrais:
-- clientMarkPaymentAsPaid(payment, message)
-- confirmPayment(paymentId, actor)
-- createFinalPayment(quote, settings)
-
-Cliente pode alterar somente status pendente para informado_pelo_cliente e clientMessage.
-Admin confirma pagamentos e, se for entrada, o evento entra na agenda.
+1. Cliente cria solicitacao a partir de servicos publicos.
+2. Sistema cria quote interno e clientQuoteView sanitizada.
+3. Admin revisa, recalcula custos, ajusta percentual de entrada e aprova ou recusa.
+4. Ao aprovar, o sistema cria pagamento de entrada e atualiza a visao do cliente.
+5. Cliente informa pagamento realizado.
+6. Admin confirma pagamento; entrada confirmada leva o orcamento para agenda.
+7. Admin registra realizacao e cria/acompanha pagamento restante quando necessario.
 
 ====================================================================================================
-11. RESET ADMIN SEGURO
+10. CHECKLIST DE VALIDACAO DESTA GERACAO
 ====================================================================================================
-Nao existe segredo fixo no front-end.
-O reset do admin primario e feito somente localmente:
-  npm run reset-admin
-
-O script pede para digitar RESETAR, remove documentos de sistema, remove users/{uid}, tenta deletar o usuario do Auth e registra auditoria.
-
-====================================================================================================
-12. DEPLOY
-====================================================================================================
-GitHub Pages e o deploy principal:
-  git push origin main
-
-Firebase Hosting opcional:
-  npm run deploy
-
-Firestore Rules:
-  firebase deploy --only firestore --project pwa-bandashow
+- npm run lint: OK.
+- npm run build: OK.
+- npx --yes npm@10 ci --dry-run: OK.
+- Preview local /login com captura Playwright: OK.
+- package-lock.json contem @emnapi/core e @emnapi/runtime top-level exigidos pelo npm ci: OK.
 
 ====================================================================================================
-13. VALIDACOES REALIZADAS NESTA REVISAO
+11. OBSERVACOES OPERACIONAIS
 ====================================================================================================
-- npm install: concluido
-- npm@10 ci --dry-run: concluido, lockfile validado para GitHub Actions
-- npm run lint: concluido sem erros
-- npm run build: concluido sem erros
-- firebase deploy --only firestore --project pwa-bandashow: concluido com regras compiladas e publicadas
-- Aviso restante: bundle Vite acima de 500 kB por Firebase/Recharts; nao bloqueia build.
-- Aviso restante: npm audit reportou 8 vulnerabilidades moderadas em dependencias; nao foi aplicado audit fix force para evitar breaking changes.
+- O Firebase Auth precisa estar com Email/Password habilitado no console do Firebase para cadastro/login funcionarem.
+- O deploy do GitHub Pages roda via workflow em .github/workflows.
+- O alerta de bundle maior que 500 kB aparece no Vite por Firebase/Recharts; nao impediu o build.
+- Foram mantidas 8 vulnerabilidades moderadas reportadas pelo npm audit; nao foi executado npm audit fix --force para evitar atualizacoes quebradas sem revisao.
 
 ====================================================================================================
-14. ARVORE DE ARQUIVOS DOCUMENTADA
+12. ARVORE DE ARQUIVOS DOCUMENTADA
 ====================================================================================================
-- .env.example
-- CHECKLIST_PRODUCAO.md
-- eslint.config.js
-- firebase.json
-- firestore.indexes.json
-- firestore.rules
-- index.html
-- package.json
-- package-lock.json
-- postcss.config.cjs
-- public\icons\gd-icon.svg
-- public\manifest.webmanifest
-- public\sw.js
-- README.md
-- scripts\createAdmin.ts
-- scripts\firebaseAdmin.ts
-- scripts\resetAdmin.ts
-- scripts\seed.ts
-- src\App.tsx
-- src\components\FirebaseNotice.tsx
-- src\components\layout\AdminLayout.tsx
-- src\components\layout\ClientLayout.tsx
-- src\components\layout\DashboardLayout.tsx
-- src\components\layout\Header.tsx
-- src\components\layout\MobileMenu.tsx
-- src\components\layout\Sidebar.tsx
-- src\components\ui\Badge.tsx
-- src\components\ui\Button.tsx
-- src\components\ui\Card.tsx
-- src\components\ui\ConfirmDialog.tsx
-- src\components\ui\DataTable.tsx
-- src\components\ui\DateInput.tsx
-- src\components\ui\EmptyState.tsx
-- src\components\ui\index.ts
-- src\components\ui\Input.tsx
-- src\components\ui\Loading.tsx
-- src\components\ui\Modal.tsx
-- src\components\ui\MoneyInput.tsx
-- src\components\ui\Select.tsx
-- src\components\ui\Textarea.tsx
-- src\contexts\AuthContext.tsx
-- src\hooks\useCollection.ts
-- src\hooks\useDocument.ts
-- src\index.css
-- src\lib\firebase.ts
-- src\main.tsx
-- src\pages\admin\AdminAgendaPage.tsx
-- src\pages\admin\AdminClientsPage.tsx
-- src\pages\admin\AdminDashboardPage.tsx
-- src\pages\admin\AdminMembersPage.tsx
-- src\pages\admin\AdminPaymentsPage.tsx
-- src\pages\admin\AdminQuoteDetailPage.tsx
-- src\pages\admin\AdminQuotesPage.tsx
-- src\pages\admin\AdminServicesPage.tsx
-- src\pages\admin\AdminSettingsPage.tsx
-- src\pages\admin\AdminSuppliersPage.tsx
-- src\pages\auth\AdminAccessPage.tsx
-- src\pages\auth\LoginPage.tsx
-- src\pages\auth\RegisterPage.tsx
-- src\pages\client\ClientDashboardPage.tsx
-- src\pages\client\ClientPaymentsPage.tsx
-- src\pages\client\ClientQuoteDetailPage.tsx
-- src\pages\client\ClientQuotesPage.tsx
-- src\pages\client\NewQuotePage.tsx
-- src\pages\public\HomePage.tsx
-- src\pages\public\RequestQuotePage.tsx
-- src\routes\ProtectedRoute.tsx
-- src\routes\router.tsx
-- src\services\adminAccountService.ts
-- src\services\auditService.ts
-- src\services\firestoreService.ts
-- src\services\paymentService.ts
-- src\services\quoteService.ts
-- src\services\serviceService.ts
-- src\services\settingsService.ts
-- src\types\index.ts
-- src\utils\calculations.ts
-- src\utils\constants.ts
-- src\utils\firebaseErrors.ts
-- src\utils\format.ts
-- tailwind.config.ts
-- tsconfig.app.json
-- tsconfig.json
-- tsconfig.node.json
-- vite.config.ts
-
-Arquivos binarios encontrados e nao embutidos:
-- src\assets\dvanera-hero.png
-
-Diretorios/arquivos omitidos propositalmente: node_modules, dist, .git, logs, .env.local e binarios.
+- .env.example (688 bytes)
+- .github\workflows\deploy-pages.yml (1513 bytes)
+- .gitignore (279 bytes)
+- CHECKLIST_PRODUCAO.md (2949 bytes)
+- eslint.config.js (712 bytes)
+- firebase.json (692 bytes)
+- firestore.indexes.json (728 bytes)
+- firestore.rules (6356 bytes)
+- index.html (647 bytes)
+- package.json (1344 bytes)
+- package-lock.json (260380 bytes)
+- postcss.config.cjs (82 bytes)
+- public\manifest.webmanifest (487 bytes)
+- public\sw.js (1504 bytes)
+- README.md (7718 bytes)
+- scripts\createAdmin.ts (1676 bytes)
+- scripts\firebaseAdmin.ts (827 bytes)
+- scripts\resetAdmin.ts (1832 bytes)
+- scripts\seed.ts (3725 bytes)
+- src\App.tsx (275 bytes)
+- src\components\FirebaseNotice.tsx (681 bytes)
+- src\components\layout\AdminLayout.tsx (1019 bytes)
+- src\components\layout\ClientLayout.tsx (629 bytes)
+- src\components\layout\DashboardLayout.tsx (1204 bytes)
+- src\components\layout\Header.tsx (1387 bytes)
+- src\components\layout\MobileMenu.tsx (945 bytes)
+- src\components\layout\Sidebar.tsx (2269 bytes)
+- src\components\ui\Badge.tsx (740 bytes)
+- src\components\ui\Button.tsx (1537 bytes)
+- src\components\ui\Card.tsx (918 bytes)
+- src\components\ui\ConfirmDialog.tsx (1107 bytes)
+- src\components\ui\DataTable.tsx (1753 bytes)
+- src\components\ui\DateInput.tsx (435 bytes)
+- src\components\ui\EmptyState.tsx (663 bytes)
+- src\components\ui\index.ts (493 bytes)
+- src\components\ui\Input.tsx (1008 bytes)
+- src\components\ui\Loading.tsx (320 bytes)
+- src\components\ui\Modal.tsx (882 bytes)
+- src\components\ui\MoneyInput.tsx (544 bytes)
+- src\components\ui\Select.tsx (1353 bytes)
+- src\components\ui\Textarea.tsx (1038 bytes)
+- src\contexts\AuthContext.tsx (4161 bytes)
+- src\hooks\useCollection.ts (1288 bytes)
+- src\hooks\useDocument.ts (1111 bytes)
+- src\index.css (585 bytes)
+- src\lib\firebase.ts (1348 bytes)
+- src\main.tsx (462 bytes)
+- src\pages\admin\AdminAgendaPage.tsx (4695 bytes)
+- src\pages\admin\AdminClientsPage.tsx (947 bytes)
+- src\pages\admin\AdminDashboardPage.tsx (5912 bytes)
+- src\pages\admin\AdminMembersPage.tsx (9775 bytes)
+- src\pages\admin\AdminPaymentsPage.tsx (4306 bytes)
+- src\pages\admin\AdminQuoteDetailPage.tsx (13096 bytes)
+- src\pages\admin\AdminQuotesPage.tsx (2344 bytes)
+- src\pages\admin\AdminServicesPage.tsx (12398 bytes)
+- src\pages\admin\AdminSettingsPage.tsx (5469 bytes)
+- src\pages\admin\AdminSuppliersPage.tsx (9731 bytes)
+- src\pages\auth\AdminAccessPage.tsx (6873 bytes)
+- src\pages\auth\LoginPage.tsx (3121 bytes)
+- src\pages\auth\RegisterPage.tsx (4243 bytes)
+- src\pages\client\ClientDashboardPage.tsx (3386 bytes)
+- src\pages\client\ClientPaymentsPage.tsx (4366 bytes)
+- src\pages\client\ClientQuoteDetailPage.tsx (8426 bytes)
+- src\pages\client\ClientQuotesPage.tsx (1926 bytes)
+- src\pages\client\NewQuotePage.tsx (14249 bytes)
+- src\pages\public\HomePage.tsx (3975 bytes)
+- src\pages\public\RequestQuotePage.tsx (1250 bytes)
+- src\routes\ProtectedRoute.tsx (663 bytes)
+- src\routes\router.tsx (4034 bytes)
+- src\services\adminAccountService.ts (1860 bytes)
+- src\services\auditService.ts (455 bytes)
+- src\services\firestoreService.ts (1507 bytes)
+- src\services\paymentService.ts (3135 bytes)
+- src\services\quoteService.ts (11561 bytes)
+- src\services\serviceService.ts (1820 bytes)
+- src\services\settingsService.ts (1773 bytes)
+- src\types\index.ts (5400 bytes)
+- src\utils\calculations.ts (1617 bytes)
+- src\utils\constants.ts (2327 bytes)
+- src\utils\firebaseErrors.ts (1386 bytes)
+- src\utils\format.ts (1343 bytes)
+- tailwind.config.ts (774 bytes)
+- tsconfig.app.json (617 bytes)
+- tsconfig.json (119 bytes)
+- tsconfig.node.json (591 bytes)
+- vite.config.ts (258 bytes)
 
 ====================================================================================================
-15. CODIGO-FONTE COMPLETO DOS ARQUIVOS DE TEXTO
+13. CODIGO-FONTE COMPLETO DOS ARQUIVOS DE TEXTO
 ====================================================================================================
 
 ----------------------------------------------------------------------------------------------------
@@ -342,6 +278,108 @@ ADMIN_NAME=Administrador Grupo Dvanera
 
 ----------------------------------------------------------------------------------------------------
 FIM DO ARQUIVO: .env.example
+
+----------------------------------------------------------------------------------------------------
+INICIO DO ARQUIVO: .github\workflows\deploy-pages.yml
+----------------------------------------------------------------------------------------------------
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_BASE_PATH: /PWA-BANDASHOW/
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+
+      - name: Add SPA fallback
+        run: cp dist/index.html dist/404.html
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+----------------------------------------------------------------------------------------------------
+FIM DO ARQUIVO: .github\workflows\deploy-pages.yml
+
+----------------------------------------------------------------------------------------------------
+INICIO DO ARQUIVO: .gitignore
+----------------------------------------------------------------------------------------------------
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+.env
+.env.*
+!.env.example
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+----------------------------------------------------------------------------------------------------
+FIM DO ARQUIVO: .gitignore
 
 ----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: CHECKLIST_PRODUCAO.md
@@ -919,7 +957,6 @@ INICIO DO ARQUIVO: package-lock.json
       "integrity": "sha512-RgHBCvtjbOK2gXSNBNIkNoEc9qoVEtau3hj8gEqKQuL3HZAibKarWFEI3Lfm6EYKkLalOh8eSrj9b+ch9H/VBA==",
       "dev": true,
       "license": "MIT",
-      "peer": true,
       "dependencies": {
         "@babel/code-frame": "^7.29.7",
         "@babel/generator": "^7.29.7",
@@ -1129,6 +1166,31 @@ INICIO DO ARQUIVO: package-lock.json
         "node": ">=6.9.0"
       }
     },
+    "node_modules/@emnapi/core": {
+      "version": "1.11.0",
+      "resolved": "https://registry.npmjs.org/@emnapi/core/-/core-1.11.0.tgz",
+      "integrity": "sha512-l9Oo58x0HOP5znGzVhYW9U3e5wVuA4LAZU2AGezTmkhO1CgQRFDhDg4nneHsu/t3WniXg9QrG2nIXL/ZS8ln8Q==",
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "peer": true,
+      "dependencies": {
+        "@emnapi/wasi-threads": "1.2.2",
+        "tslib": "^2.4.0"
+      }
+    },
+    "node_modules/@emnapi/runtime": {
+      "version": "1.11.0",
+      "resolved": "https://registry.npmjs.org/@emnapi/runtime/-/runtime-1.11.0.tgz",
+      "integrity": "sha512-55coeOFKHv1ywEcUXJtWU5f+Jr/W5tZDvZig8DLKSwUN1JpROQ4rk/SNOQiFWmaR/VKF4zuFyW1B8JduOSv6Pg==",
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "peer": true,
+      "dependencies": {
+        "tslib": "^2.4.0"
+      }
+    },
     "node_modules/@emnapi/wasi-threads": {
       "version": "1.2.2",
       "resolved": "https://registry.npmjs.org/@emnapi/wasi-threads/-/wasi-threads-1.2.2.tgz",
@@ -1136,6 +1198,7 @@ INICIO DO ARQUIVO: package-lock.json
       "dev": true,
       "license": "MIT",
       "optional": true,
+      "peer": true,
       "dependencies": {
         "tslib": "^2.4.0"
       }
@@ -1780,7 +1843,6 @@ INICIO DO ARQUIVO: package-lock.json
       "resolved": "https://registry.npmjs.org/@firebase/app/-/app-0.14.13.tgz",
       "integrity": "sha512-H89Jeyp31+EZk9GPu6vaeL9mEmoXgM3nASB7UPBYYS/lqAks21mO1BU1dF8NbsVTL6tgGZkGUtiGJgxtDiwHkw==",
       "license": "Apache-2.0",
-      "peer": true,
       "dependencies": {
         "@firebase/component": "0.7.3",
         "@firebase/logger": "0.5.1",
@@ -1847,7 +1909,6 @@ INICIO DO ARQUIVO: package-lock.json
       "resolved": "https://registry.npmjs.org/@firebase/app-compat/-/app-compat-0.5.13.tgz",
       "integrity": "sha512-pn3FvXwUR34kWPccDQfCKsNZcM2wD1OS+J1jeEgzM1ZNXoxR2NaF6e5DjDuRrnTwR6LN2XQQt0IqE6yKmgpCQg==",
       "license": "Apache-2.0",
-      "peer": true,
       "dependencies": {
         "@firebase/app": "0.14.13",
         "@firebase/component": "0.7.3",
@@ -1864,7 +1925,6 @@ INICIO DO ARQUIVO: package-lock.json
       "resolved": "https://registry.npmjs.org/@firebase/app-types/-/app-types-0.9.5.tgz",
       "integrity": "sha512-YevqTjvo7Iujsa9Dwowmd6dSoElhzmD63ZSrq6bzjvQ6POjYgNjOFHLmNIgJs48eNO093NCERibuFnxbfOvU7A==",
       "license": "Apache-2.0",
-      "peer": true,
       "dependencies": {
         "@firebase/logger": "0.5.1"
       }
@@ -2318,7 +2378,6 @@ INICIO DO ARQUIVO: package-lock.json
       "integrity": "sha512-LUdM4Wg7YM9Pq/49nGYySJA0CSQEKnGffFzWV8+6gXN7mGxn+FL1IqvFbuZUtAQcfZgHYDwCE1wwlK7rB7gl2g==",
       "hasInstallScript": true,
       "license": "Apache-2.0",
-      "peer": true,
       "dependencies": {
         "tslib": "^2.1.0"
       },
@@ -3288,7 +3347,6 @@ INICIO DO ARQUIVO: package-lock.json
       "integrity": "sha512-esJiCAnl0kfpNdE69f3So4WJUXy95dLZydX0KwK46riIHDzHM7O9Vtf9xCHW0PXIqvgqNrswl522kA/5yx+F4w==",
       "devOptional": true,
       "license": "MIT",
-      "peer": true,
       "dependencies": {
         "csstype": "^3.2.2"
       }
@@ -3376,7 +3434,6 @@ INICIO DO ARQUIVO: package-lock.json
       "integrity": "sha512-A0M6ua6H252bVjPvvtSgl2QA4+ET9S5Mtkb2GDyTxIhH/C4qDItT7RQNO5PhMC6NXGYXOR9dIalcDDgBKT7oFA==",
       "dev": true,
       "license": "MIT",
-      "peer": true,
       "dependencies": {
         "@typescript-eslint/scope-manager": "8.60.1",
         "@typescript-eslint/types": "8.60.1",
@@ -3621,7 +3678,6 @@ INICIO DO ARQUIVO: package-lock.json
       "integrity": "sha512-UVJyE9MttOsBQIDKw1skb9nAwQuR5wuGD3+82K6JgJlm/Y+KI92oNsMNGZCYdDsVtRHSak0pcV5Dno5+4jh9sw==",
       "dev": true,
       "license": "MIT",
-      "peer": true,
       "bin": {
         "acorn": "bin/acorn"
       },
@@ -3911,7 +3967,6 @@ INICIO DO ARQUIVO: package-lock.json
         }
       ],
       "license": "MIT",
-      "peer": true,
       "dependencies": {
         "baseline-browser-mapping": "^2.10.12",
         "caniuse-lite": "^1.0.30001782",
@@ -4553,7 +4608,6 @@ INICIO DO ARQUIVO: package-lock.json
       "integrity": "sha512-AyIKhnOBuOAdueD7RB3xB+YeAWScb9jHsJBgH2Hcde8InP5JYhqrRR6iTMHyTEwgENK54Cp44e4v8BwNhsuHuw==",
       "dev": true,
       "license": "MIT",
-      "peer": true,
       "dependencies": {
         "@eslint-community/eslint-utils": "^4.8.0",
         "@eslint-community/regexpp": "^4.12.2",
@@ -5786,7 +5840,6 @@ INICIO DO ARQUIVO: package-lock.json
       "integrity": "sha512-/imKNG4EbWNrVjoNC/1H5/9GFy+tqjGBHCaSsN+P2RnPqjsLmv6UD3Ej+Kj8nBWaRAwyk7kK5ZUc+OEatnTR3A==",
       "dev": true,
       "license": "MIT",
-      "peer": true,
       "bin": {
         "jiti": "bin/jiti.js"
       }
@@ -6735,7 +6788,6 @@ INICIO DO ARQUIVO: package-lock.json
       "integrity": "sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A==",
       "dev": true,
       "license": "MIT",
-      "peer": true,
       "engines": {
         "node": ">=12"
       },
@@ -6783,7 +6835,6 @@ INICIO DO ARQUIVO: package-lock.json
         }
       ],
       "license": "MIT",
-      "peer": true,
       "dependencies": {
         "nanoid": "^3.3.12",
         "picocolors": "^1.1.1",
@@ -7011,7 +7062,6 @@ INICIO DO ARQUIVO: package-lock.json
       "resolved": "https://registry.npmjs.org/react/-/react-19.2.7.tgz",
       "integrity": "sha512-HNe9WslTbXmFK8o8cmwgAeJFSBvt1bPdHCVKtaaV+WlAN36mpT4hcRpwbf3fY56ar2oIXzsBpOAiIRHAdY0OlQ==",
       "license": "MIT",
-      "peer": true,
       "engines": {
         "node": ">=0.10.0"
       }
@@ -7021,7 +7071,6 @@ INICIO DO ARQUIVO: package-lock.json
       "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-19.2.7.tgz",
       "integrity": "sha512-t0BRVXvbiE/o20Hfw669rLbMCDWtYZLvmJigy2f0MxsXF+71pxhR3xOkspmsO8h3ZlNzyibAmtCa3l4lYKk6gQ==",
       "license": "MIT",
-      "peer": true,
       "dependencies": {
         "scheduler": "^0.27.0"
       },
@@ -7034,7 +7083,6 @@ INICIO DO ARQUIVO: package-lock.json
       "resolved": "https://registry.npmjs.org/react-hook-form/-/react-hook-form-7.77.0.tgz",
       "integrity": "sha512-Sslh9YDYc0GDlWT/lxasnIduNo4v3yyvqRGvmGKUre5AFjDs/HV9/OafHGD8d+sB2yoL4UIL9L8X9i0WlZZebg==",
       "license": "MIT",
-      "peer": true,
       "engines": {
         "node": ">=18.0.0"
       },
@@ -7058,7 +7106,6 @@ INICIO DO ARQUIVO: package-lock.json
       "resolved": "https://registry.npmjs.org/react-redux/-/react-redux-9.3.0.tgz",
       "integrity": "sha512-KQopgqFo/p/fgmAs5qz6p5RWaNAzq40WAu7fJIXnQpYxFPbJYtsJPWvGeF2rOBaY/kEuV77AVsX8TsQzKm+A/g==",
       "license": "MIT",
-      "peer": true,
       "dependencies": {
         "@types/use-sync-external-store": "^0.0.6",
         "use-sync-external-store": "^1.4.0"
@@ -7201,8 +7248,7 @@ INICIO DO ARQUIVO: package-lock.json
       "version": "5.0.1",
       "resolved": "https://registry.npmjs.org/redux/-/redux-5.0.1.tgz",
       "integrity": "sha512-M9/ELqF6fy8FwmkpnF0S3YKOqMyoWJ4+CS5Efg2ct3oY9daQvd/Pc71FpGZsVsbl3Cpb+IIcjBDUnnyBdQbq4w==",
-      "license": "MIT",
-      "peer": true
+      "license": "MIT"
     },
     "node_modules/redux-thunk": {
       "version": "3.1.0",
@@ -7735,7 +7781,6 @@ INICIO DO ARQUIVO: package-lock.json
       "integrity": "sha512-X8EX+XV4QR5xCsrgxaED954zTDfY8KqlDtskKEL0cHhyS/P8b4IFOvGDQpsC9Q1XnLq915wEfwwY/zzskCtmhg==",
       "dev": true,
       "license": "MIT",
-      "peer": true,
       "dependencies": {
         "esbuild": "~0.28.0"
       },
@@ -7768,7 +7813,6 @@ INICIO DO ARQUIVO: package-lock.json
       "integrity": "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==",
       "dev": true,
       "license": "Apache-2.0",
-      "peer": true,
       "bin": {
         "tsc": "bin/tsc",
         "tsserver": "bin/tsserver"
@@ -7904,7 +7948,6 @@ INICIO DO ARQUIVO: package-lock.json
       "integrity": "sha512-h9bXPmJichP5fLmVQo3PyaGSDE2n3aPuomeAlVRm0JLmt4rY6zmPKd59HYI4LNW8oTK7tlTsuC7l/m7awx9Jcw==",
       "dev": true,
       "license": "MIT",
-      "peer": true,
       "dependencies": {
         "lightningcss": "^1.32.0",
         "picomatch": "^4.0.4",
@@ -8165,7 +8208,6 @@ INICIO DO ARQUIVO: package-lock.json
       "resolved": "https://registry.npmjs.org/zod/-/zod-4.4.3.tgz",
       "integrity": "sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==",
       "license": "MIT",
-      "peer": true,
       "funding": {
         "url": "https://github.com/sponsors/colinhacks"
       }
@@ -8201,19 +8243,6 @@ module.exports = {
 
 ----------------------------------------------------------------------------------------------------
 FIM DO ARQUIVO: postcss.config.cjs
-
-----------------------------------------------------------------------------------------------------
-INICIO DO ARQUIVO: public\icons\gd-icon.svg
-----------------------------------------------------------------------------------------------------
-<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="512" height="512" rx="112" fill="#06070B"/>
-  <rect x="36" y="36" width="440" height="440" rx="92" stroke="#F7B731" stroke-width="18"/>
-  <path d="M248.88 268.72C248.88 306.08 224.16 330.4 184.56 330.4C143.92 330.4 116.96 301.04 116.96 256.08C116.96 211.68 144.4 181.6 185.36 181.6C213.76 181.6 235.76 195.28 245.84 218.24L216.32 232.16C210.72 218.72 199.52 212 183.92 212C162.4 212 148.32 229.12 148.32 256.08C148.32 283.36 162.24 300 185.2 300C203.6 300 216.16 291.36 219.36 275.6H187.12V249.76H248.88V268.72ZM271.02 184H323.18C368.3 184 394.38 210.56 394.38 256C394.38 301.44 368.3 328 323.18 328H271.02V184ZM321.9 298.64C347.66 298.64 362.86 282.8 362.86 256C362.86 229.2 347.66 213.36 321.9 213.36H302.06V298.64H321.9Z" fill="#FFD166"/>
-  <path d="M126 378H386" stroke="#F7B731" stroke-width="12" stroke-linecap="round"/>
-</svg>
-
-----------------------------------------------------------------------------------------------------
-FIM DO ARQUIVO: public\icons\gd-icon.svg
 
 ----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: public\manifest.webmanifest
@@ -12004,7 +12033,7 @@ FIM DO ARQUIVO: src\pages\auth\AdminAccessPage.tsx
 INICIO DO ARQUIVO: src\pages\auth\LoginPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Music2 } from 'lucide-react'
+import { ArrowLeft, Music2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
@@ -12048,6 +12077,11 @@ export function LoginPage() {
   return (
     <div className="grid min-h-screen place-items-center bg-night-950 px-4 py-10 text-white">
       <div className="w-full max-w-md space-y-4">
+        <Link className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-gold-200" to="/">
+          <ArrowLeft className="h-4 w-4" />
+          Voltar para o inicio
+        </Link>
+
         {!firebaseReady && <FirebaseNotice />}
         <Card>
           <div className="mb-8 text-center">
@@ -12084,7 +12118,7 @@ FIM DO ARQUIVO: src\pages\auth\LoginPage.tsx
 INICIO DO ARQUIVO: src\pages\auth\RegisterPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { zodResolver } from '@hookform/resolvers/zod'
-import { UserPlus } from 'lucide-react'
+import { ArrowLeft, UserPlus } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
@@ -12131,6 +12165,11 @@ export function RegisterPage() {
   return (
     <div className="min-h-screen bg-night-950 px-4 py-10 text-white">
       <div className="mx-auto max-w-3xl space-y-4">
+        <Link className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-gold-200" to="/">
+          <ArrowLeft className="h-4 w-4" />
+          Voltar para o inicio
+        </Link>
+
         {!firebaseReady && <FirebaseNotice />}
         <Card>
           <div className="mb-8 flex items-center gap-3">
