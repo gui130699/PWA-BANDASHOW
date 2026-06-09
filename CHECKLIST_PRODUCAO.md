@@ -1,6 +1,23 @@
-# Checklist de Producao - Grupo Dvanera
+# Checklist de Produção - Grupo Dvanera
 
-Validacao final executada em 8 de junho de 2026.
+Validação final executada em 8 de junho de 2026.
+
+## Revisão administrativa - 9 de junho de 2026
+
+- [x] Serviços separados em Acesso e Cadastro
+- [x] Integrantes separados em Acesso e Cadastro
+- [x] Botões de edição carregam o registro na aba Cadastro
+- [x] Cadastros vazios bloqueados
+- [x] Resumo de confirmação antes de novos cadastros
+- [x] Categorias de serviços no Firestore
+- [x] Tipos de fornecedores no Firestore
+- [x] Funções de integrantes no Firestore
+- [x] Tipos de evento no Firestore
+- [x] Regras de leitura e escrita dos cadastros auxiliares
+- [x] Configurações organizadas em oito seções recolhíveis
+- [x] Sincronização segura com `publicSettings/main`
+- [x] Revisão textual PT-BR
+- [x] `npm run check:text`
 
 ## Deploy
 
@@ -22,9 +39,9 @@ Validacao final executada em 8 de junho de 2026.
 - [x] Icone maskable configurado
 - [x] Service worker ativo
 - [x] App atende aos criterios de instalabilidade
-- [x] Cache v5 atualizado sem prender versao antiga
+- [x] Cache v5 atualizado sem prender versão antiga
 - [x] Navegacao offline basica carregada pelo app shell
-- [x] Firebase Auth/Firestore nao sao cacheados
+- [x] Firebase Auth/Firestore não são cacheados
 
 ## Performance
 
@@ -48,8 +65,8 @@ Validacao final executada em 8 de junho de 2026.
 - [x] Botao para voltar a tela inicial
 - [x] Dashboard cliente com metricas
 - [x] Dashboard admin com metricas
-- [x] Progresso do novo orcamento
-- [x] Linha do tempo do orcamento
+- [x] Progresso do novo orçamento
+- [x] Linha do tempo do orçamento
 - [x] Agenda com filtros responsivos
 - [x] Icones PWA substituidos
 - [x] Manifesto e metadados atualizados
@@ -59,7 +76,7 @@ Validacao final executada em 8 de junho de 2026.
 - [x] Sem overflow horizontal nos viewports testados
 - [x] `BRANDING_DVANERA.md` criado
 
-## Seguranca de dependencias
+## Segurança de dependências
 
 - [x] `npm install` executado
 - [x] `npm audit` executado
@@ -69,30 +86,30 @@ Validacao final executada em 8 de junho de 2026.
 - [x] Downgrade breaking de `firebase-admin` recusado
 - [x] `npm@10 ci --dry-run` validado
 
-## Seguranca Firebase
+## Segurança Firebase
 
-- [x] Cliente nao le `quotes`
-- [x] Cliente nao le `services`
-- [x] Cliente nao le `suppliers`
-- [x] Cliente nao le `bandMembers`
-- [x] Cliente nao le `settings`
-- [x] Cliente nao le `system/adminOwner`
-- [x] Cliente le somente sua `clientQuoteViews`
-- [x] Cliente le somente seus pagamentos
-- [x] `publicServices` nao expoe custos internos
-- [x] `clientQuoteViews` nao expoe custos, lucro ou notas admin
+- [x] Cliente não lê `quotes`
+- [x] Cliente não lê `services`
+- [x] Cliente não lê `suppliers`
+- [x] Cliente não lê `bandMembers`
+- [x] Cliente não lê `settings`
+- [x] Cliente não lê `system/adminOwner`
+- [x] Cliente lê somente sua `clientQuoteViews`
+- [x] Cliente lê somente seus pagamentos
+- [x] `publicServices` não expõe custos internos
+- [x] `clientQuoteViews` não expõe custos, lucro ou notas admin
 - [x] Reset admin permanece fora do front-end
 
-## Orcamentos e pagamentos
+## Orçamentos e pagamentos
 
-- [x] Primeiro admin criado e autenticado em teste temporario
+- [x] Primeiro admin criado e autenticado em teste temporário
 - [x] Fornecedor criado
 - [x] Integrante criado
-- [x] Servico criado com custos vinculados
+- [x] Serviço criado com custos vinculados
 - [x] Cliente criado
-- [x] Orcamento e visao sanitizada criados
+- [x] Orçamento e visão sanitizada criados
 - [x] Recalculo gera `costSnapshot`
-- [x] Aprovacao gera entrada
+- [x] Aprovação gera entrada
 - [x] Cliente informa entrada
 - [x] Admin confirma entrada
 - [x] Evento entra na agenda
@@ -104,11 +121,11 @@ Validacao final executada em 8 de junho de 2026.
 
 ## Robustez
 
-- [x] Consulta Firestore nao entra em ciclo de ressubscricao
-- [x] Sincronizacao sem pagamento nao grava `undefined`
+- [x] Consulta Firestore não entra em ciclo de ressubscrição
+- [x] Sincronização sem pagamento não grava `undefined`
 - [x] Consulta de pagamentos do cliente respeita as regras
-- [x] Usuario autenticado sem perfil nao entra em loop
-- [x] Erros Firebase recebem mensagens amigaveis
+- [x] Usuário autenticado sem perfil não entra em loop
+- [x] Erros Firebase recebem mensagens amigáveis
 - [x] Pix ausente desabilita copia e mostra orientacao
 
 ## Qualidade final
@@ -117,10 +134,10 @@ Validacao final executada em 8 de junho de 2026.
 - [x] `npm run build`
 - [x] Preview local
 - [x] Site publico
-- [x] Rotas publicas e protegidas
+- [x] Rotas públicas e protegidas
 - [x] Manifest publico
 - [x] Service worker publico
-- [x] Instalabilidade publica
+- [x] Instalabilidade pública
 - [x] Dados QA removidos
 - [x] Contas QA removidas
-- [x] Documentacao atualizada
+- [x] Documentação atualizada

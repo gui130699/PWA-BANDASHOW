@@ -1,19 +1,19 @@
 # Identidade Visual do Grupo Dvanera
 
-Documento de referencia para manter a identidade oficial do Grupo Dvanera consistente na home, autenticacao, painel do cliente, painel administrativo e PWA.
+Documento de referência para manter a identidade oficial do Grupo Dvanera consistente na home, autenticação, painel do cliente, painel administrativo e PWA.
 
 ## Direcao visual
 
-A interface combina palco, musica e operacao profissional. O resultado deve transmitir energia, confianca e organizacao sem transformar o painel em uma pagina promocional.
+A interface combina palco, música e operação profissional. O resultado deve transmitir energia, confiança e organização sem transformar o painel em uma página promocional.
 
 Principios:
 
 - preto e grafite como base;
 - marfim para texto e logotipo;
-- dourado fosco para destaque e acao principal;
+- dourado fosco para destaque e ação principal;
 - azul e verde somente como cores funcionais;
-- fotografia real de palco nas telas publicas e de autenticacao;
-- paineis internos densos, claros e orientados a tarefas;
+- fotografia real de palco nas telas públicas e de autenticação;
+- painéis internos densos, claros e orientados a tarefas;
 - cantos discretos, bordas finas e sombras controladas.
 
 ## Paleta
@@ -30,7 +30,7 @@ Principios:
 | Destaque principal | Dourado fosco | `#D8AA36` |
 | Destaque escuro | Dourado profundo | `#B98520` |
 | Sucesso | Verde esmeralda | Tailwind `emerald` |
-| Informacao | Azul ceu | Tailwind `sky` |
+| Informação | Azul céu | Tailwind `sky` |
 | Erro | Vermelho | Tailwind `red` |
 
 Os tokens ficam em `tailwind.config.ts` e `src/index.css`.
@@ -40,8 +40,8 @@ Os tokens ficam em `tailwind.config.ts` e `src/index.css`.
 - Interface e textos: `Inter`, `Segoe UI`, `Arial`, sans-serif.
 - Titulos e numeros de destaque: `Arial Black`, `Inter`, sans-serif.
 - Titulos usam `font-display`.
-- Nao usar tamanho de fonte vinculado diretamente a largura da tela.
-- Letter spacing negativo nao faz parte da identidade.
+- Não usar tamanho de fonte vinculado diretamente a largura da tela.
+- Letter spacing negativo não faz parte da identidade.
 
 ## Arquivos oficiais
 
@@ -58,12 +58,12 @@ public/icons/gd-icon.svg
 
 Uso:
 
-- `logo-dvanera-original.jpeg`: referencia recebida do Grupo Dvanera.
+- `logo-dvanera-original.jpeg`: referência recebida do Grupo Dvanera.
 - `logo-dvanera-light.png`: wordmark oficial em marfim e fundo transparente.
 - `mark-dvanera.png`: monograma quadrado para PWA e contextos compactos.
-- `dvanera-hero.jpg`: palco principal da home e da autenticacao.
+- `dvanera-hero.jpg`: palco principal da home e da autenticação.
 
-Para substituir a fotografia, mantenha enquadramento horizontal, palco claramente visivel e arquivo otimizado. Evite imagens abstratas, desfocadas ou sem relacao direta com shows.
+Para substituir a fotografia, mantenha enquadramento horizontal, palco claramente visível e arquivo otimizado. Evite imagens abstratas, desfocadas ou sem relacao direta com shows.
 
 ## Componentes de marca
 
@@ -76,10 +76,10 @@ src/components/ui/QuoteTimeline.tsx
 ```
 
 - `BrandLogo`: alterna entre wordmark completo e monograma.
-- `AuthShell`: estrutura comum de login, cadastro, solicitacao e acesso admin.
+- `AuthShell`: estrutura comum de login, cadastro, solicitação e acesso admin.
 - `MetricCard`: indicadores compactos para os dashboards.
-- `PageHeader`: titulo, descricao e acao principal das paginas internas.
-- `QuoteTimeline`: progresso visual do orcamento do cliente.
+- `PageHeader`: título, descrição e ação principal das páginas internas.
+- `QuoteTimeline`: progresso visual do orçamento do cliente.
 
 ## Aplicacao por tela
 
@@ -87,8 +87,8 @@ src/components/ui/QuoteTimeline.tsx
 
 - hero em tela cheia com fotografia real;
 - logotipo oficial como primeiro sinal da marca;
-- chamada comercial e botoes de orcamento/login;
-- secoes Sobre, Servicos, Como funciona, Por que contratar e CTA;
+- chamada comercial e botões de orçamento/login;
+- secoes Sobre, Serviços, Como funciona, Por que contratar e CTA;
 - icone administrativo discreto no canto superior direito;
 - WhatsApp exibido somente quando configurado no Firebase.
 
@@ -97,20 +97,20 @@ src/components/ui/QuoteTimeline.tsx
 - fundo de palco com camada escura;
 - logotipo oficial;
 - card de formulario em carvao;
-- botao com seta para voltar a tela inicial em desktop e celular;
-- mesma estrutura para login, cadastro, solicitacao e primeiro admin.
+- botão com seta para voltar a tela inicial em desktop e celular;
+- mesma estrutura para login, cadastro, solicitação e primeiro admin.
 
 ### Painel do cliente
 
 - metricas compactas;
-- novo orcamento como acao primaria;
+- novo orçamento como ação primária;
 - progresso em quatro etapas;
-- linha do tempo no detalhe do orcamento;
+- linha do tempo no detalhe do orçamento;
 - pagamentos Pix com estados e orientacoes claras.
 
 ### Painel administrativo
 
-- navegacao lateral com logo oficial;
+- navegação lateral com logo oficial;
 - dashboard com indicadores por cor funcional;
 - tabelas com cabecalho discreto e hover dourado;
 - agenda com filtros responsivos;
@@ -127,20 +127,20 @@ theme_color: #050505
 background_color: #050505
 ```
 
-O cache atual e `grupo-dvanera-v5`. Sempre altere o numero do cache quando trocar assets criticos, icones ou shell principal.
+O cache atual e `grupo-dvanera-v5`. Sempre altere o numero do cache quando trocar assets criticos, ícones ou shell principal.
 
 ## Acessibilidade e responsividade
 
-- foco de teclado global visivel em dourado;
-- botoes de icone possuem `aria-label` e `title` quando necessario;
+- foco de teclado global visível em dourado;
+- botões de icone possuem `aria-label` e `title` quando necessario;
 - contraste alto entre texto e superfice;
-- animacoes sao desativadas com `prefers-reduced-motion`;
+- animacoes são desativadas com `prefers-reduced-motion`;
 - tabelas usam rolagem horizontal controlada;
-- home e autenticacao nao geram overflow horizontal;
+- home e autenticação não geram overflow horizontal;
 - controles mantem pelo menos 44 px de altura;
 - textos quebram ou truncam somente onde o contexto permanece compreensivel.
 
-## Validacao visual
+## Validação visual
 
 Em 9 de junho de 2026 foram validados:
 
