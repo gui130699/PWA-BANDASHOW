@@ -16,6 +16,23 @@ PWA em React, TypeScript e Firebase para administrar agenda, orcamentos, servico
 - `npm run build`: OK.
 - `npm audit --omit=dev`: 0 vulnerabilidades.
 
+## Identidade visual Dvanera
+
+Atualizacao visual concluida em 9 de junho de 2026:
+
+- logotipo oficial aplicado na home, autenticacao e paineis;
+- hero com fotografia real de palco;
+- paleta preto, grafite, marfim e dourado fosco;
+- home comercial com Sobre, Servicos, Como funciona e CTA;
+- login, cadastro, solicitacao e acesso admin com estrutura unificada;
+- dashboards com indicadores compactos;
+- fluxo de orcamento com progresso e linha do tempo;
+- botao para voltar a tela inicial nas paginas de acesso;
+- novos icones PWA e cache `grupo-dvanera-v5`;
+- validacao responsiva em desktop e celular.
+
+Guia completo: `BRANDING_DVANERA.md`.
+
 ## Stack
 
 - React 19, React Router e TypeScript
@@ -102,7 +119,7 @@ public/icons/maskable-512.png
 src/main.tsx
 ```
 
-O service worker `grupo-dvanera-v4`:
+O service worker `grupo-dvanera-v5`:
 
 - usa network-first para navegacao;
 - usa cache de runtime somente para assets locais;
@@ -150,10 +167,12 @@ location.reload()
 
 Todas as paginas sao carregadas com `React.lazy` e `Suspense`. Recharts so e baixado quando uma pagina administrativa com graficos e aberta. Firebase usa imports modulares.
 
-Principais chunks do build final:
+Principais arquivos do build de branding:
 
 ```txt
-index                    55.14 kB
+logo oficial             61.33 kB
+hero                    273.51 kB
+index                    58.46 kB
 firebase-auth            85.71 kB
 forms-vendor             87.43 kB
 firebase-firestore      266.77 kB
@@ -308,6 +327,7 @@ Consulte:
 - `CHECKLIST_PRODUCAO.md`
 - `TESTES_MANUAIS_PRODUCAO.md`
 - `RELATORIO_FINAL_PRODUCAO.md`
+- `BRANDING_DVANERA.md`
 - `DOCUMENTACAO_COMPLETA_PROJETO.txt`
 
 ## Solucao de tela branca

@@ -1,13 +1,13 @@
 {
-  "name": "Grupo Dvanera - Gestao de Agenda e Orcamentos",
+  "name": "Grupo Dvanera",
   "short_name": "Dvanera",
-  "description": "Painel PWA para agenda, orcamentos, servicos, custos e pagamentos do Grupo Dvanera.",
+  "description": "Solicite orcamentos e acompanhe eventos, agenda e pagamentos do Grupo Dvanera.",
   "id": "/PWA-BANDASHOW/",
   "start_url": "/PWA-BANDASHOW/",
   "scope": "/PWA-BANDASHOW/",
   "display": "standalone",
-  "background_color": "#05060a",
-  "theme_color": "#06070b",
+  "background_color": "#050505",
+  "theme_color": "#050505",
   "orientation": "portrait-primary",
   "icons": [
     {

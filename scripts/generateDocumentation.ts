@@ -105,6 +105,7 @@ const sections: string[] = [
   '',
   'DOCUMENTOS DE REFERENCIA',
   '- README.md',
+  '- BRANDING_DVANERA.md',
   '- CHECKLIST_PRODUCAO.md',
   '- TESTES_MANUAIS_PRODUCAO.md',
   '- RELATORIO_FINAL_PRODUCAO.md',

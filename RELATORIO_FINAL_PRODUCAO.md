@@ -172,3 +172,36 @@ Manutencao futura:
 Nota sugerida: **10/10**.
 
 Justificativa: build, lint, Pages, rotas, PWA, instalabilidade, fluxo autenticado, regras e limpeza foram validados na pratica. Os alertas restantes sao exclusivamente de ferramentas locais de desenvolvimento, sem dependencia vulneravel no bundle de producao, e estao documentados sem aplicar downgrade breaking.
+
+## 13. Atualizacao de branding - 9 de junho de 2026
+
+A identidade oficial do Grupo Dvanera foi aplicada sobre a aplicacao existente sem alterar regras Firebase, calculos, permissoes ou fluxo financeiro.
+
+Entregas:
+
+- logotipo oficial tratado para fundo transparente;
+- monograma oficial para icones PWA;
+- paleta preta, grafite, marfim e dourada;
+- nova home comercial com fotografia real;
+- estrutura visual comum para autenticacao;
+- retorno para a tela inicial em desktop e celular;
+- metricas de cliente e administrador;
+- progresso de solicitacao e linha do tempo;
+- agenda e componentes globais responsivos;
+- manifesto, metadados e service worker v5;
+- guia `BRANDING_DVANERA.md`;
+- documentacao consolidada atualizada.
+
+Validacao local:
+
+```txt
+npm run lint: OK
+npm run build com VITE_BASE_PATH: OK
+home desktop: OK
+home celular: OK
+login desktop: OK
+login celular: OK
+acesso admin: OK
+overflow horizontal: inexistente
+console da home: sem erros
+```

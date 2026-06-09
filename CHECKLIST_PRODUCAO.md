@@ -22,7 +22,7 @@ Validacao final executada em 8 de junho de 2026.
 - [x] Icone maskable configurado
 - [x] Service worker ativo
 - [x] App atende aos criterios de instalabilidade
-- [x] Cache v4 atualizado sem prender versao antiga
+- [x] Cache v5 atualizado sem prender versao antiga
 - [x] Navegacao offline basica carregada pelo app shell
 - [x] Firebase Auth/Firestore nao sao cacheados
 
@@ -36,6 +36,28 @@ Validacao final executada em 8 de junho de 2026.
 - [x] Nenhum chunk acima de 500 kB
 - [x] Aviso de chunk grande removido
 - [x] Hero reduzido de 2,05 MB para 273,51 kB
+- [x] Logo oficial transparente otimizado para 61,33 kB
+
+## Branding e interface - 9 de junho de 2026
+
+- [x] Logotipo oficial aplicado
+- [x] Home comercial completa
+- [x] Hero com fotografia real
+- [x] Paleta Dvanera consolidada em tokens
+- [x] Login, cadastro e admin com estrutura comum
+- [x] Botao para voltar a tela inicial
+- [x] Dashboard cliente com metricas
+- [x] Dashboard admin com metricas
+- [x] Progresso do novo orcamento
+- [x] Linha do tempo do orcamento
+- [x] Agenda com filtros responsivos
+- [x] Icones PWA substituidos
+- [x] Manifesto e metadados atualizados
+- [x] Foco de teclado e movimento reduzido
+- [x] Home validada em desktop e celular
+- [x] Login validado em desktop e celular
+- [x] Sem overflow horizontal nos viewports testados
+- [x] `BRANDING_DVANERA.md` criado
 
 ## Seguranca de dependencias
 

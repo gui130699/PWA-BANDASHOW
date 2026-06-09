@@ -183,3 +183,37 @@ Resultado: APROVADO.
 ## Conclusao
 
 O fluxo cliente/admin, seguranca, deploy, PWA, performance e limpeza de dados passaram. O projeto esta apto para o primeiro admin definitivo ser criado pelo proprietario.
+
+## 14. Branding e responsividade - 9 de junho de 2026
+
+Resultado: APROVADO LOCALMENTE.
+
+Build equivalente ao GitHub Pages:
+
+```powershell
+$env:VITE_BASE_PATH='/PWA-BANDASHOW/'
+npm run build
+npm run preview -- --host 127.0.0.1 --port 4175
+```
+
+Validacoes:
+
+- home carregou logo oficial, hero e secoes comerciais;
+- desktop sem sobreposicao de navegacao, textos ou botoes;
+- celular sem overflow horizontal;
+- hero manteve CTA e indicio da secao seguinte;
+- login carregou em desktop e celular;
+- botao de retorno para a tela inicial visivel;
+- acesso admin exibiu somente criacao do primeiro admin quando nao configurado;
+- manifest, favicon e icones apontam para os novos assets;
+- console do navegador sem erros na home;
+- logotipo transparente sem fundo quadriculado;
+- `npm run lint`: OK;
+- `npm run build`: OK.
+
+Viewports usados:
+
+```txt
+Desktop: 1280 x 720
+Celular: 390 x 844
+```

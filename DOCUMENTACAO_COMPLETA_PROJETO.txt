@@ -1,7 +1,7 @@
 DOCUMENTACAO COMPLETA DO PROJETO - PWA-BANDASHOW / GRUPO DVANERA
 Gerado automaticamente para leitura, manutencao, auditoria tecnica e backup.
-Data de geracao: 2026-06-08 20:01:13 - America/Sao_Paulo
-Commit base documentado: 08511aa
+Data de geracao: 2026-06-09 07:25:26 - America/Sao_Paulo
+Commit base documentado: 0daea7f
 Pasta local: C:\Users\guilh\OneDrive\HP Guilherme Notebook\Área de Trabalho\PWA- Everton
 Repositorio: https://github.com/gui130699/PWA-BANDASHOW.git
 Pages: https://gui130699.github.io/PWA-BANDASHOW/
@@ -13,14 +13,18 @@ SEGURANCA
 
 DOCUMENTOS DE REFERENCIA
 - README.md
+- BRANDING_DVANERA.md
 - CHECKLIST_PRODUCAO.md
 - TESTES_MANUAIS_PRODUCAO.md
 - RELATORIO_FINAL_PRODUCAO.md
 
 ARQUIVOS BINARIOS INVENTARIADOS
-- public/icons/icon-192.png (2450 bytes)
-- public/icons/icon-512.png (7868 bytes)
-- public/icons/maskable-512.png (7782 bytes)
+- public/icons/icon-192.png (30728 bytes)
+- public/icons/icon-512.png (213916 bytes)
+- public/icons/maskable-512.png (213916 bytes)
+- src/assets/brand/logo-dvanera-light.png (61339 bytes)
+- src/assets/brand/logo-dvanera-original.jpeg (26211 bytes)
+- src/assets/brand/mark-dvanera.png (213916 bytes)
 - src/assets/dvanera-hero.jpg (273517 bytes)
 
 ----------------------------------------------------------------------------------------------------
@@ -153,6 +157,167 @@ dist-ssr
 FIM DO ARQUIVO: .gitignore
 
 ----------------------------------------------------------------------------------------------------
+INICIO DO ARQUIVO: BRANDING_DVANERA.md
+----------------------------------------------------------------------------------------------------
+# Identidade Visual do Grupo Dvanera
+
+Documento de referencia para manter a identidade oficial do Grupo Dvanera consistente na home, autenticacao, painel do cliente, painel administrativo e PWA.
+
+## Direcao visual
+
+A interface combina palco, musica e operacao profissional. O resultado deve transmitir energia, confianca e organizacao sem transformar o painel em uma pagina promocional.
+
+Principios:
+
+- preto e grafite como base;
+- marfim para texto e logotipo;
+- dourado fosco para destaque e acao principal;
+- azul e verde somente como cores funcionais;
+- fotografia real de palco nas telas publicas e de autenticacao;
+- paineis internos densos, claros e orientados a tarefas;
+- cantos discretos, bordas finas e sombras controladas.
+
+## Paleta
+
+| Uso | Cor | Valor |
+| --- | --- | --- |
+| Fundo principal | Preto | `#050505` |
+| Fundo secundario | Grafite profundo | `#0B0C0C` |
+| Superficie | Carvao | `#101211` |
+| Superficie elevada | Grafite | `#171A18` |
+| Borda | Branco com baixa opacidade | `rgba(255,255,255,0.10)` |
+| Texto principal | Marfim | `#F7F0DE` |
+| Texto secundario | Cinza frio | Tailwind `slate-400` |
+| Destaque principal | Dourado fosco | `#D8AA36` |
+| Destaque escuro | Dourado profundo | `#B98520` |
+| Sucesso | Verde esmeralda | Tailwind `emerald` |
+| Informacao | Azul ceu | Tailwind `sky` |
+| Erro | Vermelho | Tailwind `red` |
+
+Os tokens ficam em `tailwind.config.ts` e `src/index.css`.
+
+## Tipografia
+
+- Interface e textos: `Inter`, `Segoe UI`, `Arial`, sans-serif.
+- Titulos e numeros de destaque: `Arial Black`, `Inter`, sans-serif.
+- Titulos usam `font-display`.
+- Nao usar tamanho de fonte vinculado diretamente a largura da tela.
+- Letter spacing negativo nao faz parte da identidade.
+
+## Arquivos oficiais
+
+```txt
+src/assets/brand/logo-dvanera-original.jpeg
+src/assets/brand/logo-dvanera-light.png
+src/assets/brand/mark-dvanera.png
+src/assets/dvanera-hero.jpg
+public/icons/icon-192.png
+public/icons/icon-512.png
+public/icons/maskable-512.png
+public/icons/gd-icon.svg
+```
+
+Uso:
+
+- `logo-dvanera-original.jpeg`: referencia recebida do Grupo Dvanera.
+- `logo-dvanera-light.png`: wordmark oficial em marfim e fundo transparente.
+- `mark-dvanera.png`: monograma quadrado para PWA e contextos compactos.
+- `dvanera-hero.jpg`: palco principal da home e da autenticacao.
+
+Para substituir a fotografia, mantenha enquadramento horizontal, palco claramente visivel e arquivo otimizado. Evite imagens abstratas, desfocadas ou sem relacao direta com shows.
+
+## Componentes de marca
+
+```txt
+src/components/brand/BrandLogo.tsx
+src/components/brand/AuthShell.tsx
+src/components/ui/MetricCard.tsx
+src/components/ui/PageHeader.tsx
+src/components/ui/QuoteTimeline.tsx
+```
+
+- `BrandLogo`: alterna entre wordmark completo e monograma.
+- `AuthShell`: estrutura comum de login, cadastro, solicitacao e acesso admin.
+- `MetricCard`: indicadores compactos para os dashboards.
+- `PageHeader`: titulo, descricao e acao principal das paginas internas.
+- `QuoteTimeline`: progresso visual do orcamento do cliente.
+
+## Aplicacao por tela
+
+### Home
+
+- hero em tela cheia com fotografia real;
+- logotipo oficial como primeiro sinal da marca;
+- chamada comercial e botoes de orcamento/login;
+- secoes Sobre, Servicos, Como funciona, Por que contratar e CTA;
+- icone administrativo discreto no canto superior direito;
+- WhatsApp exibido somente quando configurado no Firebase.
+
+### Autenticacao
+
+- fundo de palco com camada escura;
+- logotipo oficial;
+- card de formulario em carvao;
+- botao com seta para voltar a tela inicial em desktop e celular;
+- mesma estrutura para login, cadastro, solicitacao e primeiro admin.
+
+### Painel do cliente
+
+- metricas compactas;
+- novo orcamento como acao primaria;
+- progresso em quatro etapas;
+- linha do tempo no detalhe do orcamento;
+- pagamentos Pix com estados e orientacoes claras.
+
+### Painel administrativo
+
+- navegacao lateral com logo oficial;
+- dashboard com indicadores por cor funcional;
+- tabelas com cabecalho discreto e hover dourado;
+- agenda com filtros responsivos;
+- formularios e modais usando os componentes globais.
+
+## PWA
+
+O manifesto usa:
+
+```txt
+name: Grupo Dvanera
+short_name: Dvanera
+theme_color: #050505
+background_color: #050505
+```
+
+O cache atual e `grupo-dvanera-v5`. Sempre altere o numero do cache quando trocar assets criticos, icones ou shell principal.
+
+## Acessibilidade e responsividade
+
+- foco de teclado global visivel em dourado;
+- botoes de icone possuem `aria-label` e `title` quando necessario;
+- contraste alto entre texto e superfice;
+- animacoes sao desativadas com `prefers-reduced-motion`;
+- tabelas usam rolagem horizontal controlada;
+- home e autenticacao nao geram overflow horizontal;
+- controles mantem pelo menos 44 px de altura;
+- textos quebram ou truncam somente onde o contexto permanece compreensivel.
+
+## Validacao visual
+
+Em 9 de junho de 2026 foram validados:
+
+- home em desktop;
+- home em viewport de celular;
+- login em desktop;
+- login em viewport de celular;
+- acesso ao primeiro admin;
+- ausencia de overflow horizontal;
+- carregamento do logo, hero e assets;
+- retorno para a tela inicial.
+
+----------------------------------------------------------------------------------------------------
+FIM DO ARQUIVO: BRANDING_DVANERA.md
+
+----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: CHECKLIST_PRODUCAO.md
 ----------------------------------------------------------------------------------------------------
 # Checklist de Producao - Grupo Dvanera
@@ -179,7 +344,7 @@ Validacao final executada em 8 de junho de 2026.
 - [x] Icone maskable configurado
 - [x] Service worker ativo
 - [x] App atende aos criterios de instalabilidade
-- [x] Cache v4 atualizado sem prender versao antiga
+- [x] Cache v5 atualizado sem prender versao antiga
 - [x] Navegacao offline basica carregada pelo app shell
 - [x] Firebase Auth/Firestore nao sao cacheados
 
@@ -193,6 +358,28 @@ Validacao final executada em 8 de junho de 2026.
 - [x] Nenhum chunk acima de 500 kB
 - [x] Aviso de chunk grande removido
 - [x] Hero reduzido de 2,05 MB para 273,51 kB
+- [x] Logo oficial transparente otimizado para 61,33 kB
+
+## Branding e interface - 9 de junho de 2026
+
+- [x] Logotipo oficial aplicado
+- [x] Home comercial completa
+- [x] Hero com fotografia real
+- [x] Paleta Dvanera consolidada em tokens
+- [x] Login, cadastro e admin com estrutura comum
+- [x] Botao para voltar a tela inicial
+- [x] Dashboard cliente com metricas
+- [x] Dashboard admin com metricas
+- [x] Progresso do novo orcamento
+- [x] Linha do tempo do orcamento
+- [x] Agenda com filtros responsivos
+- [x] Icones PWA substituidos
+- [x] Manifesto e metadados atualizados
+- [x] Foco de teclado e movimento reduzido
+- [x] Home validada em desktop e celular
+- [x] Login validado em desktop e celular
+- [x] Sem overflow horizontal nos viewports testados
+- [x] `BRANDING_DVANERA.md` criado
 
 ## Seguranca de dependencias
 
@@ -578,16 +765,16 @@ INICIO DO ARQUIVO: index.html
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="%BASE_URL%icons/gd-icon.svg" />
+    <link rel="icon" type="image/png" href="%BASE_URL%icons/icon-192.png" />
     <link rel="apple-touch-icon" href="%BASE_URL%icons/icon-192.png" />
     <link rel="manifest" href="%BASE_URL%manifest.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#06070b" />
+    <meta name="theme-color" content="#050505" />
     <meta
       name="description"
-      content="Gestao de agenda, orcamentos, pagamentos e custos do Grupo Dvanera."
+      content="Shows para eventos e uma experiencia online simples para orcamentos, agenda e pagamentos do Grupo Dvanera."
     />
-    <title>Grupo Dvanera | Agenda e Orcamentos</title>
+    <title>Grupo Dvanera | Shows e Eventos</title>
   </head>
   <body>
     <div id="root"></div>
@@ -7992,10 +8179,12 @@ FIM DO ARQUIVO: postcss.config.cjs
 INICIO DO ARQUIVO: public/icons/gd-icon.svg
 ----------------------------------------------------------------------------------------------------
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="512" height="512" rx="112" fill="#06070B"/>
-  <rect x="36" y="36" width="440" height="440" rx="92" stroke="#F7B731" stroke-width="18"/>
-  <path d="M248.88 268.72C248.88 306.08 224.16 330.4 184.56 330.4C143.92 330.4 116.96 301.04 116.96 256.08C116.96 211.68 144.4 181.6 185.36 181.6C213.76 181.6 235.76 195.28 245.84 218.24L216.32 232.16C210.72 218.72 199.52 212 183.92 212C162.4 212 148.32 229.12 148.32 256.08C148.32 283.36 162.24 300 185.2 300C203.6 300 216.16 291.36 219.36 275.6H187.12V249.76H248.88V268.72ZM271.02 184H323.18C368.3 184 394.38 210.56 394.38 256C394.38 301.44 368.3 328 323.18 328H271.02V184ZM321.9 298.64C347.66 298.64 362.86 282.8 362.86 256C362.86 229.2 347.66 213.36 321.9 213.36H302.06V298.64H321.9Z" fill="#FFD166"/>
-  <path d="M126 378H386" stroke="#F7B731" stroke-width="12" stroke-linecap="round"/>
+  <rect width="512" height="512" rx="88" fill="#050505"/>
+  <circle cx="256" cy="256" r="178" stroke="#F7F0DE" stroke-width="26"/>
+  <path d="M145 178H225C292 178 326 211 326 256C326 301 292 334 225 334H145V178ZM218 299C254 299 274 283 274 256C274 229 254 213 218 213H193V299H218Z" fill="#F7F0DE"/>
+  <path d="M273 177L333 315L392 177H349L333 225L316 177H273Z" fill="#D8AA36"/>
+  <path d="M347 137H397" stroke="#050505" stroke-width="32"/>
+  <path d="M347 375H397" stroke="#050505" stroke-width="32"/>
 </svg>
 
 ----------------------------------------------------------------------------------------------------
@@ -8005,15 +8194,15 @@ FIM DO ARQUIVO: public/icons/gd-icon.svg
 INICIO DO ARQUIVO: public/manifest.webmanifest
 ----------------------------------------------------------------------------------------------------
 {
-  "name": "Grupo Dvanera - Gestao de Agenda e Orcamentos",
+  "name": "Grupo Dvanera",
   "short_name": "Dvanera",
-  "description": "Painel PWA para agenda, orcamentos, servicos, custos e pagamentos do Grupo Dvanera.",
+  "description": "Solicite orcamentos e acompanhe eventos, agenda e pagamentos do Grupo Dvanera.",
   "id": "/PWA-BANDASHOW/",
   "start_url": "/PWA-BANDASHOW/",
   "scope": "/PWA-BANDASHOW/",
   "display": "standalone",
-  "background_color": "#05060a",
-  "theme_color": "#06070b",
+  "background_color": "#050505",
+  "theme_color": "#050505",
   "orientation": "portrait-primary",
   "icons": [
     {
@@ -8043,13 +8232,14 @@ FIM DO ARQUIVO: public/manifest.webmanifest
 ----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: public/sw.js
 ----------------------------------------------------------------------------------------------------
-const CACHE_NAME = 'grupo-dvanera-v4'
+const CACHE_NAME = 'grupo-dvanera-v5'
 const BASE_PATH = new URL(self.registration.scope).pathname
 const APP_SHELL = [
   BASE_PATH,
   `${BASE_PATH}manifest.webmanifest`,
   `${BASE_PATH}icons/icon-192.png`,
   `${BASE_PATH}icons/icon-512.png`,
+  `${BASE_PATH}icons/maskable-512.png`,
 ]
 
 self.addEventListener('install', (event) => {
@@ -8149,6 +8339,23 @@ PWA em React, TypeScript e Firebase para administrar agenda, orcamentos, servico
 - `npm run build`: OK.
 - `npm audit --omit=dev`: 0 vulnerabilidades.
 
+## Identidade visual Dvanera
+
+Atualizacao visual concluida em 9 de junho de 2026:
+
+- logotipo oficial aplicado na home, autenticacao e paineis;
+- hero com fotografia real de palco;
+- paleta preto, grafite, marfim e dourado fosco;
+- home comercial com Sobre, Servicos, Como funciona e CTA;
+- login, cadastro, solicitacao e acesso admin com estrutura unificada;
+- dashboards com indicadores compactos;
+- fluxo de orcamento com progresso e linha do tempo;
+- botao para voltar a tela inicial nas paginas de acesso;
+- novos icones PWA e cache `grupo-dvanera-v5`;
+- validacao responsiva em desktop e celular.
+
+Guia completo: `BRANDING_DVANERA.md`.
+
 ## Stack
 
 - React 19, React Router e TypeScript
@@ -8235,7 +8442,7 @@ public/icons/maskable-512.png
 src/main.tsx
 ```
 
-O service worker `grupo-dvanera-v4`:
+O service worker `grupo-dvanera-v5`:
 
 - usa network-first para navegacao;
 - usa cache de runtime somente para assets locais;
@@ -8283,10 +8490,12 @@ location.reload()
 
 Todas as paginas sao carregadas com `React.lazy` e `Suspense`. Recharts so e baixado quando uma pagina administrativa com graficos e aberta. Firebase usa imports modulares.
 
-Principais chunks do build final:
+Principais arquivos do build de branding:
 
 ```txt
-index                    55.14 kB
+logo oficial             61.33 kB
+hero                    273.51 kB
+index                    58.46 kB
 firebase-auth            85.71 kB
 forms-vendor             87.43 kB
 firebase-firestore      266.77 kB
@@ -8441,6 +8650,7 @@ Consulte:
 - `CHECKLIST_PRODUCAO.md`
 - `TESTES_MANUAIS_PRODUCAO.md`
 - `RELATORIO_FINAL_PRODUCAO.md`
+- `BRANDING_DVANERA.md`
 - `DOCUMENTACAO_COMPLETA_PROJETO.txt`
 
 ## Solucao de tela branca
@@ -8648,6 +8858,39 @@ Manutencao futura:
 Nota sugerida: **10/10**.
 
 Justificativa: build, lint, Pages, rotas, PWA, instalabilidade, fluxo autenticado, regras e limpeza foram validados na pratica. Os alertas restantes sao exclusivamente de ferramentas locais de desenvolvimento, sem dependencia vulneravel no bundle de producao, e estao documentados sem aplicar downgrade breaking.
+
+## 13. Atualizacao de branding - 9 de junho de 2026
+
+A identidade oficial do Grupo Dvanera foi aplicada sobre a aplicacao existente sem alterar regras Firebase, calculos, permissoes ou fluxo financeiro.
+
+Entregas:
+
+- logotipo oficial tratado para fundo transparente;
+- monograma oficial para icones PWA;
+- paleta preta, grafite, marfim e dourada;
+- nova home comercial com fotografia real;
+- estrutura visual comum para autenticacao;
+- retorno para a tela inicial em desktop e celular;
+- metricas de cliente e administrador;
+- progresso de solicitacao e linha do tempo;
+- agenda e componentes globais responsivos;
+- manifesto, metadados e service worker v5;
+- guia `BRANDING_DVANERA.md`;
+- documentacao consolidada atualizada.
+
+Validacao local:
+
+```txt
+npm run lint: OK
+npm run build com VITE_BASE_PATH: OK
+home desktop: OK
+home celular: OK
+login desktop: OK
+login celular: OK
+acesso admin: OK
+overflow horizontal: inexistente
+console da home: sem erros
+```
 
 ----------------------------------------------------------------------------------------------------
 FIM DO ARQUIVO: RELATORIO_FINAL_PRODUCAO.md
@@ -8886,6 +9129,7 @@ const sections: string[] = [
   '',
   'DOCUMENTOS DE REFERENCIA',
   '- README.md',
+  '- BRANDING_DVANERA.md',
   '- CHECKLIST_PRODUCAO.md',
   '- TESTES_MANUAIS_PRODUCAO.md',
   '- RELATORIO_FINAL_PRODUCAO.md',
@@ -9118,6 +9362,104 @@ export default function App() {
 FIM DO ARQUIVO: src/App.tsx
 
 ----------------------------------------------------------------------------------------------------
+INICIO DO ARQUIVO: src/components/brand/AuthShell.tsx
+----------------------------------------------------------------------------------------------------
+import { ArrowLeft } from 'lucide-react'
+import type { ReactNode } from 'react'
+import { Link } from 'react-router-dom'
+import heroImage from '../../assets/dvanera-hero.jpg'
+import { BrandLogo } from './BrandLogo'
+
+type AuthShellProps = {
+  children: ReactNode
+  eyebrow: string
+}
+
+export function AuthShell({ children, eyebrow }: AuthShellProps) {
+  return (
+    <main className="relative min-h-screen overflow-hidden bg-night-950 text-white">
+      <div
+        className="fixed inset-0 bg-cover bg-[70%_center] opacity-35"
+        style={{ backgroundImage: `url(${heroImage})` }}
+      />
+      <div className="fixed inset-0 bg-night-950/78" />
+      <Link
+        aria-label="Voltar para a tela inicial"
+        className="fixed right-6 top-6 z-20 hidden h-11 w-11 place-items-center rounded-md border border-white/15 bg-black/45 text-ivory-50 backdrop-blur transition hover:border-gold-300 hover:text-gold-300 lg:grid"
+        title="Voltar para a tela inicial"
+        to="/"
+      >
+        <ArrowLeft className="h-5 w-5" />
+      </Link>
+      <div className="relative mx-auto grid min-h-screen max-w-7xl lg:grid-cols-[0.9fr_1.1fr]">
+        <aside className="hidden min-h-screen flex-col justify-between border-r border-white/10 p-10 lg:flex">
+          <Link aria-label="Voltar para o inicio" className="w-fit" to="/">
+            <BrandLogo className="h-24 w-56" />
+          </Link>
+          <div className="max-w-md pb-10">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gold-300">{eyebrow}</p>
+            <h2 className="mt-4 font-display text-3xl leading-tight text-ivory-50">
+              Shows memoraveis. Gestao simples. Tudo no mesmo ritmo.
+            </h2>
+            <p className="mt-4 text-sm leading-7 text-slate-300">
+              Acompanhe orcamentos, pagamentos e eventos com a experiencia oficial do Grupo Dvanera.
+            </p>
+          </div>
+        </aside>
+        <section className="flex min-h-screen items-center justify-center px-4 py-8 sm:px-8 lg:px-12">
+          <div className="w-full max-w-2xl animate-fade-up">
+            <div className="mb-5 flex items-center justify-between gap-4 lg:hidden">
+              <BrandLogo className="h-16 w-40" />
+              <Link
+                aria-label="Voltar para o inicio"
+                className="grid h-11 w-11 place-items-center rounded-md border border-white/15 bg-black/35 text-ivory-50 transition hover:border-gold-300"
+                title="Voltar para o inicio"
+                to="/"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Link>
+            </div>
+            {children}
+          </div>
+        </section>
+      </div>
+    </main>
+  )
+}
+
+----------------------------------------------------------------------------------------------------
+FIM DO ARQUIVO: src/components/brand/AuthShell.tsx
+
+----------------------------------------------------------------------------------------------------
+INICIO DO ARQUIVO: src/components/brand/BrandLogo.tsx
+----------------------------------------------------------------------------------------------------
+import { clsx } from 'clsx'
+import logo from '../../assets/brand/logo-dvanera-light.png'
+import mark from '../../assets/brand/mark-dvanera.png'
+
+type BrandLogoProps = {
+  compact?: boolean
+  className?: string
+}
+
+export function BrandLogo({ compact = false, className }: BrandLogoProps) {
+  return (
+    <img
+      alt="Dvanera"
+      className={clsx(
+        compact ? 'aspect-square object-contain' : 'aspect-[2/1] object-contain object-left',
+        className,
+      )}
+      decoding="async"
+      src={compact ? mark : logo}
+    />
+  )
+}
+
+----------------------------------------------------------------------------------------------------
+FIM DO ARQUIVO: src/components/brand/BrandLogo.tsx
+
+----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: src/components/FirebaseNotice.tsx
 ----------------------------------------------------------------------------------------------------
 import { AlertCircle } from 'lucide-react'
@@ -9231,15 +9573,14 @@ export function DashboardLayout({ title, subtitle, items, children }: DashboardL
 
   return (
     <div className="min-h-screen bg-night-950 text-white">
-      <div className="fixed inset-0 -z-10 bg-[linear-gradient(135deg,#05060a,#0d111c_55%,#05060a)]" />
-      <div className="grid min-h-screen lg:grid-cols-[18rem_1fr]">
+      <div className="grid min-h-screen lg:grid-cols-[17rem_1fr]">
         <div className="hidden lg:block">
           <Sidebar items={items} title={title} />
         </div>
         <MobileMenu items={items} onClose={() => setMenuOpen(false)} open={menuOpen} title={title} />
         <main className="min-w-0">
           <Header onMenuClick={() => setMenuOpen(true)} subtitle={subtitle} title={title} />
-          <div className="mx-auto max-w-7xl px-4 py-6 xl:px-8">{children || <Outlet />}</div>
+          <div className="mx-auto max-w-[92rem] px-4 py-6 xl:px-8">{children || <Outlet />}</div>
         </main>
       </div>
     </div>
@@ -9266,7 +9607,7 @@ export function Header({ title, subtitle, onMenuClick }: HeaderProps) {
   const { profile } = useAuth()
 
   return (
-    <header className="sticky top-0 z-20 border-b border-white/10 bg-night-900/85 px-4 py-4 backdrop-blur xl:px-8">
+    <header className="sticky top-0 z-20 border-b border-white/10 bg-night-950/90 px-4 py-4 backdrop-blur-xl xl:px-8">
       <div className="flex items-center justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3">
           {onMenuClick && (
@@ -9280,13 +9621,13 @@ export function Header({ title, subtitle, onMenuClick }: HeaderProps) {
             </Button>
           )}
           <div className="min-w-0">
-            <h1 className="truncate text-xl font-semibold text-white">{title}</h1>
+            <h1 className="truncate font-display text-xl text-ivory-50">{title}</h1>
             {subtitle && <p className="truncate text-sm text-slate-400">{subtitle}</p>}
           </div>
         </div>
-        <div className="hidden text-right sm:block">
-          <p className="text-sm font-medium text-white">{profile?.name}</p>
-          <p className="text-xs text-slate-400">{profile?.role === 'admin' ? 'Administrador' : 'Cliente'}</p>
+        <div className="hidden rounded-md border border-white/10 bg-white/[0.035] px-3 py-2 text-right sm:block">
+          <p className="text-sm font-medium text-ivory-50">{profile?.name}</p>
+          <p className="text-xs text-gold-300">{profile?.role === 'admin' ? 'Administrador' : 'Cliente'}</p>
         </div>
       </div>
     </header>
@@ -9317,7 +9658,7 @@ export function MobileMenu({ open, title, items, onClose }: MobileMenuProps) {
     <div className="fixed inset-0 z-40 lg:hidden">
       <button
         aria-label="Fechar menu"
-        className="absolute inset-0 bg-black/70"
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
         onClick={onClose}
         type="button"
       />
@@ -9339,9 +9680,10 @@ FIM DO ARQUIVO: src/components/layout/MobileMenu.tsx
 ----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: src/components/layout/Sidebar.tsx
 ----------------------------------------------------------------------------------------------------
-import { LogOut, Music2 } from 'lucide-react'
+import { LogOut } from 'lucide-react'
 import type { ComponentType } from 'react'
 import { NavLink } from 'react-router-dom'
+import { BrandLogo } from '../brand/BrandLogo'
 import { Button } from '../ui'
 import { useAuth } from '../../contexts/AuthContext'
 
@@ -9361,15 +9703,10 @@ export function Sidebar({ items, title, onNavigate }: SidebarProps) {
   const { profile, logout } = useAuth()
 
   return (
-    <aside className="flex h-full min-h-0 flex-col border-r border-white/10 bg-night-950/95">
-      <div className="flex items-center gap-3 border-b border-white/10 px-5 py-5">
-        <div className="grid h-11 w-11 place-items-center rounded-md bg-gold-400 text-night-950">
-          <Music2 className="h-6 w-6" />
-        </div>
-        <div>
-          <p className="text-sm font-semibold text-white">Grupo Dvanera</p>
-          <p className="text-xs text-slate-400">{title}</p>
-        </div>
+    <aside className="flex h-full min-h-0 flex-col border-r border-white/10 bg-night-950/98">
+      <div className="border-b border-white/10 px-5 py-5">
+        <BrandLogo className="h-16 w-40" />
+        <p className="mt-2 text-xs font-medium uppercase tracking-[0.12em] text-slate-500">{title}</p>
       </div>
 
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
@@ -9380,10 +9717,10 @@ export function Sidebar({ items, title, onNavigate }: SidebarProps) {
             <NavLink
               className={({ isActive }) =>
                 [
-                  'flex min-h-11 items-center gap-3 rounded-md px-3 text-sm font-medium transition',
+                  'flex min-h-11 items-center gap-3 rounded-md border px-3 text-sm font-medium transition',
                   isActive
-                    ? 'bg-gold-400 text-night-950'
-                    : 'text-slate-300 hover:bg-white/8 hover:text-white',
+                    ? 'border-gold-300/40 bg-gold-300/12 text-gold-100'
+                    : 'border-transparent text-slate-300 hover:border-white/10 hover:bg-white/[0.045] hover:text-white',
                 ].join(' ')
               }
               key={item.to}
@@ -9398,9 +9735,9 @@ export function Sidebar({ items, title, onNavigate }: SidebarProps) {
       </nav>
 
       <div className="border-t border-white/10 p-4">
-        <div className="mb-3">
-          <p className="truncate text-sm font-semibold text-white">{profile?.name || 'Usuario'}</p>
-          <p className="truncate text-xs text-slate-400">{profile?.email}</p>
+        <div className="mb-3 rounded-md border border-white/10 bg-white/[0.035] p-3">
+          <p className="truncate text-sm font-semibold text-ivory-50">{profile?.name || 'Usuario'}</p>
+          <p className="truncate text-xs text-slate-500">{profile?.email}</p>
         </div>
         <Button className="w-full" icon={<LogOut className="h-4 w-4" />} onClick={logout} variant="secondary">
           Sair
@@ -9466,12 +9803,12 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variants: Record<ButtonVariant, string> = {
   primary:
-    'bg-gold-400 text-night-950 hover:bg-gold-300 focus-visible:ring-gold-300 shadow-glow',
+    'border border-gold-300 bg-gold-400 text-night-950 hover:bg-gold-300 focus-visible:ring-gold-300 shadow-glow',
   secondary:
-    'bg-white/10 text-white ring-1 ring-white/12 hover:bg-white/15 focus-visible:ring-gold-300',
-  ghost: 'bg-transparent text-slate-200 hover:bg-white/8 focus-visible:ring-gold-300',
-  danger: 'bg-red-500/90 text-white hover:bg-red-500 focus-visible:ring-red-300',
-  success: 'bg-emerald-500 text-night-950 hover:bg-emerald-400 focus-visible:ring-emerald-300',
+    'border border-white/15 bg-white/[0.055] text-ivory-50 hover:border-gold-300/50 hover:bg-white/10 focus-visible:ring-gold-300',
+  ghost: 'border border-transparent bg-transparent text-slate-200 hover:bg-white/8 focus-visible:ring-gold-300',
+  danger: 'border border-red-400/50 bg-red-500/85 text-white hover:bg-red-500 focus-visible:ring-red-300',
+  success: 'border border-emerald-300/50 bg-emerald-500 text-night-950 hover:bg-emerald-400 focus-visible:ring-emerald-300',
 }
 
 export function Button({
@@ -9487,7 +9824,7 @@ export function Button({
   return (
     <button
       className={clsx(
-        'inline-flex min-h-11 items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-55',
+        'inline-flex min-h-11 items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition duration-200 focus:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-55',
         variants[variant],
         className,
       )}
@@ -9520,7 +9857,7 @@ export function Card({ title, description, action, className, children, ...props
   return (
     <section
       className={clsx(
-        'rounded-lg border border-white/10 bg-white/[0.055] p-5 shadow-soft backdrop-blur',
+        'rounded-lg border border-white/10 bg-night-850/92 p-5 shadow-soft backdrop-blur transition-colors',
         className,
       )}
       {...props}
@@ -9528,8 +9865,8 @@ export function Card({ title, description, action, className, children, ...props
       {(title || description || action) && (
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            {title && <h2 className="text-lg font-semibold text-white">{title}</h2>}
-            {description && <p className="mt-1 text-sm text-slate-400">{description}</p>}
+            {title && <h2 className="font-display text-lg text-ivory-50">{title}</h2>}
+            {description && <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-400">{description}</p>}
           </div>
           {action}
         </div>
@@ -9623,14 +9960,14 @@ export function DataTable<T>({
   if (data.length === 0) return <EmptyState description={emptyDescription} title={emptyTitle} />
 
   return (
-    <div className="overflow-hidden rounded-lg border border-white/10">
+    <div className="overflow-hidden rounded-lg border border-white/10 bg-black/10">
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-white/10">
-          <thead className="bg-white/[0.04]">
+          <thead className="bg-white/[0.045]">
             <tr>
               {columns.map((column) => (
                 <th
-                  className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400"
+                  className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.08em] text-slate-400"
                   key={column.header}
                 >
                   {column.header}
@@ -9640,7 +9977,7 @@ export function DataTable<T>({
           </thead>
           <tbody className="divide-y divide-white/10">
             {data.map((row) => (
-              <tr className="bg-transparent transition hover:bg-white/[0.03]" key={getRowKey(row)}>
+              <tr className="bg-transparent transition hover:bg-gold-300/[0.035]" key={getRowKey(row)}>
                 {columns.map((column) => (
                   <td className={column.className || 'px-4 py-3 text-sm text-slate-200'} key={column.header}>
                     {column.cell(row)}
@@ -9701,9 +10038,11 @@ type EmptyStateProps = {
 
 export function EmptyState({ title, description, action }: EmptyStateProps) {
   return (
-    <div className="grid place-items-center rounded-lg border border-dashed border-white/15 px-6 py-12 text-center">
-      <Inbox className="mb-3 h-10 w-10 text-gold-300" />
-      <h3 className="text-base font-semibold text-white">{title}</h3>
+    <div className="grid place-items-center rounded-lg border border-dashed border-gold-300/20 bg-gold-300/[0.025] px-6 py-12 text-center">
+      <div className="mb-4 grid h-12 w-12 place-items-center rounded-md border border-gold-300/25 bg-gold-300/10">
+        <Inbox className="h-6 w-6 text-gold-300" />
+      </div>
+      <h3 className="font-display text-base text-ivory-50">{title}</h3>
       {description && <p className="mt-2 max-w-md text-sm text-slate-400">{description}</p>}
       {action && <div className="mt-5">{action}</div>}
     </div>
@@ -9725,8 +10064,11 @@ export { DateInput } from './DateInput'
 export { EmptyState } from './EmptyState'
 export { Input } from './Input'
 export { Loading } from './Loading'
+export { MetricCard } from './MetricCard'
 export { Modal } from './Modal'
 export { MoneyInput } from './MoneyInput'
+export { PageHeader } from './PageHeader'
+export { QuoteTimeline } from './QuoteTimeline'
 export { Select } from './Select'
 export { Textarea } from './Textarea'
 
@@ -9750,10 +10092,10 @@ export function Input({ label, error, className, wrapperClassName, id, ...props 
 
   return (
     <label className={clsx('grid gap-2 text-sm text-slate-200', wrapperClassName)} htmlFor={inputId}>
-      {label && <span className="font-medium">{label}</span>}
+      {label && <span className="font-semibold text-ivory-100">{label}</span>}
       <input
         className={clsx(
-          'min-h-11 rounded-md border border-white/10 bg-white/[0.06] px-3 py-2 text-white outline-none transition placeholder:text-slate-500 focus:border-gold-300/70 focus:ring-2 focus:ring-gold-300/20',
+          'min-h-11 rounded-md border border-white/12 bg-black/25 px-3 py-2 text-ivory-50 outline-none transition placeholder:text-slate-500 hover:border-white/20 focus:border-gold-300/70 focus:ring-2 focus:ring-gold-300/15',
           error && 'border-red-400/70 focus:border-red-400 focus:ring-red-400/20',
           className,
         )}
@@ -9776,7 +10118,9 @@ import { Loader2 } from 'lucide-react'
 export function Loading({ label = 'Carregando...' }: { label?: string }) {
   return (
     <div className="flex min-h-40 items-center justify-center gap-3 text-slate-300">
-      <Loader2 className="h-5 w-5 animate-spin text-gold-300" />
+      <div className="grid h-10 w-10 place-items-center rounded-full border border-gold-300/20 bg-gold-300/[0.06]">
+        <Loader2 className="h-5 w-5 animate-spin text-gold-300" />
+      </div>
       <span>{label}</span>
     </div>
   )
@@ -9784,6 +10128,45 @@ export function Loading({ label = 'Carregando...' }: { label?: string }) {
 
 ----------------------------------------------------------------------------------------------------
 FIM DO ARQUIVO: src/components/ui/Loading.tsx
+
+----------------------------------------------------------------------------------------------------
+INICIO DO ARQUIVO: src/components/ui/MetricCard.tsx
+----------------------------------------------------------------------------------------------------
+import { clsx } from 'clsx'
+import type { ComponentType } from 'react'
+
+type MetricCardProps = {
+  label: string
+  value: string | number
+  icon: ComponentType<{ className?: string }>
+  tone?: 'gold' | 'green' | 'blue' | 'neutral'
+}
+
+const tones = {
+  gold: 'border-gold-300/25 bg-gold-300/[0.055] text-gold-300',
+  green: 'border-emerald-300/20 bg-emerald-400/[0.05] text-emerald-300',
+  blue: 'border-sky-300/20 bg-sky-400/[0.05] text-sky-300',
+  neutral: 'border-white/10 bg-white/[0.035] text-ivory-100',
+}
+
+export function MetricCard({ label, value, icon: Icon, tone = 'neutral' }: MetricCardProps) {
+  return (
+    <article className={clsx('min-w-0 rounded-lg border p-5 shadow-soft transition hover:-translate-y-0.5', tones[tone])}>
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="break-words text-2xl font-semibold text-ivory-50">{value}</p>
+          <p className="mt-1 text-sm leading-5 text-slate-400">{label}</p>
+        </div>
+        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-md border border-current/20 bg-black/20">
+          <Icon className="h-5 w-5" />
+        </div>
+      </div>
+    </article>
+  )
+}
+
+----------------------------------------------------------------------------------------------------
+FIM DO ARQUIVO: src/components/ui/MetricCard.tsx
 
 ----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: src/components/ui/Modal.tsx
@@ -9804,9 +10187,9 @@ export function Modal({ open, title, children, onClose }: ModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-2xl rounded-lg border border-white/10 bg-night-900 p-5 shadow-soft">
+      <div className="w-full max-w-2xl animate-fade-up rounded-lg border border-gold-300/15 bg-night-900 p-5 shadow-soft">
         <div className="mb-5 flex items-center justify-between gap-4">
-          <h2 className="text-lg font-semibold text-white">{title}</h2>
+          <h2 className="font-display text-lg text-ivory-50">{title}</h2>
           <Button aria-label="Fechar" className="h-10 w-10 px-0" onClick={onClose} variant="ghost">
             <X className="h-4 w-4" />
           </Button>
@@ -9851,6 +10234,81 @@ export function MoneyInput({ label, value, onChange, error, name }: MoneyInputPr
 FIM DO ARQUIVO: src/components/ui/MoneyInput.tsx
 
 ----------------------------------------------------------------------------------------------------
+INICIO DO ARQUIVO: src/components/ui/PageHeader.tsx
+----------------------------------------------------------------------------------------------------
+import type { ReactNode } from 'react'
+
+type PageHeaderProps = {
+  title: string
+  description?: string
+  action?: ReactNode
+  eyebrow?: string
+}
+
+export function PageHeader({ title, description, action, eyebrow }: PageHeaderProps) {
+  return (
+    <div className="flex flex-col gap-4 border-b border-white/10 pb-5 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        {eyebrow && <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-300">{eyebrow}</p>}
+        <h2 className="mt-1 font-display text-2xl text-ivory-50">{title}</h2>
+        {description && <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">{description}</p>}
+      </div>
+      {action}
+    </div>
+  )
+}
+
+----------------------------------------------------------------------------------------------------
+FIM DO ARQUIVO: src/components/ui/PageHeader.tsx
+
+----------------------------------------------------------------------------------------------------
+INICIO DO ARQUIVO: src/components/ui/QuoteTimeline.tsx
+----------------------------------------------------------------------------------------------------
+import { Check } from 'lucide-react'
+import type { QuoteStatus } from '../../types'
+
+const steps: { status: QuoteStatus; label: string }[] = [
+  { status: 'em_analise', label: 'Solicitado' },
+  { status: 'aprovado_aguardando_entrada', label: 'Aprovado' },
+  { status: 'entrada_informada_pelo_cliente', label: 'Entrada informada' },
+  { status: 'agendado', label: 'Agendado' },
+  { status: 'realizado', label: 'Realizado' },
+]
+
+export function QuoteTimeline({ status }: { status: QuoteStatus }) {
+  const currentIndex = steps.findIndex((step) => step.status === status)
+  const interrupted = status === 'recusado' || status === 'cancelado'
+
+  return (
+    <ol className="grid gap-3 sm:grid-cols-5">
+      {steps.map((step, index) => {
+        const completed = !interrupted && index <= currentIndex
+        return (
+          <li className="relative flex min-w-0 items-center gap-3 sm:block" key={step.status}>
+            <span
+              className={[
+                'grid h-8 w-8 shrink-0 place-items-center rounded-full border text-xs font-semibold',
+                completed
+                  ? 'border-gold-300 bg-gold-400 text-night-950'
+                  : 'border-white/15 bg-night-800 text-slate-500',
+              ].join(' ')}
+            >
+              {completed ? <Check className="h-4 w-4" /> : index + 1}
+            </span>
+            <p className={completed ? 'text-sm font-medium text-ivory-50 sm:mt-2' : 'text-sm text-slate-500 sm:mt-2'}>
+              {step.label}
+            </p>
+          </li>
+        )
+      })}
+    </ol>
+  )
+}
+
+----------------------------------------------------------------------------------------------------
+FIM DO ARQUIVO: src/components/ui/QuoteTimeline.tsx
+
+----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: src/components/ui/Select.tsx
 ----------------------------------------------------------------------------------------------------
 import type { SelectHTMLAttributes } from 'react'
@@ -9883,10 +10341,10 @@ export function Select({
 
   return (
     <label className={clsx('grid gap-2 text-sm text-slate-200', wrapperClassName)} htmlFor={selectId}>
-      {label && <span className="font-medium">{label}</span>}
+      {label && <span className="font-semibold text-ivory-100">{label}</span>}
       <select
         className={clsx(
-          'min-h-11 rounded-md border border-white/10 bg-night-800 px-3 py-2 text-white outline-none transition focus:border-gold-300/70 focus:ring-2 focus:ring-gold-300/20',
+          'min-h-11 rounded-md border border-white/12 bg-night-800 px-3 py-2 text-ivory-50 outline-none transition hover:border-white/20 focus:border-gold-300/70 focus:ring-2 focus:ring-gold-300/15',
           error && 'border-red-400/70 focus:border-red-400 focus:ring-red-400/20',
           className,
         )}
@@ -9925,10 +10383,10 @@ export function Textarea({ label, error, className, wrapperClassName, id, ...pro
 
   return (
     <label className={clsx('grid gap-2 text-sm text-slate-200', wrapperClassName)} htmlFor={textareaId}>
-      {label && <span className="font-medium">{label}</span>}
+      {label && <span className="font-semibold text-ivory-100">{label}</span>}
       <textarea
         className={clsx(
-          'min-h-28 rounded-md border border-white/10 bg-white/[0.06] px-3 py-2 text-white outline-none transition placeholder:text-slate-500 focus:border-gold-300/70 focus:ring-2 focus:ring-gold-300/20',
+          'min-h-28 rounded-md border border-white/12 bg-black/25 px-3 py-2 text-ivory-50 outline-none transition placeholder:text-slate-500 hover:border-white/20 focus:border-gold-300/70 focus:ring-2 focus:ring-gold-300/15',
           error && 'border-red-400/70 focus:border-red-400 focus:ring-red-400/20',
           className,
         )}
@@ -10216,8 +10674,15 @@ INICIO DO ARQUIVO: src/index.css
 @tailwind utilities;
 
 :root {
-  color: #f8fafc;
-  background: #05060a;
+  --brand-bg: #050505;
+  --brand-surface: #101211;
+  --brand-surface-raised: #171a18;
+  --brand-primary: #d8aa36;
+  --brand-primary-soft: #e7c66f;
+  --brand-text: #fbfaf6;
+  --brand-muted: #a9aaa5;
+  color: var(--brand-text);
+  background: var(--brand-bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -10230,14 +10695,19 @@ INICIO DO ARQUIVO: src/index.css
 
 html {
   min-width: 320px;
-  background: #05060a;
+  scroll-behavior: smooth;
+  background: var(--brand-bg);
 }
 
 body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
-  background: #05060a;
+  background:
+    linear-gradient(rgba(216, 170, 54, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(216, 170, 54, 0.025) 1px, transparent 1px),
+    var(--brand-bg);
+  background-size: 42px 42px;
 }
 
 a {
@@ -10253,8 +10723,24 @@ textarea {
 }
 
 ::selection {
-  color: #05060a;
-  background: #ffd166;
+  color: var(--brand-bg);
+  background: var(--brand-primary-soft);
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand-primary-soft);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 ----------------------------------------------------------------------------------------------------
@@ -10361,7 +10847,7 @@ INICIO DO ARQUIVO: src/pages/admin/AdminAgendaPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Button, Card, DataTable, Input, Select, StatusBadge } from '../../components/ui'
+import { Button, Card, DataTable, Input, PageHeader, Select, StatusBadge } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
 import { cancelQuote, markQuoteAsDone } from '../../services/quoteService'
@@ -10394,10 +10880,15 @@ export function AdminAgendaPage() {
 
   return (
     <div className="space-y-6">
-      <Card
-        action={
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <PageHeader
+        description="Eventos confirmados entram aqui automaticamente apos a confirmacao da entrada."
+        eyebrow="Operacao"
+        title="Agenda de eventos"
+      />
+      <Card>
+        <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <Select
+              aria-label="Filtrar por status"
               onChange={(event) => setStatus(event.target.value)}
               options={agendaStatuses.map((item) => ({ label: quoteStatusMeta[item].label, value: item }))}
               placeholder="Todos"
@@ -10406,11 +10897,7 @@ export function AdminAgendaPage() {
             <Input onChange={(event) => setCity(event.target.value)} placeholder="Cidade" value={city} />
             <Input onChange={(event) => setClient(event.target.value)} placeholder="Cliente" value={client} />
             <Input onChange={(event) => setType(event.target.value)} placeholder="Tipo" value={type} />
-          </div>
-        }
-        description="Eventos confirmados entram aqui automaticamente apos confirmacao da entrada."
-        title="Agenda"
-      >
+        </div>
         <DataTable
           columns={[
             { header: 'Data', cell: (quote) => formatDate(quote.event.date) },
@@ -10503,7 +10990,7 @@ INICIO DO ARQUIVO: src/pages/admin/AdminDashboardPage.tsx
 import { BarChart3, CalendarDays, ClipboardList, TrendingUp, WalletCards } from 'lucide-react'
 import { useMemo } from 'react'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { Card, DataTable, StatusBadge } from '../../components/ui'
+import { Card, DataTable, MetricCard, PageHeader, StatusBadge } from '../../components/ui'
 import { useCollection } from '../../hooks/useCollection'
 import type { Payment, Quote } from '../../types'
 import { formatCurrency, formatDate } from '../../utils/format'
@@ -10606,17 +11093,19 @@ export function AdminDashboardPage() {
 
   return (
     <div className="space-y-6">
+      <PageHeader
+        description="Visao operacional de propostas, agenda, recebimentos e resultado estimado."
+        eyebrow="Centro de controle"
+        title="Resumo administrativo"
+      />
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {stats.map((item) => {
-          const Icon = item.icon
-          return (
-            <Card key={item.label}>
-              <Icon className="mb-4 h-7 w-7 text-gold-300" />
-              <p className="text-2xl font-semibold text-white">{item.value}</p>
-              <p className="mt-1 text-sm text-slate-400">{item.label}</p>
-            </Card>
-          )
-        })}
+        {stats.map((item, index) => (
+          <MetricCard
+            key={item.label}
+            {...item}
+            tone={index === 6 || index === 9 ? 'green' : index === 7 ? 'blue' : index < 4 ? 'gold' : 'neutral'}
+          />
+        ))}
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
@@ -10628,10 +11117,10 @@ export function AdminDashboardPage() {
                 <XAxis dataKey="month" stroke="#94a3b8" />
                 <YAxis stroke="#94a3b8" tickFormatter={(value) => `R$${Number(value) / 1000}k`} />
                 <Tooltip
-                  contentStyle={{ background: '#0d111c', border: '1px solid rgba(255,255,255,0.12)' }}
+                  contentStyle={{ background: '#101211', border: '1px solid rgba(216,170,54,0.25)' }}
                   formatter={(value) => formatCurrency(Number(value))}
                 />
-                <Bar dataKey="receita" fill="#f7b731" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="receita" fill="#d8aa36" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="custos" fill="#38bdf8" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -12002,11 +12491,12 @@ FIM DO ARQUIVO: src/pages/admin/AdminSuppliersPage.tsx
 INICIO DO ARQUIVO: src/pages/auth/AdminAccessPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft, LogIn, ShieldCheck, UserPlus } from 'lucide-react'
+import { LogIn, ShieldCheck, UserPlus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
+import { AuthShell } from '../../components/brand/AuthShell'
 import { FirebaseNotice } from '../../components/FirebaseNotice'
 import { Button, Card, Input, Loading } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
@@ -12085,21 +12575,16 @@ export function AdminAccessPage() {
   const isClientAccount = profile?.role === 'client'
 
   return (
-    <div className="min-h-screen bg-night-950 px-4 py-10 text-white">
+    <AuthShell eyebrow="Area administrativa">
       <div className="mx-auto w-full max-w-md space-y-4">
-        <Link className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-gold-200" to="/">
-          <ArrowLeft className="h-4 w-4" />
-          Voltar para o inicio
-        </Link>
-
         {!firebaseReady && <FirebaseNotice />}
 
-        <Card>
+        <Card className="border-gold-300/20 bg-night-850/95">
           <div className="mb-8 text-center">
-            <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-md bg-gold-400 text-night-950">
+            <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-md border border-gold-300/30 bg-gold-400 text-night-950 shadow-gold">
               <ShieldCheck className="h-8 w-8" />
             </div>
-            <h1 className="text-2xl font-semibold">Acesso admin</h1>
+            <h1 className="font-display text-2xl text-ivory-50">Acesso administrativo</h1>
             <p className="mt-2 text-sm leading-6 text-slate-400">
               {adminConfigured
                 ? 'Entre com a conta admin cadastrada.'
@@ -12179,7 +12664,7 @@ export function AdminAccessPage() {
           )}
         </Card>
       </div>
-    </div>
+    </AuthShell>
   )
 }
 
@@ -12190,11 +12675,11 @@ FIM DO ARQUIVO: src/pages/auth/AdminAccessPage.tsx
 INICIO DO ARQUIVO: src/pages/auth/LoginPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft, Music2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { z } from 'zod'
+import { AuthShell } from '../../components/brand/AuthShell'
 import { FirebaseNotice } from '../../components/FirebaseNotice'
 import { Button, Card, Input } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
@@ -12232,21 +12717,16 @@ export function LoginPage() {
   }
 
   return (
-    <div className="grid min-h-screen place-items-center bg-night-950 px-4 py-10 text-white">
-      <div className="w-full max-w-md space-y-4">
-        <Link className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-gold-200" to="/">
-          <ArrowLeft className="h-4 w-4" />
-          Voltar para o inicio
-        </Link>
-
+    <AuthShell eyebrow="Acesso ao sistema">
+      <div className="mx-auto w-full max-w-md space-y-4">
         {!firebaseReady && <FirebaseNotice />}
-        <Card>
-          <div className="mb-8 text-center">
-            <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-md bg-gold-400 text-night-950">
-              <Music2 className="h-8 w-8" />
-            </div>
-            <h1 className="text-2xl font-semibold">Entrar no Grupo Dvanera</h1>
-            <p className="mt-2 text-sm text-slate-400">Acesse como admin ou cliente.</p>
+        <Card className="border-gold-300/20 bg-night-850/95">
+          <div className="mb-7">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-300">Bem-vindo</p>
+            <h1 className="mt-2 font-display text-3xl text-ivory-50">Entrar no Grupo Dvanera</h1>
+            <p className="mt-2 text-sm leading-6 text-slate-400">
+              Acesse seus orcamentos, eventos e pagamentos.
+            </p>
           </div>
           <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
             <Input error={errors.email?.message} label="E-mail" type="email" {...register('email')} />
@@ -12264,7 +12744,7 @@ export function LoginPage() {
           </p>
         </Card>
       </div>
-    </div>
+    </AuthShell>
   )
 }
 
@@ -12275,11 +12755,12 @@ FIM DO ARQUIVO: src/pages/auth/LoginPage.tsx
 INICIO DO ARQUIVO: src/pages/auth/RegisterPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft, UserPlus } from 'lucide-react'
+import { UserPlus } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { z } from 'zod'
+import { AuthShell } from '../../components/brand/AuthShell'
 import { FirebaseNotice } from '../../components/FirebaseNotice'
 import { Button, Card, Input, Select, Textarea } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
@@ -12320,22 +12801,18 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-night-950 px-4 py-10 text-white">
-      <div className="mx-auto max-w-3xl space-y-4">
-        <Link className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-gold-200" to="/">
-          <ArrowLeft className="h-4 w-4" />
-          Voltar para o inicio
-        </Link>
-
+    <AuthShell eyebrow="Novo cliente">
+      <div className="mx-auto w-full max-w-2xl space-y-4">
         {!firebaseReady && <FirebaseNotice />}
-        <Card>
+        <Card className="border-gold-300/20 bg-night-850/95">
           <div className="mb-8 flex items-center gap-3">
-            <div className="grid h-12 w-12 place-items-center rounded-md bg-gold-400 text-night-950">
+            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-md bg-gold-400 text-night-950">
               <UserPlus className="h-6 w-6" />
             </div>
             <div>
-              <h1 className="text-2xl font-semibold">Cadastro do cliente</h1>
-              <p className="text-sm text-slate-400">Depois do cadastro voce ja pode solicitar orcamento.</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gold-300">Comece por aqui</p>
+              <h1 className="font-display text-2xl text-ivory-50">Cadastro do cliente</h1>
+              <p className="mt-1 text-sm text-slate-400">Crie seu acesso e solicite o primeiro orcamento.</p>
             </div>
           </div>
 
@@ -12366,7 +12843,7 @@ export function RegisterPage() {
           </form>
         </Card>
       </div>
-    </div>
+    </AuthShell>
   )
 }
 
@@ -12380,7 +12857,7 @@ import { CalendarClock, ClipboardList, PlusCircle, WalletCards } from 'lucide-re
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { where } from 'firebase/firestore'
-import { Button, Card, DataTable, StatusBadge } from '../../components/ui'
+import { Button, Card, DataTable, MetricCard, PageHeader, StatusBadge } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
 import type { ClientQuoteView } from '../../types'
@@ -12397,16 +12874,19 @@ export function ClientDashboardPage() {
         label: 'Orcamentos enviados',
         value: quotes.length,
         icon: ClipboardList,
+        tone: 'gold' as const,
       },
       {
         label: 'Aguardando entrada',
         value: quotes.filter((quote) => quote.status === 'aprovado_aguardando_entrada').length,
         icon: WalletCards,
+        tone: 'blue' as const,
       },
       {
         label: 'Eventos agendados',
         value: quotes.filter((quote) => quote.status === 'agendado').length,
         icon: CalendarClock,
+        tone: 'green' as const,
       },
     ],
     [quotes],
@@ -12414,27 +12894,19 @@ export function ClientDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-2xl font-semibold text-white">Resumo</h2>
-          <p className="text-sm text-slate-400">Acompanhe seus orcamentos e pagamentos.</p>
-        </div>
-        <Link to="/cliente/novo-orcamento">
-          <Button icon={<PlusCircle className="h-4 w-4" />}>Novo orcamento</Button>
-        </Link>
-      </div>
+      <PageHeader
+        action={
+          <Link to="/cliente/novo-orcamento">
+            <Button icon={<PlusCircle className="h-4 w-4" />}>Novo orcamento</Button>
+          </Link>
+        }
+        description="Acompanhe seus orcamentos, eventos e pagamentos em um unico lugar."
+        eyebrow="Painel do cliente"
+        title="Seu resumo"
+      />
 
       <div className="grid gap-4 md:grid-cols-3">
-        {stats.map((item) => {
-          const Icon = item.icon
-          return (
-            <Card key={item.label}>
-              <Icon className="mb-4 h-7 w-7 text-gold-300" />
-              <p className="text-3xl font-semibold">{item.value}</p>
-              <p className="mt-1 text-sm text-slate-400">{item.label}</p>
-            </Card>
-          )
-        })}
+        {stats.map((item) => <MetricCard key={item.label} {...item} />)}
       </div>
 
       <Card title="Orcamentos recentes">
@@ -12591,7 +13063,7 @@ import { where } from 'firebase/firestore'
 import { Copy, Send } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Badge, Button, Card, Loading, StatusBadge, Textarea } from '../../components/ui'
+import { Badge, Button, Card, Loading, QuoteTimeline, StatusBadge, Textarea } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
 import { useDocument } from '../../hooks/useDocument'
@@ -12677,6 +13149,9 @@ export function ClientQuoteDetailPage() {
         title={`Orcamento de ${quote.clientSnapshot.name}`}
       >
         <p className="mb-5 rounded-md bg-white/8 p-3 text-sm text-slate-200">{statusMessage(quote.status)}</p>
+        <div className="mb-7 border-b border-white/10 pb-6">
+          <QuoteTimeline status={quote.status} />
+        </div>
         <div className="grid gap-4 md:grid-cols-4">
           <div>
             <p className="text-sm text-slate-400">Total aprovado/estimado</p>
@@ -12844,7 +13319,7 @@ import { doc, serverTimestamp, setDoc, where } from 'firebase/firestore'
 import { ArrowLeft, ArrowRight, Check, Minus, Plus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Card, DateInput, EmptyState, Input, Select, Textarea } from '../../components/ui'
+import { Button, Card, DateInput, EmptyState, Input, PageHeader, Select, Textarea } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
 import { useDocument } from '../../hooks/useDocument'
@@ -12883,6 +13358,8 @@ const emptyEvent: QuoteEvent = {
   estimatedGuests: 0,
   notes: '',
 }
+
+const stepLabels = ['Seus dados', 'Evento', 'Servicos', 'Revisao']
 
 export function NewQuotePage() {
   const { user, profile } = useAuth()
@@ -13023,21 +13500,26 @@ export function NewQuotePage() {
 
   return (
     <div className="space-y-6">
+      <PageHeader
+        description="Preencha as etapas abaixo. Voce podera revisar tudo antes do envio."
+        eyebrow="Nova solicitacao"
+        title="Monte seu orcamento"
+      />
       <Card>
-        <div className="flex flex-wrap items-center gap-2">
-          {[1, 2, 3, 4].map((item) => (
-            <span
-              className={[
-                'rounded-md px-3 py-1.5 text-xs font-semibold ring-1',
-                step === item
-                  ? 'bg-gold-400 text-night-950 ring-gold-300'
-                  : 'bg-white/5 text-slate-300 ring-white/10',
-              ].join(' ')}
-              key={item}
-            >
-              Etapa {item}
-            </span>
-          ))}
+        <div className="grid grid-cols-4 gap-2">
+          {stepLabels.map((label, index) => {
+            const item = index + 1
+            const active = step === item
+            const completed = step > item
+            return (
+              <div className="min-w-0" key={label}>
+                <div className={completed || active ? 'h-1 rounded-full bg-gold-400' : 'h-1 rounded-full bg-white/10'} />
+                <p className={active ? 'mt-2 truncate text-xs font-semibold text-gold-300' : 'mt-2 truncate text-xs text-slate-500'}>
+                  <span className="hidden sm:inline">{item}. </span>{label}
+                </p>
+              </div>
+            )
+          })}
         </div>
       </Card>
 
@@ -13175,64 +13657,118 @@ FIM DO ARQUIVO: src/pages/client/NewQuotePage.tsx
 ----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: src/pages/public/HomePage.tsx
 ----------------------------------------------------------------------------------------------------
-import { ArrowRight, CalendarCheck, ShieldCheck, Sparkles, WalletCards } from 'lucide-react'
+import {
+  ArrowRight,
+  CalendarCheck,
+  CheckCircle2,
+  ClipboardCheck,
+  Headphones,
+  MessageCircle,
+  Music2,
+  ShieldCheck,
+  Sparkles,
+  Users,
+  WalletCards,
+} from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import heroImage from '../../assets/dvanera-hero.jpg'
+import { BrandLogo } from '../../components/brand/BrandLogo'
 import { FirebaseNotice } from '../../components/FirebaseNotice'
-import { Button, Card } from '../../components/ui'
+import { Button } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
+import { getPublicSettings } from '../../services/settingsService'
+import type { PublicSettings } from '../../types'
 
-const highlights = [
+const services = [
   {
-    title: 'Orcamentos guiados',
-    description: 'Cliente informa dados do evento, escolhe servicos e acompanha cada status.',
+    title: 'Show completo',
+    description: 'Repertorio envolvente e estrutura pensada para transformar a pista.',
+    icon: Music2,
+  },
+  {
+    title: 'Experiencia personalizada',
+    description: 'Formato, duracao e servicos alinhados ao estilo do seu evento.',
     icon: Sparkles,
   },
   {
-    title: 'Agenda operacional',
-    description: 'Eventos aprovados entram no calendario depois da confirmacao da entrada.',
-    icon: CalendarCheck,
-  },
-  {
-    title: 'Pix com conferencia manual',
-    description: 'Entrada configuravel, chave Pix publica segura e confirmacao manual pelo admin.',
-    icon: WalletCards,
-  },
-  {
-    title: 'Custos protegidos',
-    description: 'Admin enxerga fornecedores, integrantes, custos e lucro estimado.',
-    icon: ShieldCheck,
+    title: 'Producao integrada',
+    description: 'Organizacao de agenda, equipe e fornecedores em uma unica operacao.',
+    icon: Headphones,
   },
 ]
 
+const steps = [
+  'Informe os dados do evento',
+  'Escolha os servicos',
+  'Envie para analise',
+  'Receba a aprovacao',
+  'Pague a entrada via Pix',
+  'Tenha seu evento confirmado',
+]
+
+const reasons = [
+  'Atendimento organizado do primeiro contato ao evento',
+  'Orcamento transparente e acompanhamento online',
+  'Pagamento Pix com conferencia administrativa',
+  'Agenda e status atualizados em tempo real',
+]
+
+function whatsappUrl(value?: string) {
+  const digits = value?.replace(/\D/g, '')
+  return digits ? `https://wa.me/${digits}` : null
+}
+
 export function HomePage() {
   const { firebaseReady } = useAuth()
+  const [settings, setSettings] = useState<PublicSettings | null>(null)
+
+  useEffect(() => {
+    getPublicSettings().then(setSettings).catch(() => setSettings(null))
+  }, [])
+
+  const whatsapp = whatsappUrl(settings?.whatsapp)
 
   return (
     <div className="min-h-screen bg-night-950 text-white">
-      <Link
-        aria-label="Acessar admin"
-        className="fixed right-4 top-4 z-30 grid h-12 w-12 place-items-center rounded-md border border-white/15 bg-night-950/80 text-gold-200 shadow-soft backdrop-blur transition hover:border-gold-300/70 hover:bg-gold-400 hover:text-night-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-300"
-        title="Acessar admin"
-        to="/admin/acesso"
-      >
-        <ShieldCheck className="h-5 w-5" />
-      </Link>
+      <header className="fixed inset-x-0 top-0 z-30 border-b border-white/10 bg-night-950/80 backdrop-blur-xl">
+        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4 lg:px-8">
+          <Link aria-label="Grupo Dvanera - inicio" to="/">
+            <BrandLogo className="h-16 w-40 sm:w-48" />
+          </Link>
+          <nav className="hidden items-center gap-6 text-sm text-slate-300 md:flex">
+            <a className="transition hover:text-gold-300" href="#sobre">Sobre</a>
+            <a className="transition hover:text-gold-300" href="#servicos">Servicos</a>
+            <a className="transition hover:text-gold-300" href="#como-funciona">Como funciona</a>
+          </nav>
+          <Link
+            aria-label="Acessar painel administrativo"
+            className="grid h-11 w-11 place-items-center rounded-md border border-white/15 bg-white/[0.045] text-gold-300 transition hover:border-gold-300/60 hover:bg-gold-300/10"
+            title="Acessar painel administrativo"
+            to="/admin/acesso"
+          >
+            <ShieldCheck className="h-5 w-5" />
+          </Link>
+        </div>
+      </header>
+
       <section
-        className="relative flex min-h-[92vh] items-center overflow-hidden bg-cover bg-center"
+        className="relative flex min-h-[88vh] items-end overflow-hidden bg-cover bg-center pt-20"
         style={{ backgroundImage: `url(${heroImage})` }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-night-950 via-night-950/72 to-night-950/25" />
-        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-night-950 to-transparent" />
-        <div className="relative mx-auto grid w-full max-w-7xl gap-10 px-4 py-20 lg:grid-cols-[1.1fr_0.9fr] lg:px-8">
-          <div className="max-w-3xl">
-            <p className="mb-4 text-sm font-semibold uppercase tracking-[0.22em] text-gold-300">
-              Gestao de Agenda e Orcamentos
+        <div className="absolute inset-0 bg-black/58" />
+        <div className="relative mx-auto w-full max-w-7xl px-4 pb-16 pt-24 lg:px-8 lg:pb-20">
+          <div className="max-w-3xl animate-fade-up">
+            <BrandLogo className="mb-8 h-28 w-[min(80vw,34rem)]" />
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gold-300">
+              Musica ao vivo para momentos que ficam
             </p>
-            <h1 className="text-5xl font-bold leading-tight text-white md:text-7xl">Grupo Dvanera</h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-200">
-              Um PWA completo para administrar shows, servicos, custos internos, integrantes,
-              fornecedores, pagamentos Pix e a agenda da banda com visual premium.
+            <h1 className="mt-4 max-w-3xl font-display text-4xl leading-[1.08] text-ivory-50 sm:text-5xl lg:text-6xl">
+              Transforme seu evento em uma experiencia inesquecivel
+            </h1>
+            <p className="mt-6 max-w-2xl text-base leading-7 text-slate-200 sm:text-lg">
+              Solicite seu orcamento online, escolha os servicos desejados e acompanhe tudo de
+              forma simples e segura.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link to="/cadastro">
@@ -13250,22 +13786,140 @@ export function HomePage() {
         </div>
       </section>
 
-      <main className="mx-auto -mt-12 max-w-7xl px-4 pb-16 lg:px-8">
-        {!firebaseReady && <div className="mb-6"><FirebaseNotice /></div>}
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {highlights.map((item) => {
-            const Icon = item.icon
+      <main>
+        {!firebaseReady && (
+          <div className="mx-auto max-w-7xl px-4 pt-8 lg:px-8">
+            <FirebaseNotice />
+          </div>
+        )}
 
-            return (
-              <Card className="bg-night-900/90" key={item.title}>
-                <Icon className="mb-4 h-8 w-8 text-gold-300" />
-                <h2 className="text-base font-semibold text-white">{item.title}</h2>
-                <p className="mt-2 text-sm leading-6 text-slate-400">{item.description}</p>
-              </Card>
-            )
-          })}
-        </div>
+        <section className="border-y border-white/10 bg-night-900" id="sobre">
+          <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-300">Sobre</p>
+              <h2 className="mt-3 font-display text-3xl text-ivory-50 sm:text-4xl">Grupo Dvanera</h2>
+            </div>
+            <div className="max-w-3xl">
+              <p className="text-lg leading-8 text-slate-200">
+                Energia de palco, repertorio marcante e uma producao preparada para casamentos,
+                formaturas, eventos empresariais e celebracoes especiais.
+              </p>
+              <div className="mt-8 grid gap-4 sm:grid-cols-3">
+                {[
+                  { label: 'Atendimento', value: 'Proximo', icon: Users },
+                  { label: 'Gestao', value: 'Organizada', icon: ClipboardCheck },
+                  { label: 'Experiencia', value: 'Memoravel', icon: CalendarCheck },
+                ].map(({ label, value, icon: Icon }) => (
+                  <div className="border-l-2 border-gold-400 pl-4" key={label}>
+                    <Icon className="mb-3 h-5 w-5 text-gold-300" />
+                    <p className="font-display text-lg text-ivory-50">{value}</p>
+                    <p className="text-sm text-slate-500">{label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-7xl px-4 py-16 lg:px-8" id="servicos">
+          <div className="max-w-2xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-300">Servicos</p>
+            <h2 className="mt-3 font-display text-3xl text-ivory-50 sm:text-4xl">
+              Uma entrega completa para o seu evento
+            </h2>
+          </div>
+          <div className="mt-10 grid gap-4 md:grid-cols-3">
+            {services.map(({ title, description, icon: Icon }) => (
+              <article
+                className="rounded-lg border border-white/10 bg-night-850 p-6 transition hover:-translate-y-1 hover:border-gold-300/35"
+                key={title}
+              >
+                <div className="grid h-11 w-11 place-items-center rounded-md border border-gold-300/25 bg-gold-300/10 text-gold-300">
+                  <Icon className="h-5 w-5" />
+                </div>
+                <h3 className="mt-5 font-display text-lg text-ivory-50">{title}</h3>
+                <p className="mt-3 text-sm leading-6 text-slate-400">{description}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="border-y border-white/10 bg-night-900" id="como-funciona">
+          <div className="mx-auto max-w-7xl px-4 py-16 lg:px-8">
+            <div className="max-w-2xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-300">Como funciona</p>
+              <h2 className="mt-3 font-display text-3xl text-ivory-50 sm:text-4xl">
+                Do primeiro contato ao evento confirmado
+              </h2>
+            </div>
+            <ol className="mt-10 grid gap-px overflow-hidden rounded-lg border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
+              {steps.map((step, index) => (
+                <li className="min-h-36 bg-night-850 p-5" key={step}>
+                  <span className="text-sm font-semibold text-gold-300">0{index + 1}</span>
+                  <p className="mt-6 max-w-xs font-display text-lg text-ivory-50">{step}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        <section className="mx-auto grid max-w-7xl gap-10 px-4 py-16 lg:grid-cols-2 lg:px-8">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-300">Por que contratar</p>
+            <h2 className="mt-3 font-display text-3xl text-ivory-50 sm:text-4xl">
+              Mais seguranca para voce curtir cada momento
+            </h2>
+          </div>
+          <ul className="grid gap-4">
+            {reasons.map((reason) => (
+              <li className="flex gap-3 border-b border-white/10 pb-4 text-slate-200" key={reason}>
+                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-gold-300" />
+                <span>{reason}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="border-t border-white/10 bg-gold-400 text-night-950">
+          <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-14 sm:flex-row sm:items-center sm:justify-between lg:px-8">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em]">Seu evento comeca aqui</p>
+              <h2 className="mt-2 max-w-2xl font-display text-3xl">
+                Conte sua ideia. O Grupo Dvanera cuida do proximo passo.
+              </h2>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Link to="/cadastro">
+                <Button className="w-full border-night-950 bg-night-950 text-white hover:bg-night-800 sm:w-auto">
+                  Pedir orcamento
+                </Button>
+              </Link>
+              {whatsapp && (
+                <a href={whatsapp} rel="noreferrer" target="_blank">
+                  <Button
+                    className="w-full border-night-950/25 bg-transparent text-night-950 hover:bg-black/10 sm:w-auto"
+                    icon={<MessageCircle className="h-4 w-4" />}
+                    variant="secondary"
+                  >
+                    WhatsApp
+                  </Button>
+                </a>
+              )}
+            </div>
+          </div>
+        </section>
       </main>
+
+      <footer className="border-t border-white/10 bg-night-950">
+        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-8 sm:flex-row sm:items-center sm:justify-between lg:px-8">
+          <BrandLogo className="h-16 w-40" />
+          <div className="flex items-center gap-5 text-xs text-slate-500">
+            <span>Grupo Dvanera</span>
+            <span>Agenda, orcamentos e pagamentos</span>
+            <WalletCards className="h-4 w-4 text-gold-300" />
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
@@ -13278,15 +13932,16 @@ INICIO DO ARQUIVO: src/pages/public/RequestQuotePage.tsx
 ----------------------------------------------------------------------------------------------------
 import { ArrowRight, ClipboardList } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { AuthShell } from '../../components/brand/AuthShell'
 import { Card, Button } from '../../components/ui'
 
 export function RequestQuotePage() {
   return (
-    <div className="min-h-screen bg-night-950 px-4 py-12 text-white">
-      <div className="mx-auto max-w-3xl">
-        <Card>
+    <AuthShell eyebrow="Solicitacao online">
+      <div className="mx-auto max-w-xl">
+        <Card className="border-gold-300/20 bg-night-850/95">
           <ClipboardList className="mb-5 h-10 w-10 text-gold-300" />
-          <h1 className="text-3xl font-semibold">Solicitar orcamento</h1>
+          <h1 className="font-display text-3xl text-ivory-50">Solicitar orcamento</h1>
           <p className="mt-4 leading-7 text-slate-300">
             Para acompanhar status, aprovacao e pagamento Pix com seguranca, crie seu cadastro ou
             entre no painel do cliente. O formulario completo fica em "Novo orcamento" depois do login.
@@ -13305,7 +13960,7 @@ export function RequestQuotePage() {
           </div>
         </Card>
       </div>
-    </div>
+    </AuthShell>
   )
 }
 
@@ -14913,27 +15568,46 @@ export default {
     extend: {
       colors: {
         night: {
-          950: '#05060a',
-          900: '#090b12',
-          850: '#0d111c',
-          800: '#121725',
-          700: '#1d2536',
+          950: '#050505',
+          900: '#0b0c0c',
+          850: '#101211',
+          800: '#171a18',
+          700: '#252a27',
         },
         gold: {
-          50: '#fff8e1',
-          100: '#ffedb2',
-          300: '#ffd166',
-          400: '#f7b731',
-          500: '#d9991d',
-          700: '#8f5c00',
+          50: '#fffaf0',
+          100: '#f9eccb',
+          300: '#e7c66f',
+          400: '#d8aa36',
+          500: '#b98520',
+          700: '#765011',
+        },
+        ivory: {
+          50: '#fbfaf6',
+          100: '#f5f1e7',
+          300: '#d8d1c1',
+        },
+        sage: {
+          300: '#9fb8a7',
+          500: '#5e8069',
         },
       },
       boxShadow: {
-        glow: '0 0 40px rgba(247, 183, 49, 0.12)',
-        soft: '0 22px 70px rgba(0, 0, 0, 0.28)',
+        glow: '0 14px 40px rgba(216, 170, 54, 0.14)',
+        soft: '0 22px 70px rgba(0, 0, 0, 0.34)',
       },
       fontFamily: {
         sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['Arial Black', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
+      keyframes: {
+        'fade-up': {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+      },
+      animation: {
+        'fade-up': 'fade-up 420ms ease-out both',
       },
     },
   },
@@ -15131,6 +15805,40 @@ Resultado: APROVADO.
 ## Conclusao
 
 O fluxo cliente/admin, seguranca, deploy, PWA, performance e limpeza de dados passaram. O projeto esta apto para o primeiro admin definitivo ser criado pelo proprietario.
+
+## 14. Branding e responsividade - 9 de junho de 2026
+
+Resultado: APROVADO LOCALMENTE.
+
+Build equivalente ao GitHub Pages:
+
+```powershell
+$env:VITE_BASE_PATH='/PWA-BANDASHOW/'
+npm run build
+npm run preview -- --host 127.0.0.1 --port 4175
+```
+
+Validacoes:
+
+- home carregou logo oficial, hero e secoes comerciais;
+- desktop sem sobreposicao de navegacao, textos ou botoes;
+- celular sem overflow horizontal;
+- hero manteve CTA e indicio da secao seguinte;
+- login carregou em desktop e celular;
+- botao de retorno para a tela inicial visivel;
+- acesso admin exibiu somente criacao do primeiro admin quando nao configurado;
+- manifest, favicon e icones apontam para os novos assets;
+- console do navegador sem erros na home;
+- logotipo transparente sem fundo quadriculado;
+- `npm run lint`: OK;
+- `npm run build`: OK.
+
+Viewports usados:
+
+```txt
+Desktop: 1280 x 720
+Celular: 390 x 844
+```
 
 ----------------------------------------------------------------------------------------------------
 FIM DO ARQUIVO: TESTES_MANUAIS_PRODUCAO.md
