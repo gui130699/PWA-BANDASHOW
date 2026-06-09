@@ -28,8 +28,12 @@ import {
 } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
-import { createAuditLog } from '../../services/auditService'
-import { getSettings, saveSettings } from '../../services/settingsService'
+import {
+  getPublicSettings,
+  getSettings,
+  publicSettingsAreSynchronized,
+  updateSettings,
+} from '../../services/settingsService'
 import type { AdminOption, AuditLog, PixKeyType, Settings } from '../../types'
 import { brazilianStates, defaultSettings } from '../../utils/constants'
 import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
@@ -136,6 +140,8 @@ function CatalogCard({
 export function AdminSettingsPage() {
   const { user, profile } = useAuth()
   const [settings, setSettings] = useState<Settings>(defaultSettings)
+  const [loadedSettings, setLoadedSettings] = useState<Settings>(defaultSettings)
+  const [publicSettingsSynchronized, setPublicSettingsSynchronized] = useState(false)
   const { data: auditLogs, loading: auditLoading } = useCollection<AuditLog>('auditLogs')
   const [saving, setSaving] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -147,7 +153,15 @@ export function AdminSettingsPage() {
     setLoading(true)
     setFeedback('')
     try {
-      setSettings(await getSettings())
+      const [nextSettings, nextPublicSettings] = await Promise.all([
+        getSettings(),
+        getPublicSettings(),
+      ])
+      setSettings(nextSettings)
+      setLoadedSettings(nextSettings)
+      setPublicSettingsSynchronized(
+        publicSettingsAreSynchronized(nextSettings, nextPublicSettings),
+      )
       setFeedback('Configurações recarregadas.')
     } catch (error) {
       setSettings(defaultSettings)
@@ -181,16 +195,18 @@ export function AdminSettingsPage() {
     setSaving(true)
     setFeedback('')
     try {
-      await saveSettings(settings)
-      await createAuditLog({
-        userId: user?.uid || 'admin',
-        userName: profile?.name || 'Admin',
-        action: 'settings_updated',
-        entity: 'settings',
-        entityId: 'main',
-        description: 'Configurações administrativas e públicas atualizadas.',
-      }).catch(() => undefined)
-      setFeedback('Configurações salvas e dados públicos sincronizados.')
+      const savedSettings = await updateSettings(
+        settings,
+        {
+          userId: user?.uid || 'admin',
+          userName: profile?.name || 'Admin',
+        },
+        loadedSettings,
+      )
+      setSettings(savedSettings)
+      setLoadedSettings(savedSettings)
+      setPublicSettingsSynchronized(true)
+      setFeedback('Configurações salvas com sucesso. Dados públicos sincronizados.')
     } catch (error) {
       setFeedback(getFriendlyFirebaseError(error, 'Não foi possível salvar as configurações.'))
     } finally {
@@ -213,6 +229,14 @@ export function AdminSettingsPage() {
     return normalizeSearch(`${title} ${description} ${keywords}`).includes(normalizedSearch)
   }
   const forceOpen = Boolean(normalizedSearch)
+  const pixComplete = Boolean(
+    settings.pixReceiverName.trim() &&
+      settings.pixKey.trim() &&
+      settings.bankName?.trim() &&
+      settings.defaultDepositPercent >= 1 &&
+      settings.defaultDepositPercent <= 100,
+  )
+  const environment = import.meta.env.PROD ? 'Produção' : 'Desenvolvimento'
 
   return (
     <div className="space-y-6">
@@ -453,18 +477,39 @@ export function AdminSettingsPage() {
 
       {visible('Auditoria e Manutenção', 'Acompanhe ações recentes e status do sistema.', 'logs versão cache deploy públicas') && (
         <AccordionSection
-          badge={<Badge className="bg-emerald-400/15 text-emerald-200 ring-emerald-300/20">Sincronização ativa</Badge>}
+          badge={
+            <Badge
+              className={
+                publicSettingsSynchronized
+                  ? 'bg-emerald-400/15 text-emerald-200 ring-emerald-300/20'
+                  : 'bg-amber-400/15 text-amber-100 ring-amber-300/20'
+              }
+            >
+              {publicSettingsSynchronized ? 'Sincronizado' : 'Atenção'}
+            </Badge>
+          }
           description="Acompanhe ações recentes e status do sistema."
           forceOpen={forceOpen}
           icon={<FileClock className="h-5 w-5" />}
           id="audit-maintenance"
           title="Auditoria e Manutenção"
         >
-          <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+            <div className="rounded-md bg-white/[0.035] p-3 text-sm">
+              <strong className="block text-white">Configuração Pix</strong>
+              <span className={pixComplete ? 'text-emerald-200' : 'text-amber-200'}>
+                {pixComplete ? 'Completa' : 'Incompleta'}
+              </span>
+            </div>
+            <div className="rounded-md bg-white/[0.035] p-3 text-sm">
+              <strong className="block text-white">PublicSettings</strong>
+              <span className={publicSettingsSynchronized ? 'text-emerald-200' : 'text-amber-200'}>
+                {publicSettingsSynchronized ? 'Sincronizado' : 'Não sincronizado'}
+              </span>
+            </div>
             <div className="rounded-md bg-white/[0.035] p-3 text-sm"><strong className="block text-white">Versão</strong><span className="text-slate-400">1.0.0</span></div>
             <div className="rounded-md bg-white/[0.035] p-3 text-sm"><strong className="block text-white">Cache PWA</strong><span className="text-slate-400">grupo-dvanera-v6</span></div>
-            <div className="rounded-md bg-white/[0.035] p-3 text-sm"><strong className="block text-white">Último deploy</strong><span className="text-slate-400">Não documentado</span></div>
-            <div className="rounded-md bg-white/[0.035] p-3 text-sm"><strong className="block text-white">Configurações públicas</strong><span className="text-slate-400">Sincronizadas ao salvar</span></div>
+            <div className="rounded-md bg-white/[0.035] p-3 text-sm"><strong className="block text-white">Ambiente</strong><span className="text-slate-400">{environment}</span></div>
           </div>
           <div className="mb-4 flex justify-end">
             <Button icon={<RefreshCcw className="h-4 w-4" />} onClick={() => void reload()} variant="secondary">

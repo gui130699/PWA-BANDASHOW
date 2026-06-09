@@ -10,6 +10,7 @@ Validações locais executadas:
 - [x] Home carregada em ambiente local
 - [x] Rotas administrativas continuam protegidas e redirecionam para login sem sessão
 - [x] Manifest e service worker preservados
+- [x] Tipagem, lint e build validados após o complemento de conformidade
 
 Roteiro autenticado para homologação:
 
@@ -17,11 +18,15 @@ Roteiro autenticado para homologação:
 - [ ] Tentar cadastrar serviço vazio e confirmar o bloqueio
 - [ ] Cadastrar serviço após revisar o resumo
 - [ ] Editar serviço pelo botão da lista e confirmar abertura da aba Cadastro
+- [ ] Conferir permissão de edição de valor, vínculos e custo interno na lista
 - [ ] Repetir o fluxo em Integrantes
+- [ ] Conferir telefone, e-mail e dados Pix na lista de Integrantes
 - [ ] Criar, editar, desativar e reativar cada cadastro auxiliar
 - [ ] Confirmar que somente opções ativas aparecem nos selects
 - [ ] Salvar cada grupo de Configurações e conferir `settings/main`
 - [ ] Conferir a sincronização segura em `publicSettings/main`
+- [ ] Conferir os logs geral e específicos dos grupos alterados
+- [ ] Conferir os indicadores de Pix, PublicSettings, cache PWA e ambiente
 - [ ] Validar a responsividade das novas telas em sessão administrativa
 
 Os itens autenticados exigem credenciais administrativas e dados reais de homologação. Eles não foram marcados como concluídos sem uma sessão válida.

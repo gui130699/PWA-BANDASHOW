@@ -16,9 +16,9 @@ const serviceCategories = [
   'Som',
   'Iluminação',
   'Transporte',
-  'Cerimonial',
   'Hora extra',
-  'Estrutura adicional',
+  'Estrutura',
+  'Adicional',
   'Outro',
 ]
 
@@ -59,7 +59,17 @@ const members = [
   { name: 'Bateria', role: 'Bateria', defaultPayment: 450 },
 ]
 
-const memberRoles = ['Vocal', 'Sanfona', 'Guitarra', 'Baixo', 'Bateria', 'Percussão', 'Técnico']
+const memberRoles = [
+  'Vocal',
+  'Sanfona',
+  'Guitarra',
+  'Baixo',
+  'Bateria',
+  'Teclado',
+  'Técnico',
+  'Motorista',
+  'Outro',
+]
 
 async function upsertByName(collectionName: string, item: Record<string, unknown>) {
   const existing = await adminDb.collection(collectionName).where('name', '==', item.name).limit(1).get()

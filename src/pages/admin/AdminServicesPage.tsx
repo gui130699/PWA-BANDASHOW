@@ -101,6 +101,12 @@ export function AdminServicesPage() {
     setActiveTab('registration')
   }
 
+  function cancelRegistration() {
+    resetForm()
+    setFeedback('')
+    setActiveTab('access')
+  }
+
   function changeTab(tab: ServicesTab) {
     if (tab === activeTab) return
     if (tab === 'registration') resetForm()
@@ -289,6 +295,10 @@ export function AdminServicesPage() {
   }
 
   function renderServiceFields() {
+    const internalCost =
+      form.supplierLinks.reduce((sum, link) => sum + link.cost, 0) +
+      form.memberCostLinks.reduce((sum, link) => sum + link.cost, 0)
+
     return (
       <>
         <div className="grid gap-4 md:grid-cols-2">
@@ -420,6 +430,14 @@ export function AdminServicesPage() {
             </div>
           </div>
         </div>
+
+        <div className="mt-4 rounded-lg border border-gold-300/20 bg-gold-300/[0.06] p-4">
+          <p className="text-sm text-slate-400">Custo interno padrão vinculado</p>
+          <p className="mt-1 text-xl font-semibold text-gold-200">{formatCurrency(internalCost)}</p>
+          <p className="mt-1 text-xs text-slate-500">
+            Soma dos custos de fornecedores e integrantes vinculados ao serviço.
+          </p>
+        </div>
       </>
     )
   }
@@ -453,7 +471,7 @@ export function AdminServicesPage() {
               : 'Esta área é exclusiva para novos cadastros. Campos com * são obrigatórios.'
           }
           role="tabpanel"
-          title={editingId ? 'Editar serviço' : 'Novo cadastro de serviço'}
+          title={editingId ? 'Editar serviço' : 'Cadastrar serviço'}
         >
           {renderServiceFields()}
           <div className="mt-6 flex flex-wrap gap-3">
@@ -462,7 +480,10 @@ export function AdminServicesPage() {
               isLoading={saving}
               onClick={editingId ? () => void saveEdit() : requestCreate}
             >
-              {editingId ? 'Salvar alterações' : 'Revisar e cadastrar serviço'}
+              {editingId ? 'Atualizar serviço' : 'Salvar serviço'}
+            </Button>
+            <Button onClick={cancelRegistration} variant="secondary">
+              {editingId ? 'Cancelar edição' : 'Cancelar'}
             </Button>
             <Button icon={<RotateCcw className="h-4 w-4" />} onClick={resetForm} variant="secondary">
               Limpar formulário
@@ -521,8 +542,20 @@ export function AdminServicesPage() {
               { header: 'Serviço', cell: (service) => service.name },
               { header: 'Tipo', cell: (service) => service.category },
               { header: 'Valor', cell: (service) => formatCurrency(service.basePrice) },
+              {
+                header: 'Edição de valor',
+                cell: (service) => (service.allowPriceEdit ? 'Permitida' : 'Bloqueada'),
+              },
               { header: 'Fornecedores', cell: (service) => service.supplierLinks?.length || 0 },
               { header: 'Integrantes', cell: (service) => service.memberCostLinks?.length || 0 },
+              {
+                header: 'Custo interno',
+                cell: (service) =>
+                  formatCurrency(
+                    (service.supplierLinks || []).reduce((sum, link) => sum + link.cost, 0) +
+                      (service.memberCostLinks || []).reduce((sum, link) => sum + link.cost, 0),
+                  ),
+              },
               { header: 'Atualização', cell: (service) => formatDate(service.updatedAt || service.createdAt) },
               {
                 header: 'Status',

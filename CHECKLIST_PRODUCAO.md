@@ -9,6 +9,9 @@ Validação final executada em 8 de junho de 2026.
 - [x] Botões de edição carregam o registro na aba Cadastro
 - [x] Cadastros vazios bloqueados
 - [x] Resumo de confirmação antes de novos cadastros
+- [x] Botões Salvar e Cancelar separados do fluxo de consulta
+- [x] Serviços exibem permissão de edição de valor e custo interno
+- [x] Integrantes exibem contatos e dados Pix na consulta administrativa
 - [x] Categorias de serviços no Firestore
 - [x] Tipos de fornecedores no Firestore
 - [x] Funções de integrantes no Firestore
@@ -16,6 +19,9 @@ Validação final executada em 8 de junho de 2026.
 - [x] Regras de leitura e escrita dos cadastros auxiliares
 - [x] Configurações organizadas em oito seções recolhíveis
 - [x] Sincronização segura com `publicSettings/main`
+- [x] Salvamento centralizado em `settingsService.updateSettings()`
+- [x] Auditoria geral e por grupo de configuração alterado
+- [x] Indicadores de Pix, sincronização pública, cache e ambiente
 - [x] Revisão textual PT-BR
 - [x] `npm run check:text`
 

@@ -95,6 +95,12 @@ export function AdminMembersPage() {
     setActiveTab('registration')
   }
 
+  function cancelRegistration() {
+    resetForm()
+    setFeedback('')
+    setActiveTab('access')
+  }
+
   function changeTab(tab: MembersTab) {
     if (tab === activeTab) return
     if (tab === 'registration') resetForm()
@@ -327,7 +333,7 @@ export function AdminMembersPage() {
               : 'Esta área é exclusiva para novos cadastros. Campos com * são obrigatórios.'
           }
           role="tabpanel"
-          title={editingId ? 'Editar integrante' : 'Novo cadastro de integrante'}
+          title={editingId ? 'Editar integrante' : 'Cadastrar integrante'}
         >
           {renderMemberFields()}
           <div className="mt-6 flex flex-wrap gap-3">
@@ -336,7 +342,10 @@ export function AdminMembersPage() {
               isLoading={saving}
               onClick={editingId ? () => void saveEdit() : requestCreate}
             >
-              {editingId ? 'Salvar alterações' : 'Revisar e cadastrar integrante'}
+              {editingId ? 'Atualizar integrante' : 'Salvar integrante'}
+            </Button>
+            <Button onClick={cancelRegistration} variant="secondary">
+              {editingId ? 'Cancelar edição' : 'Cancelar'}
             </Button>
             <Button icon={<RotateCcw className="h-4 w-4" />} onClick={resetForm} variant="secondary">
               Limpar formulário
@@ -394,7 +403,24 @@ export function AdminMembersPage() {
                 ),
               },
               { header: 'Função', cell: (member) => member.role },
-              { header: 'Contato', cell: (member) => member.phone || member.email || '-' },
+              {
+                header: 'Contato',
+                cell: (member) => (
+                  <div>
+                    <p>{member.phone || 'Telefone não informado'}</p>
+                    <p className="text-xs text-slate-400">{member.email || 'E-mail não informado'}</p>
+                  </div>
+                ),
+              },
+              {
+                header: 'Pix',
+                cell: (member) => (
+                  <div>
+                    <p className="max-w-48 break-all">{member.pixKey || 'Não informado'}</p>
+                    <p className="text-xs uppercase text-slate-400">{member.pixKeyType || '-'}</p>
+                  </div>
+                ),
+              },
               { header: 'Pagamento padrão', cell: (member) => formatCurrency(member.defaultPayment) },
               {
                 header: 'Total pago',

@@ -53,6 +53,8 @@ As páginas de Serviços e Integrantes possuem duas áreas internas bem separada
 - novos cadastros exigem campos obrigatórios e uma confirmação com resumo;
 - após salvar, a interface retorna automaticamente para Acesso.
 
+Em Serviços, a consulta também informa permissão de edição do valor, vínculos e custo interno padrão. Em Integrantes, a listagem administrativa reúne telefone, e-mail, chave e tipo de chave Pix, valor padrão e ações relacionadas.
+
 Os cadastros auxiliares são mantidos no Firestore e podem ser gerenciados nos formulários ou em Configurações:
 
 ```txt
@@ -77,7 +79,7 @@ A página `/admin/configuracoes` organiza os dados em oito seções recolhíveis
 - Segurança e Administração
 - Auditoria e Manutenção
 
-Ao salvar `settings/main`, somente os campos públicos seguros são sincronizados em `publicSettings/main`.
+O salvamento é centralizado em `settingsService.updateSettings()`: atualiza `settings/main`, sincroniza somente os campos públicos seguros em `publicSettings/main` e registra auditoria geral e por grupo alterado. A área de manutenção mostra o estado da configuração Pix, da sincronização pública, do cache PWA e do ambiente.
 
 ## Instalar e rodar
 

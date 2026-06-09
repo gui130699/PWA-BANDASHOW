@@ -4,9 +4,11 @@
 
 Foi concluída a reorganização das páginas de Serviços e Integrantes em abas internas de Acesso e Cadastro. A edição deixou de abrir um modal separado e agora carrega o registro na aba Cadastro, com retorno automático para Acesso após salvar.
 
+O complemento final de conformidade separou de forma explícita consulta e formulário, adicionou ações de cancelamento, manteve a confirmação resumida antes da criação e ampliou as listas administrativas. Serviços agora exibem permissão de edição do valor e custo interno vinculado; Integrantes exibem contatos e dados Pix permitidos ao administrador.
+
 Foram criados quatro cadastros auxiliares no Firestore: `serviceCategories`, `supplierTypes`, `memberRoles` e `eventTypes`. Os formulários usam somente opções ativas, preservam valores históricos durante edições e registram as alterações em `auditLogs`.
 
-A página de Configurações foi reorganizada em oito seções recolhíveis, com busca, recarga, feedback, gerenciamento dos cadastros auxiliares e sincronização restrita de dados públicos em `publicSettings/main`.
+A página de Configurações foi reorganizada em oito seções recolhíveis, com busca, recarga, feedback, gerenciamento dos cadastros auxiliares e sincronização restrita de dados públicos em `publicSettings/main`. O serviço centralizado de configurações registra auditoria geral e por grupo alterado, enquanto a área de manutenção informa o estado do Pix, da sincronização pública, do cache PWA e do ambiente.
 
 A interface, os documentos e os metadados foram revisados em português brasileiro. O projeto recebeu o comando `npm run check:text` e o arquivo `CHECKLIST_ORTOGRAFIA_PTBR.md`.
 

@@ -1,7 +1,7 @@
 DOCUMENTACAO COMPLETA DO PROJETO - PWA-BANDASHOW / GRUPO DVANERA
 Gerado automaticamente para leitura, manutencao, auditoria tecnica e backup.
-Data de geracao: 2026-06-09 11:36:05 - America/Sao_Paulo
-Commit base documentado: 99df68c
+Data de geracao: 2026-06-09 11:54:33 - America/Sao_Paulo
+Commit base documentado: 5a5e10f
 Pasta local: C:\Users\guilh\OneDrive\HP Guilherme Notebook\Área de Trabalho\PWA- Everton
 Repositorio: https://github.com/gui130699/PWA-BANDASHOW.git
 Pages: https://gui130699.github.io/PWA-BANDASHOW/
@@ -374,6 +374,9 @@ Validação final executada em 8 de junho de 2026.
 - [x] Botões de edição carregam o registro na aba Cadastro
 - [x] Cadastros vazios bloqueados
 - [x] Resumo de confirmação antes de novos cadastros
+- [x] Botões Salvar e Cancelar separados do fluxo de consulta
+- [x] Serviços exibem permissão de edição de valor e custo interno
+- [x] Integrantes exibem contatos e dados Pix na consulta administrativa
 - [x] Categorias de serviços no Firestore
 - [x] Tipos de fornecedores no Firestore
 - [x] Funções de integrantes no Firestore
@@ -381,6 +384,9 @@ Validação final executada em 8 de junho de 2026.
 - [x] Regras de leitura e escrita dos cadastros auxiliares
 - [x] Configurações organizadas em oito seções recolhíveis
 - [x] Sincronização segura com `publicSettings/main`
+- [x] Salvamento centralizado em `settingsService.updateSettings()`
+- [x] Auditoria geral e por grupo de configuração alterado
+- [x] Indicadores de Pix, sincronização pública, cache e ambiente
 - [x] Revisão textual PT-BR
 - [x] `npm run check:text`
 
@@ -8454,6 +8460,8 @@ As páginas de Serviços e Integrantes possuem duas áreas internas bem separada
 - novos cadastros exigem campos obrigatórios e uma confirmação com resumo;
 - após salvar, a interface retorna automaticamente para Acesso.
 
+Em Serviços, a consulta também informa permissão de edição do valor, vínculos e custo interno padrão. Em Integrantes, a listagem administrativa reúne telefone, e-mail, chave e tipo de chave Pix, valor padrão e ações relacionadas.
+
 Os cadastros auxiliares são mantidos no Firestore e podem ser gerenciados nos formulários ou em Configurações:
 
 ```txt
@@ -8478,7 +8486,7 @@ A página `/admin/configuracoes` organiza os dados em oito seções recolhíveis
 - Segurança e Administração
 - Auditoria e Manutenção
 
-Ao salvar `settings/main`, somente os campos públicos seguros são sincronizados em `publicSettings/main`.
+O salvamento é centralizado em `settingsService.updateSettings()`: atualiza `settings/main`, sincroniza somente os campos públicos seguros em `publicSettings/main` e registra auditoria geral e por grupo alterado. A área de manutenção mostra o estado da configuração Pix, da sincronização pública, do cache PWA e do ambiente.
 
 ## Instalar e rodar
 
@@ -8809,9 +8817,11 @@ INICIO DO ARQUIVO: RELATORIO_FINAL_PRODUCAO.md
 
 Foi concluída a reorganização das páginas de Serviços e Integrantes em abas internas de Acesso e Cadastro. A edição deixou de abrir um modal separado e agora carrega o registro na aba Cadastro, com retorno automático para Acesso após salvar.
 
+O complemento final de conformidade separou de forma explícita consulta e formulário, adicionou ações de cancelamento, manteve a confirmação resumida antes da criação e ampliou as listas administrativas. Serviços agora exibem permissão de edição do valor e custo interno vinculado; Integrantes exibem contatos e dados Pix permitidos ao administrador.
+
 Foram criados quatro cadastros auxiliares no Firestore: `serviceCategories`, `supplierTypes`, `memberRoles` e `eventTypes`. Os formulários usam somente opções ativas, preservam valores históricos durante edições e registram as alterações em `auditLogs`.
 
-A página de Configurações foi reorganizada em oito seções recolhíveis, com busca, recarga, feedback, gerenciamento dos cadastros auxiliares e sincronização restrita de dados públicos em `publicSettings/main`.
+A página de Configurações foi reorganizada em oito seções recolhíveis, com busca, recarga, feedback, gerenciamento dos cadastros auxiliares e sincronização restrita de dados públicos em `publicSettings/main`. O serviço centralizado de configurações registra auditoria geral e por grupo alterado, enquanto a área de manutenção informa o estado do Pix, da sincronização pública, do cache PWA e do ambiente.
 
 A interface, os documentos e os metadados foram revisados em português brasileiro. O projeto recebeu o comando `npm run check:text` e o arquivo `CHECKLIST_ORTOGRAFIA_PTBR.md`.
 
@@ -9452,9 +9462,9 @@ const serviceCategories = [
   'Som',
   'Iluminação',
   'Transporte',
-  'Cerimonial',
   'Hora extra',
-  'Estrutura adicional',
+  'Estrutura',
+  'Adicional',
   'Outro',
 ]
 
@@ -9495,7 +9505,17 @@ const members = [
   { name: 'Bateria', role: 'Bateria', defaultPayment: 450 },
 ]
 
-const memberRoles = ['Vocal', 'Sanfona', 'Guitarra', 'Baixo', 'Bateria', 'Percussão', 'Técnico']
+const memberRoles = [
+  'Vocal',
+  'Sanfona',
+  'Guitarra',
+  'Baixo',
+  'Bateria',
+  'Teclado',
+  'Técnico',
+  'Motorista',
+  'Outro',
+]
 
 async function upsertByName(collectionName: string, item: Record<string, unknown>) {
   const existing = await adminDb.collection(collectionName).where('name', '==', item.name).limit(1).get()
@@ -12073,6 +12093,12 @@ export function AdminMembersPage() {
     setActiveTab('registration')
   }
 
+  function cancelRegistration() {
+    resetForm()
+    setFeedback('')
+    setActiveTab('access')
+  }
+
   function changeTab(tab: MembersTab) {
     if (tab === activeTab) return
     if (tab === 'registration') resetForm()
@@ -12305,7 +12331,7 @@ export function AdminMembersPage() {
               : 'Esta área é exclusiva para novos cadastros. Campos com * são obrigatórios.'
           }
           role="tabpanel"
-          title={editingId ? 'Editar integrante' : 'Novo cadastro de integrante'}
+          title={editingId ? 'Editar integrante' : 'Cadastrar integrante'}
         >
           {renderMemberFields()}
           <div className="mt-6 flex flex-wrap gap-3">
@@ -12314,7 +12340,10 @@ export function AdminMembersPage() {
               isLoading={saving}
               onClick={editingId ? () => void saveEdit() : requestCreate}
             >
-              {editingId ? 'Salvar alterações' : 'Revisar e cadastrar integrante'}
+              {editingId ? 'Atualizar integrante' : 'Salvar integrante'}
+            </Button>
+            <Button onClick={cancelRegistration} variant="secondary">
+              {editingId ? 'Cancelar edição' : 'Cancelar'}
             </Button>
             <Button icon={<RotateCcw className="h-4 w-4" />} onClick={resetForm} variant="secondary">
               Limpar formulário
@@ -12372,7 +12401,24 @@ export function AdminMembersPage() {
                 ),
               },
               { header: 'Função', cell: (member) => member.role },
-              { header: 'Contato', cell: (member) => member.phone || member.email || '-' },
+              {
+                header: 'Contato',
+                cell: (member) => (
+                  <div>
+                    <p>{member.phone || 'Telefone não informado'}</p>
+                    <p className="text-xs text-slate-400">{member.email || 'E-mail não informado'}</p>
+                  </div>
+                ),
+              },
+              {
+                header: 'Pix',
+                cell: (member) => (
+                  <div>
+                    <p className="max-w-48 break-all">{member.pixKey || 'Não informado'}</p>
+                    <p className="text-xs uppercase text-slate-400">{member.pixKeyType || '-'}</p>
+                  </div>
+                ),
+              },
               { header: 'Pagamento padrão', cell: (member) => formatCurrency(member.defaultPayment) },
               {
                 header: 'Total pago',
@@ -13113,6 +13159,12 @@ export function AdminServicesPage() {
     setActiveTab('registration')
   }
 
+  function cancelRegistration() {
+    resetForm()
+    setFeedback('')
+    setActiveTab('access')
+  }
+
   function changeTab(tab: ServicesTab) {
     if (tab === activeTab) return
     if (tab === 'registration') resetForm()
@@ -13301,6 +13353,10 @@ export function AdminServicesPage() {
   }
 
   function renderServiceFields() {
+    const internalCost =
+      form.supplierLinks.reduce((sum, link) => sum + link.cost, 0) +
+      form.memberCostLinks.reduce((sum, link) => sum + link.cost, 0)
+
     return (
       <>
         <div className="grid gap-4 md:grid-cols-2">
@@ -13432,6 +13488,14 @@ export function AdminServicesPage() {
             </div>
           </div>
         </div>
+
+        <div className="mt-4 rounded-lg border border-gold-300/20 bg-gold-300/[0.06] p-4">
+          <p className="text-sm text-slate-400">Custo interno padrão vinculado</p>
+          <p className="mt-1 text-xl font-semibold text-gold-200">{formatCurrency(internalCost)}</p>
+          <p className="mt-1 text-xs text-slate-500">
+            Soma dos custos de fornecedores e integrantes vinculados ao serviço.
+          </p>
+        </div>
       </>
     )
   }
@@ -13465,7 +13529,7 @@ export function AdminServicesPage() {
               : 'Esta área é exclusiva para novos cadastros. Campos com * são obrigatórios.'
           }
           role="tabpanel"
-          title={editingId ? 'Editar serviço' : 'Novo cadastro de serviço'}
+          title={editingId ? 'Editar serviço' : 'Cadastrar serviço'}
         >
           {renderServiceFields()}
           <div className="mt-6 flex flex-wrap gap-3">
@@ -13474,7 +13538,10 @@ export function AdminServicesPage() {
               isLoading={saving}
               onClick={editingId ? () => void saveEdit() : requestCreate}
             >
-              {editingId ? 'Salvar alterações' : 'Revisar e cadastrar serviço'}
+              {editingId ? 'Atualizar serviço' : 'Salvar serviço'}
+            </Button>
+            <Button onClick={cancelRegistration} variant="secondary">
+              {editingId ? 'Cancelar edição' : 'Cancelar'}
             </Button>
             <Button icon={<RotateCcw className="h-4 w-4" />} onClick={resetForm} variant="secondary">
               Limpar formulário
@@ -13533,8 +13600,20 @@ export function AdminServicesPage() {
               { header: 'Serviço', cell: (service) => service.name },
               { header: 'Tipo', cell: (service) => service.category },
               { header: 'Valor', cell: (service) => formatCurrency(service.basePrice) },
+              {
+                header: 'Edição de valor',
+                cell: (service) => (service.allowPriceEdit ? 'Permitida' : 'Bloqueada'),
+              },
               { header: 'Fornecedores', cell: (service) => service.supplierLinks?.length || 0 },
               { header: 'Integrantes', cell: (service) => service.memberCostLinks?.length || 0 },
+              {
+                header: 'Custo interno',
+                cell: (service) =>
+                  formatCurrency(
+                    (service.supplierLinks || []).reduce((sum, link) => sum + link.cost, 0) +
+                      (service.memberCostLinks || []).reduce((sum, link) => sum + link.cost, 0),
+                  ),
+              },
               { header: 'Atualização', cell: (service) => formatDate(service.updatedAt || service.createdAt) },
               {
                 header: 'Status',
@@ -13654,8 +13733,12 @@ import {
 } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
-import { createAuditLog } from '../../services/auditService'
-import { getSettings, saveSettings } from '../../services/settingsService'
+import {
+  getPublicSettings,
+  getSettings,
+  publicSettingsAreSynchronized,
+  updateSettings,
+} from '../../services/settingsService'
 import type { AdminOption, AuditLog, PixKeyType, Settings } from '../../types'
 import { brazilianStates, defaultSettings } from '../../utils/constants'
 import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
@@ -13762,6 +13845,8 @@ function CatalogCard({
 export function AdminSettingsPage() {
   const { user, profile } = useAuth()
   const [settings, setSettings] = useState<Settings>(defaultSettings)
+  const [loadedSettings, setLoadedSettings] = useState<Settings>(defaultSettings)
+  const [publicSettingsSynchronized, setPublicSettingsSynchronized] = useState(false)
   const { data: auditLogs, loading: auditLoading } = useCollection<AuditLog>('auditLogs')
   const [saving, setSaving] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -13773,7 +13858,15 @@ export function AdminSettingsPage() {
     setLoading(true)
     setFeedback('')
     try {
-      setSettings(await getSettings())
+      const [nextSettings, nextPublicSettings] = await Promise.all([
+        getSettings(),
+        getPublicSettings(),
+      ])
+      setSettings(nextSettings)
+      setLoadedSettings(nextSettings)
+      setPublicSettingsSynchronized(
+        publicSettingsAreSynchronized(nextSettings, nextPublicSettings),
+      )
       setFeedback('Configurações recarregadas.')
     } catch (error) {
       setSettings(defaultSettings)
@@ -13807,16 +13900,18 @@ export function AdminSettingsPage() {
     setSaving(true)
     setFeedback('')
     try {
-      await saveSettings(settings)
-      await createAuditLog({
-        userId: user?.uid || 'admin',
-        userName: profile?.name || 'Admin',
-        action: 'settings_updated',
-        entity: 'settings',
-        entityId: 'main',
-        description: 'Configurações administrativas e públicas atualizadas.',
-      }).catch(() => undefined)
-      setFeedback('Configurações salvas e dados públicos sincronizados.')
+      const savedSettings = await updateSettings(
+        settings,
+        {
+          userId: user?.uid || 'admin',
+          userName: profile?.name || 'Admin',
+        },
+        loadedSettings,
+      )
+      setSettings(savedSettings)
+      setLoadedSettings(savedSettings)
+      setPublicSettingsSynchronized(true)
+      setFeedback('Configurações salvas com sucesso. Dados públicos sincronizados.')
     } catch (error) {
       setFeedback(getFriendlyFirebaseError(error, 'Não foi possível salvar as configurações.'))
     } finally {
@@ -13839,6 +13934,14 @@ export function AdminSettingsPage() {
     return normalizeSearch(`${title} ${description} ${keywords}`).includes(normalizedSearch)
   }
   const forceOpen = Boolean(normalizedSearch)
+  const pixComplete = Boolean(
+    settings.pixReceiverName.trim() &&
+      settings.pixKey.trim() &&
+      settings.bankName?.trim() &&
+      settings.defaultDepositPercent >= 1 &&
+      settings.defaultDepositPercent <= 100,
+  )
+  const environment = import.meta.env.PROD ? 'Produção' : 'Desenvolvimento'
 
   return (
     <div className="space-y-6">
@@ -14079,18 +14182,39 @@ export function AdminSettingsPage() {
 
       {visible('Auditoria e Manutenção', 'Acompanhe ações recentes e status do sistema.', 'logs versão cache deploy públicas') && (
         <AccordionSection
-          badge={<Badge className="bg-emerald-400/15 text-emerald-200 ring-emerald-300/20">Sincronização ativa</Badge>}
+          badge={
+            <Badge
+              className={
+                publicSettingsSynchronized
+                  ? 'bg-emerald-400/15 text-emerald-200 ring-emerald-300/20'
+                  : 'bg-amber-400/15 text-amber-100 ring-amber-300/20'
+              }
+            >
+              {publicSettingsSynchronized ? 'Sincronizado' : 'Atenção'}
+            </Badge>
+          }
           description="Acompanhe ações recentes e status do sistema."
           forceOpen={forceOpen}
           icon={<FileClock className="h-5 w-5" />}
           id="audit-maintenance"
           title="Auditoria e Manutenção"
         >
-          <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+            <div className="rounded-md bg-white/[0.035] p-3 text-sm">
+              <strong className="block text-white">Configuração Pix</strong>
+              <span className={pixComplete ? 'text-emerald-200' : 'text-amber-200'}>
+                {pixComplete ? 'Completa' : 'Incompleta'}
+              </span>
+            </div>
+            <div className="rounded-md bg-white/[0.035] p-3 text-sm">
+              <strong className="block text-white">PublicSettings</strong>
+              <span className={publicSettingsSynchronized ? 'text-emerald-200' : 'text-amber-200'}>
+                {publicSettingsSynchronized ? 'Sincronizado' : 'Não sincronizado'}
+              </span>
+            </div>
             <div className="rounded-md bg-white/[0.035] p-3 text-sm"><strong className="block text-white">Versão</strong><span className="text-slate-400">1.0.0</span></div>
             <div className="rounded-md bg-white/[0.035] p-3 text-sm"><strong className="block text-white">Cache PWA</strong><span className="text-slate-400">grupo-dvanera-v6</span></div>
-            <div className="rounded-md bg-white/[0.035] p-3 text-sm"><strong className="block text-white">Último deploy</strong><span className="text-slate-400">Não documentado</span></div>
-            <div className="rounded-md bg-white/[0.035] p-3 text-sm"><strong className="block text-white">Configurações públicas</strong><span className="text-slate-400">Sincronizadas ao salvar</span></div>
+            <div className="rounded-md bg-white/[0.035] p-3 text-sm"><strong className="block text-white">Ambiente</strong><span className="text-slate-400">{environment}</span></div>
           </div>
           <div className="mb-4 flex justify-end">
             <Button icon={<RefreshCcw className="h-4 w-4" />} onClick={() => void reload()} variant="secondary">
@@ -16829,6 +16953,79 @@ import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { requireDb } from '../lib/firebase'
 import type { PublicSettings, Settings } from '../types'
 import { defaultSettings } from '../utils/constants'
+import { createAuditLog } from './auditService'
+
+export type SettingsActor = {
+  userId: string
+  userName: string
+}
+
+const auditGroups: Array<{
+  action: string
+  description: string
+  keys: Array<keyof Settings>
+}> = [
+  {
+    action: 'band_settings_updated',
+    description: 'Dados da banda atualizados.',
+    keys: ['bandName', 'whatsapp', 'email', 'instagram', 'city', 'state', 'shortDescription', 'aboutText'],
+  },
+  {
+    action: 'pix_settings_updated',
+    description: 'Pix atualizado.',
+    keys: [
+      'pixReceiverName',
+      'pixKey',
+      'pixKeyType',
+      'bankName',
+      'defaultDepositPercent',
+      'paymentInstructions',
+      'paymentWarningMessage',
+    ],
+  },
+  {
+    action: 'quote_rules_updated',
+    description: 'Regras de orçamento atualizadas.',
+    keys: [
+      'quoteValidityDays',
+      'allowManualDiscount',
+      'allowTravelFee',
+      'showEstimatedValueBeforeApproval',
+      'allowClientNotes',
+      'quoteSubmittedMessage',
+      'quoteApprovedMessage',
+      'quoteRejectedMessage',
+      'quoteCanceledMessage',
+    ],
+  },
+  {
+    action: 'automatic_messages_updated',
+    description: 'Mensagens automáticas atualizadas.',
+    keys: ['messages'],
+  },
+  {
+    action: 'appearance_settings_updated',
+    description: 'Aparência atualizada.',
+    keys: [
+      'homeTitle',
+      'homeSubtitle',
+      'homePrimaryButtonText',
+      'homeSecondaryButtonText',
+      'useHeroImage',
+      'heroImagePath',
+      'logoPath',
+      'brandAccentColor',
+    ],
+  },
+]
+
+function valuesDiffer(
+  previous: Settings,
+  next: Settings,
+  keys: Array<keyof Settings>,
+) {
+  return keys.some((key) => JSON.stringify(previous[key]) !== JSON.stringify(next[key]))
+}
 
 export async function getSettings(): Promise<Settings> {
   const database = requireDb()
@@ -16841,28 +17038,67 @@ export async function getSettings(): Promise<Settings> {
   return { ...defaultSettings, ...snapshot.data() } as Settings
 }
 
-export async function saveSettings(settings: Settings) {
+export async function syncPublicSettings(settings: Settings) {
   const database = requireDb()
-  const updatedAt = serverTimestamp()
+  await setDoc(
+    doc(database, 'publicSettings', 'main'),
+    {
+      ...toPublicSettings(settings),
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true },
+  )
+}
 
-  await Promise.all([
-    setDoc(
-      doc(database, 'settings', 'main'),
+export async function updateSettings(
+  data: Partial<Settings>,
+  actor?: SettingsActor,
+  previousSettings?: Settings,
+) {
+  const database = requireDb()
+  const previous = previousSettings || (await getSettings())
+  const next = { ...previous, ...data }
+
+  await setDoc(
+    doc(database, 'settings', 'main'),
+    {
+      ...next,
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true },
+  )
+  await syncPublicSettings(next)
+
+  if (actor) {
+    const logs = [
       {
-        ...settings,
-        updatedAt,
+        action: 'settings_updated',
+        description: 'Configurações atualizadas.',
       },
-      { merge: true },
-    ),
-    setDoc(
-      doc(database, 'publicSettings', 'main'),
-      {
-        ...toPublicSettings(settings),
-        updatedAt,
-      },
-      { merge: true },
-    ),
-  ])
+      ...auditGroups
+        .filter((group) => valuesDiffer(previous, next, group.keys))
+        .map(({ action, description }) => ({ action, description })),
+    ]
+
+    await Promise.all(
+      logs.map((log) =>
+        createAuditLog({
+          userId: actor.userId,
+          userName: actor.userName,
+          action: log.action,
+          entity: 'settings',
+          entityId: 'main',
+          description: log.description,
+        }),
+      ),
+    )
+  }
+
+  return next
+}
+
+export async function saveSettings(settings: Settings) {
+  return updateSettings(settings)
 }
 
 export async function getPublicSettings(): Promise<PublicSettings> {
@@ -16874,6 +17110,20 @@ export async function getPublicSettings(): Promise<PublicSettings> {
   }
 
   return { ...toPublicSettings(defaultSettings), ...snapshot.data() } as PublicSettings
+}
+
+export function publicSettingsAreSynchronized(
+  settings: Settings,
+  publicSettings: PublicSettings,
+) {
+  const expected = toPublicSettings(settings)
+  const comparableKeys = Object.keys(expected).filter((key) => key !== 'updatedAt') as Array<
+    keyof PublicSettings
+  >
+
+  return comparableKeys.every(
+    (key) => JSON.stringify(expected[key]) === JSON.stringify(publicSettings[key]),
+  )
 }
 
 export function toPublicSettings(settings: Settings): PublicSettings {
@@ -17653,6 +17903,7 @@ Validações locais executadas:
 - [x] Home carregada em ambiente local
 - [x] Rotas administrativas continuam protegidas e redirecionam para login sem sessão
 - [x] Manifest e service worker preservados
+- [x] Tipagem, lint e build validados após o complemento de conformidade
 
 Roteiro autenticado para homologação:
 
@@ -17660,11 +17911,15 @@ Roteiro autenticado para homologação:
 - [ ] Tentar cadastrar serviço vazio e confirmar o bloqueio
 - [ ] Cadastrar serviço após revisar o resumo
 - [ ] Editar serviço pelo botão da lista e confirmar abertura da aba Cadastro
+- [ ] Conferir permissão de edição de valor, vínculos e custo interno na lista
 - [ ] Repetir o fluxo em Integrantes
+- [ ] Conferir telefone, e-mail e dados Pix na lista de Integrantes
 - [ ] Criar, editar, desativar e reativar cada cadastro auxiliar
 - [ ] Confirmar que somente opções ativas aparecem nos selects
 - [ ] Salvar cada grupo de Configurações e conferir `settings/main`
 - [ ] Conferir a sincronização segura em `publicSettings/main`
+- [ ] Conferir os logs geral e específicos dos grupos alterados
+- [ ] Conferir os indicadores de Pix, PublicSettings, cache PWA e ambiente
 - [ ] Validar a responsividade das novas telas em sessão administrativa
 
 Os itens autenticados exigem credenciais administrativas e dados reais de homologação. Eles não foram marcados como concluídos sem uma sessão válida.
