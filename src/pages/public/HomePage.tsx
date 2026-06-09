@@ -24,34 +24,34 @@ import type { PublicSettings } from '../../types'
 const services = [
   {
     title: 'Show completo',
-    description: 'Repertorio envolvente e estrutura pensada para transformar a pista.',
+    description: 'Repertório envolvente e estrutura pensada para transformar a pista.',
     icon: Music2,
   },
   {
-    title: 'Experiencia personalizada',
-    description: 'Formato, duracao e servicos alinhados ao estilo do seu evento.',
+    title: 'Experiência personalizada',
+    description: 'Formato, duração e serviços alinhados ao estilo do seu evento.',
     icon: Sparkles,
   },
   {
-    title: 'Producao integrada',
-    description: 'Organizacao de agenda, equipe e fornecedores em uma unica operacao.',
+    title: 'Produção integrada',
+    description: 'Organização de agenda, equipe e fornecedores em uma única operação.',
     icon: Headphones,
   },
 ]
 
 const steps = [
   'Informe os dados do evento',
-  'Escolha os servicos',
-  'Envie para analise',
-  'Receba a aprovacao',
+  'Escolha os serviços',
+  'Envie para análise',
+  'Receba a aprovação',
   'Pague a entrada via Pix',
   'Tenha seu evento confirmado',
 ]
 
 const reasons = [
   'Atendimento organizado do primeiro contato ao evento',
-  'Orcamento transparente e acompanhamento online',
-  'Pagamento Pix com conferencia administrativa',
+  'Orçamento transparente e acompanhamento online',
+  'Pagamento Pix com conferência administrativa',
   'Agenda e status atualizados em tempo real',
 ]
 
@@ -69,17 +69,22 @@ export function HomePage() {
   }, [])
 
   const whatsapp = whatsappUrl(settings?.whatsapp)
+  const logoPath = settings?.logoPath?.trim() || undefined
+  const heroBackground =
+    settings?.useHeroImage === false
+      ? undefined
+      : settings?.heroImagePath?.trim() || heroImage
 
   return (
     <div className="min-h-screen bg-night-950 text-white">
       <header className="fixed inset-x-0 top-0 z-30 border-b border-white/10 bg-night-950/80 backdrop-blur-xl">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4 lg:px-8">
-          <Link aria-label="Grupo Dvanera - inicio" to="/">
-            <BrandLogo className="h-16 w-40 sm:w-48" />
+          <Link aria-label="Grupo Dvanera - início" to="/">
+            <BrandLogo className="h-16 w-40 sm:w-48" src={logoPath} />
           </Link>
           <nav className="hidden items-center gap-6 text-sm text-slate-300 md:flex">
             <a className="transition hover:text-gold-300" href="#sobre">Sobre</a>
-            <a className="transition hover:text-gold-300" href="#servicos">Servicos</a>
+            <a className="transition hover:text-gold-300" href="#servicos">Serviços</a>
             <a className="transition hover:text-gold-300" href="#como-funciona">Como funciona</a>
           </nav>
           <Link
@@ -95,31 +100,31 @@ export function HomePage() {
 
       <section
         className="relative flex min-h-[88vh] items-end overflow-hidden bg-cover bg-center pt-20"
-        style={{ backgroundImage: `url(${heroImage})` }}
+        style={heroBackground ? { backgroundImage: `url(${heroBackground})` } : undefined}
       >
         <div className="absolute inset-0 bg-black/58" />
         <div className="relative mx-auto w-full max-w-7xl px-4 pb-16 pt-24 lg:px-8 lg:pb-20">
           <div className="max-w-3xl animate-fade-up">
-            <BrandLogo className="mb-8 h-28 w-[min(80vw,34rem)]" />
+            <BrandLogo className="mb-8 h-28 w-[min(80vw,34rem)]" src={logoPath} />
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gold-300">
-              Musica ao vivo para momentos que ficam
+              {settings?.shortDescription || 'Música ao vivo para momentos que ficam'}
             </p>
             <h1 className="mt-4 max-w-3xl font-display text-4xl leading-[1.08] text-ivory-50 sm:text-5xl lg:text-6xl">
-              Transforme seu evento em uma experiencia inesquecivel
+              {settings?.homeTitle || 'Transforme seu evento em uma experiência inesquecível'}
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-7 text-slate-200 sm:text-lg">
-              Solicite seu orcamento online, escolha os servicos desejados e acompanhe tudo de
-              forma simples e segura.
+              {settings?.homeSubtitle ||
+                'Solicite seu orçamento online, escolha os serviços desejados e acompanhe tudo de forma simples e segura.'}
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link to="/cadastro">
                 <Button className="w-full sm:w-auto" icon={<ArrowRight className="h-4 w-4" />}>
-                  Solicitar orcamento
+                  {settings?.homePrimaryButtonText || 'Solicitar orçamento'}
                 </Button>
               </Link>
               <Link to="/login">
                 <Button className="w-full sm:w-auto" variant="secondary">
-                  Entrar no sistema
+                  {settings?.homeSecondaryButtonText || 'Entrar no sistema'}
                 </Button>
               </Link>
             </div>
@@ -142,14 +147,14 @@ export function HomePage() {
             </div>
             <div className="max-w-3xl">
               <p className="text-lg leading-8 text-slate-200">
-                Energia de palco, repertorio marcante e uma producao preparada para casamentos,
-                formaturas, eventos empresariais e celebracoes especiais.
+                {settings?.aboutText ||
+                  'Energia de palco, repertório marcante e uma produção preparada para casamentos, formaturas, eventos empresariais e celebrações especiais.'}
               </p>
               <div className="mt-8 grid gap-4 sm:grid-cols-3">
                 {[
-                  { label: 'Atendimento', value: 'Proximo', icon: Users },
-                  { label: 'Gestao', value: 'Organizada', icon: ClipboardCheck },
-                  { label: 'Experiencia', value: 'Memoravel', icon: CalendarCheck },
+                  { label: 'Atendimento', value: 'Próximo', icon: Users },
+                  { label: 'Gestão', value: 'Organizada', icon: ClipboardCheck },
+                  { label: 'Experiência', value: 'Memorável', icon: CalendarCheck },
                 ].map(({ label, value, icon: Icon }) => (
                   <div className="border-l-2 border-gold-400 pl-4" key={label}>
                     <Icon className="mb-3 h-5 w-5 text-gold-300" />
@@ -164,7 +169,7 @@ export function HomePage() {
 
         <section className="mx-auto max-w-7xl px-4 py-16 lg:px-8" id="servicos">
           <div className="max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-300">Servicos</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-300">Serviços</p>
             <h2 className="mt-3 font-display text-3xl text-ivory-50 sm:text-4xl">
               Uma entrega completa para o seu evento
             </h2>
@@ -208,7 +213,7 @@ export function HomePage() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-300">Por que contratar</p>
             <h2 className="mt-3 font-display text-3xl text-ivory-50 sm:text-4xl">
-              Mais seguranca para voce curtir cada momento
+              Mais segurança para você curtir cada momento
             </h2>
           </div>
           <ul className="grid gap-4">
@@ -224,15 +229,15 @@ export function HomePage() {
         <section className="border-t border-white/10 bg-gold-400 text-night-950">
           <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-14 sm:flex-row sm:items-center sm:justify-between lg:px-8">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em]">Seu evento comeca aqui</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em]">Seu evento começa aqui</p>
               <h2 className="mt-2 max-w-2xl font-display text-3xl">
-                Conte sua ideia. O Grupo Dvanera cuida do proximo passo.
+                Conte sua ideia. O Grupo Dvanera cuida do próximo passo.
               </h2>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link to="/cadastro">
                 <Button className="w-full border-night-950 bg-night-950 text-white hover:bg-night-800 sm:w-auto">
-                  Pedir orcamento
+                  Pedir orçamento
                 </Button>
               </Link>
               {whatsapp && (
@@ -253,10 +258,10 @@ export function HomePage() {
 
       <footer className="border-t border-white/10 bg-night-950">
         <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-8 sm:flex-row sm:items-center sm:justify-between lg:px-8">
-          <BrandLogo className="h-16 w-40" />
+          <BrandLogo className="h-16 w-40" src={logoPath} />
           <div className="flex items-center gap-5 text-xs text-slate-500">
             <span>Grupo Dvanera</span>
-            <span>Agenda, orcamentos e pagamentos</span>
+            <span>Agenda, orçamentos e pagamentos</span>
             <WalletCards className="h-4 w-4 text-gold-300" />
           </div>
         </div>

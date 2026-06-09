@@ -8,40 +8,6 @@ import {
 } from 'lucide-react'
 import type { QuoteStatus, Settings } from '../types'
 
-export const serviceCategories = [
-  'Show',
-  'Som',
-  'Iluminacao',
-  'Transporte',
-  'Cerimonial',
-  'Hora extra',
-  'Estrutura adicional',
-  'Outro',
-]
-
-export const eventTypes = [
-  'Casamento',
-  'Aniversario',
-  'Formatura',
-  'Evento empresarial',
-  'Festa particular',
-  'Baile',
-  'Festival',
-  'Outro',
-]
-
-export const supplierTypes = [
-  'Som',
-  'Iluminacao',
-  'Transporte',
-  'Estrutura',
-  'Alimentacao',
-  'Hospedagem',
-  'Freelancer',
-  'Tecnico',
-  'Outro',
-]
-
 export const brazilianStates = [
   'AC',
   'AL',
@@ -119,15 +85,49 @@ export const quoteStatusMeta: Record<
 
 export const defaultSettings: Settings = {
   bandName: 'Grupo Dvanera',
+  instagram: '',
+  city: '',
+  state: '',
+  shortDescription: 'Música ao vivo para momentos que ficam.',
+  aboutText:
+    'Energia de palco, repertório marcante e uma produção preparada para eventos especiais.',
   pixReceiverName: '',
   pixKey: '',
   pixKeyType: 'cpf',
   bankName: '',
   defaultDepositPercent: 50,
   paymentInstructions:
-    'Apos realizar o Pix, clique em "Ja realizei o pagamento" para que nossa equipe confirme manualmente.',
+    'Após realizar o Pix, clique em "Já realizei o pagamento" para que nossa equipe confirme manualmente.',
+  paymentWarningMessage: 'Confira a chave e o valor antes de concluir o pagamento.',
   whatsapp: '',
   email: '',
-  serviceTypes: [...serviceCategories],
-  eventTypes: [...eventTypes],
+  quoteValidityDays: 7,
+  allowManualDiscount: true,
+  allowTravelFee: true,
+  showEstimatedValueBeforeApproval: true,
+  allowClientNotes: true,
+  quoteSubmittedMessage: 'Seu orçamento foi enviado para análise.',
+  quoteApprovedMessage: 'Seu orçamento foi aprovado.',
+  quoteRejectedMessage: 'Seu orçamento não foi aprovado.',
+  quoteCanceledMessage: 'Seu orçamento foi cancelado.',
+  messages: {
+    quoteSubmitted: 'Seu orçamento foi enviado para análise.',
+    quoteInReview: 'Nossa equipe está analisando sua solicitação.',
+    quoteApproved: 'Seu orçamento foi aprovado.',
+    paymentReported: 'O pagamento foi informado e aguarda conferência.',
+    depositConfirmed: 'A entrada foi confirmada.',
+    eventScheduled: 'Seu evento está agendado.',
+    eventCompleted: 'Evento realizado com sucesso.',
+    quoteRejected: 'Seu orçamento não foi aprovado.',
+    quoteCanceled: 'Seu orçamento foi cancelado.',
+  },
+  homeTitle: 'Transforme seu evento em uma experiência inesquecível',
+  homeSubtitle:
+    'Solicite seu orçamento online, escolha os serviços desejados e acompanhe tudo de forma simples e segura.',
+  homePrimaryButtonText: 'Solicitar orçamento',
+  homeSecondaryButtonText: 'Entrar no sistema',
+  useHeroImage: true,
+  heroImagePath: '',
+  logoPath: '',
+  brandAccentColor: '#D6B25E',
 }

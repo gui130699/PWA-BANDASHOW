@@ -5,9 +5,10 @@ import mark from '../../assets/brand/mark-dvanera.png'
 type BrandLogoProps = {
   compact?: boolean
   className?: string
+  src?: string
 }
 
-export function BrandLogo({ compact = false, className }: BrandLogoProps) {
+export function BrandLogo({ compact = false, className, src }: BrandLogoProps) {
   return (
     <img
       alt="Dvanera"
@@ -16,7 +17,7 @@ export function BrandLogo({ compact = false, className }: BrandLogoProps) {
         className,
       )}
       decoding="async"
-      src={compact ? mark : logo}
+      src={src || (compact ? mark : logo)}
     />
   )
 }
