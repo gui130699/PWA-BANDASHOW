@@ -72,8 +72,8 @@ function NotFoundPage() {
     <div className="grid min-h-screen place-items-center bg-night-950 px-4 text-center text-white">
       <div>
         <p className="text-sm font-semibold uppercase tracking-[0.18em] text-gold-300">404</p>
-        <h1 className="mt-3 text-4xl font-semibold">Pagina nao encontrada</h1>
-        <p className="mt-3 text-slate-400">Volte para o inicio ou acesse seu painel.</p>
+        <h1 className="mt-3 text-4xl font-semibold">Página não encontrada</h1>
+        <p className="mt-3 text-slate-400">Volte para o início ou acesse seu painel.</p>
       </div>
     </div>
   )

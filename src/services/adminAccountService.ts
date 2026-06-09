@@ -28,11 +28,11 @@ export async function getAdminSetupStatus() {
 }
 
 export async function createPrimaryAdminAccount(data: RegisterAdminInput): Promise<AppUser> {
-  if (!auth || !db) throw new Error('Firebase nao configurado.')
+  if (!auth || !db) throw new Error('Firebase não configurado.')
 
   const currentStatus = await getAdminSetupStatus()
   if (currentStatus.configured) {
-    throw new Error('O cadastro admin ja foi criado.')
+    throw new Error('O cadastro admin já foi criado.')
   }
 
   const credential = await createUserWithEmailAndPassword(auth, data.email, data.password)

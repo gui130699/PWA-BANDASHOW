@@ -7,7 +7,7 @@ import { router } from './routes/router'
 export default function App() {
   return (
     <AuthProvider>
-      <Suspense fallback={<Loading label="Carregando pagina..." />}>
+      <Suspense fallback={<Loading label="Carregando página..." />}>
         <RouterProvider router={router} />
       </Suspense>
     </AuthProvider>

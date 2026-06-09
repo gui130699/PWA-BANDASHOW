@@ -54,7 +54,7 @@ export function Sidebar({ items, title, onNavigate }: SidebarProps) {
 
       <div className="border-t border-white/10 p-4">
         <div className="mb-3 rounded-md border border-white/10 bg-white/[0.035] p-3">
-          <p className="truncate text-sm font-semibold text-ivory-50">{profile?.name || 'Usuario'}</p>
+          <p className="truncate text-sm font-semibold text-ivory-50">{profile?.name || 'Usuário'}</p>
           <p className="truncate text-xs text-slate-500">{profile?.email}</p>
         </div>
         <Button className="w-full" icon={<LogOut className="h-4 w-4" />} onClick={logout} variant="secondary">

@@ -7,7 +7,7 @@ export function FirebaseNotice() {
       <div className="flex gap-3">
         <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-gold-300" />
         <div>
-          <h2 className="text-sm font-semibold text-white">Firebase pendente de configuracao</h2>
+          <h2 className="text-sm font-semibold text-white">Firebase pendente de configuração</h2>
           <p className="mt-1 text-sm leading-6 text-amber-100/80">
             Copie `.env.example` para `.env` e preencha as chaves do projeto `pwa-bandashow`
             para habilitar login, Firestore e operacoes reais.

@@ -13,7 +13,7 @@ export function ClientQuotesPage() {
   const { data: quotes, loading } = useCollection<ClientQuoteView>('clientQuoteViews', constraints)
 
   return (
-    <Card title="Meus orcamentos">
+    <Card title="Meus orçamentos">
       <DataTable
         columns={[
           { header: 'Data', cell: (quote) => formatDate(quote.event.date) },
@@ -30,7 +30,7 @@ export function ClientQuotesPage() {
           { header: 'Status', cell: (quote) => <StatusBadge status={quote.status} /> },
           { header: 'Total', cell: (quote) => formatCurrency(quote.total) },
           {
-            header: 'Acao',
+            header: 'Ação',
             cell: (quote) => (
               <Link className="font-semibold text-gold-300 hover:text-gold-100" to={`/cliente/orcamentos/${quote.quoteId}`}>
                 Ver detalhes
@@ -39,8 +39,8 @@ export function ClientQuotesPage() {
           },
         ]}
         data={quotes}
-        emptyDescription="Solicite um novo orcamento para acompanhar por aqui."
-        emptyTitle="Voce ainda nao possui orcamentos"
+        emptyDescription="Solicite um novo orçamento para acompanhar por aqui."
+        emptyTitle="Você ainda não possui orçamentos"
         getRowKey={(quote) => quote.id}
         loading={loading}
       />

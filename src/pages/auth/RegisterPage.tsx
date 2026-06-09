@@ -15,7 +15,7 @@ const registerSchema = z.object({
   name: z.string().min(3, 'Informe seu nome completo.'),
   document: z.string().min(11, 'Informe CPF ou CNPJ.'),
   phone: z.string().min(10, 'Informe telefone ou WhatsApp.'),
-  email: z.string().email('Informe um e-mail valido.'),
+  email: z.string().email('Informe um e-mail válido.'),
   city: z.string().min(2, 'Informe a cidade.'),
   state: z.string().min(2, 'Informe o estado.'),
   notes: z.string().optional(),
@@ -40,7 +40,7 @@ export function RegisterPage() {
       await registerClient(data)
       navigate('/cliente/novo-orcamento', { replace: true })
     } catch (error) {
-      setFormError(getFriendlyFirebaseError(error, 'Nao foi possivel criar o cadastro.'))
+      setFormError(getFriendlyFirebaseError(error, 'Não foi possível criar o cadastro.'))
     }
   }
 
@@ -56,7 +56,7 @@ export function RegisterPage() {
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gold-300">Comece por aqui</p>
               <h1 className="font-display text-2xl text-ivory-50">Cadastro do cliente</h1>
-              <p className="mt-1 text-sm text-slate-400">Crie seu acesso e solicite o primeiro orcamento.</p>
+              <p className="mt-1 text-sm text-slate-400">Crie seu acesso e solicite o primeiro orçamento.</p>
             </div>
           </div>
 
@@ -74,11 +74,11 @@ export function RegisterPage() {
               placeholder="Selecione"
               {...register('state')}
             />
-            <Textarea label="Observacoes" wrapperClassName="md:col-span-2" {...register('notes')} />
+            <Textarea label="Observações" wrapperClassName="md:col-span-2" {...register('notes')} />
             {formError && <p className="rounded-md bg-red-500/10 p-3 text-sm text-red-200 md:col-span-2">{formError}</p>}
             <div className="flex flex-col gap-3 md:col-span-2 sm:flex-row sm:items-center sm:justify-between">
               <Link className="text-sm text-gold-300 hover:text-gold-100" to="/login">
-                Ja tenho cadastro
+                Já tenho cadastro
               </Link>
               <Button isLoading={isSubmitting} type="submit">
                 Criar cadastro

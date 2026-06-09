@@ -52,6 +52,6 @@ export function calculateQuoteTotals(
 export function serviceLinksToCosts(itemServiceName: string, costs: CostSnapshot[]) {
   return costs.map((cost) => ({
     ...cost,
-    notes: cost.notes || `Custo vinculado ao servico ${itemServiceName}`,
+    notes: cost.notes || `Custo vinculado ao serviço ${itemServiceName}`,
   }))
 }

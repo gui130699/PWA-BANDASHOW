@@ -43,7 +43,7 @@ const emptyEvent: QuoteEvent = {
   notes: '',
 }
 
-const stepLabels = ['Seus dados', 'Evento', 'Servicos', 'Revisao']
+const stepLabels = ['Seus dados', 'Evento', 'Serviços', 'Revisão']
 
 export function NewQuotePage() {
   const { user, profile } = useAuth()
@@ -176,7 +176,7 @@ export function NewQuotePage() {
 
       navigate(`/cliente/orcamentos/${quoteRef.id}`)
     } catch (submitError) {
-      setError(getFriendlyFirebaseError(submitError, 'Nao foi possivel enviar o orcamento.'))
+      setError(getFriendlyFirebaseError(submitError, 'Não foi possível enviar o orçamento.'))
     } finally {
       setSubmitting(false)
     }
@@ -185,9 +185,9 @@ export function NewQuotePage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        description="Preencha as etapas abaixo. Voce podera revisar tudo antes do envio."
-        eyebrow="Nova solicitacao"
-        title="Monte seu orcamento"
+        description="Preencha as etapas abaixo. Você poderá revisar tudo antes do envio."
+        eyebrow="Nova solicitação"
+        title="Monte seu orçamento"
       />
       <Card>
         <div className="grid grid-cols-4 gap-2">
@@ -216,16 +216,16 @@ export function NewQuotePage() {
             <Input label="E-mail" onChange={(event) => updateClient('email', event.target.value)} type="email" value={clientForm.email} />
             <Input label="Cidade" onChange={(event) => updateClient('city', event.target.value)} value={clientForm.city} />
             <Select label="Estado" onChange={(event) => updateClient('state', event.target.value)} options={brazilianStates.map((state) => ({ label: state, value: state }))} placeholder="Selecione" value={clientForm.state} />
-            <Textarea label="Observacoes" onChange={(event) => updateClient('notes', event.target.value)} value={clientForm.notes} wrapperClassName="md:col-span-2" />
+            <Textarea label="Observações" onChange={(event) => updateClient('notes', event.target.value)} value={clientForm.notes} wrapperClassName="md:col-span-2" />
           </div>
         </Card>
       )}
 
       {step === 2 && (
-        <Card description="Informe data, local e caracteristicas do evento." title="Dados do evento">
+        <Card description="Informe data, local e características do evento." title="Dados do evento">
           <div className="grid gap-4 md:grid-cols-2">
             <DateInput label="Data do evento" onChange={(value) => updateEvent('date', value)} value={eventForm.date} />
-            <Input label="Horario previsto" onChange={(event) => updateEvent('time', event.target.value)} type="time" value={eventForm.time} />
+            <Input label="Horário previsto" onChange={(event) => updateEvent('time', event.target.value)} type="time" value={eventForm.time} />
             <AdminOptionSelect
               collectionName="eventTypes"
               label="Tipo de evento"
@@ -233,21 +233,21 @@ export function NewQuotePage() {
               value={eventForm.type}
             />
             <Input label="Nome do local" onChange={(event) => updateEvent('venueName', event.target.value)} value={eventForm.venueName} />
-            <Input label="Endereco completo" onChange={(event) => updateEvent('address', event.target.value)} value={eventForm.address} wrapperClassName="md:col-span-2" />
+            <Input label="Endereço completo" onChange={(event) => updateEvent('address', event.target.value)} value={eventForm.address} wrapperClassName="md:col-span-2" />
             <Input label="Cidade" onChange={(event) => updateEvent('city', event.target.value)} value={eventForm.city} />
             <Select label="Estado" onChange={(event) => updateEvent('state', event.target.value)} options={brazilianStates.map((state) => ({ label: state, value: state }))} placeholder="Selecione" value={eventForm.state} />
             <Input label="Quantidade estimada de pessoas" min={0} onChange={(event) => updateEvent('estimatedGuests', Number(event.target.value))} type="number" value={eventForm.estimatedGuests} />
-            <Textarea label="Observacoes do evento" onChange={(event) => updateEvent('notes', event.target.value)} value={eventForm.notes} wrapperClassName="md:col-span-2" />
+            <Textarea label="Observações do evento" onChange={(event) => updateEvent('notes', event.target.value)} value={eventForm.notes} wrapperClassName="md:col-span-2" />
           </div>
         </Card>
       )}
 
       {step === 3 && (
-        <Card description="Selecione um ou mais servicos ativos." title="Servicos desejados">
+        <Card description="Selecione um ou mais serviços ativos." title="Serviços desejados">
           {services.length === 0 && !servicesLoading ? (
             <EmptyState
-              description="O admin precisa cadastrar e ativar os servicos antes do cliente solicitar."
-              title="Nenhum servico ativo"
+              description="O admin precisa cadastrar e ativar os serviços antes do cliente solicitar."
+              title="Nenhum serviço ativo"
             />
           ) : (
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -287,7 +287,7 @@ export function NewQuotePage() {
       )}
 
       {step === 4 && (
-        <Card description="Confira tudo antes de enviar para analise do Grupo Dvanera." title="Revisao">
+        <Card description="Confira tudo antes de enviar para análise do Grupo Dvanera." title="Revisão">
           <div className="grid gap-5 lg:grid-cols-2">
             <div className="space-y-2 text-sm text-slate-300">
               <p><strong className="text-white">Cliente:</strong> {clientForm.name}</p>
@@ -309,12 +309,12 @@ export function NewQuotePage() {
             </div>
           </div>
           <Textarea
-            label="Observacao para o Grupo Dvanera"
+            label="Observação para o Grupo Dvanera"
             onChange={(event) => setClientNotes(event.target.value)}
             value={clientNotes}
           />
           <p className="mt-4 rounded-md bg-gold-300/10 p-4 text-sm leading-6 text-gold-50">
-            Sua solicitacao sera enviada para analise do Grupo Dvanera. Apos aprovacao, sera
+            Sua solicitação será enviada para análise do Grupo Dvanera. Após aprovação, será
             liberado o pagamento da entrada via Pix conforme percentual configurado.
           </p>
         </Card>
@@ -332,7 +332,7 @@ export function NewQuotePage() {
           </Button>
         ) : (
           <Button icon={<Check className="h-4 w-4" />} isLoading={submitting} onClick={submitQuote}>
-            Enviar para analise
+            Enviar para análise
           </Button>
         )}
       </div>

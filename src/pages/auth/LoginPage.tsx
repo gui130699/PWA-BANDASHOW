@@ -10,7 +10,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
 
 const loginSchema = z.object({
-  email: z.string().email('Informe um e-mail valido.'),
+  email: z.string().email('Informe um e-mail válido.'),
   password: z.string().min(6, 'Informe sua senha.'),
 })
 
@@ -36,7 +36,7 @@ export function LoginPage() {
     try {
       await login(data.email, data.password)
     } catch (error) {
-      setFormError(getFriendlyFirebaseError(error, 'Nao foi possivel entrar.'))
+      setFormError(getFriendlyFirebaseError(error, 'Não foi possível entrar.'))
     }
   }
 
@@ -49,7 +49,7 @@ export function LoginPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-300">Bem-vindo</p>
             <h1 className="mt-2 font-display text-3xl text-ivory-50">Entrar no Grupo Dvanera</h1>
             <p className="mt-2 text-sm leading-6 text-slate-400">
-              Acesse seus orcamentos, eventos e pagamentos.
+              Acesse seus orçamentos, eventos e pagamentos.
             </p>
           </div>
           <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>

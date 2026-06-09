@@ -14,7 +14,7 @@ import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
 const adminSetupSchema = z
   .object({
     name: z.string().min(3, 'Informe o nome do admin.'),
-    email: z.string().email('Informe um e-mail valido.'),
+    email: z.string().email('Informe um e-mail válido.'),
     phone: z.string().optional(),
     password: z.string().min(6, 'Use pelo menos 6 caracteres.'),
     confirmPassword: z.string().min(6, 'Confirme a senha.'),
@@ -25,7 +25,7 @@ const adminSetupSchema = z
   })
 
 const adminLoginSchema = z.object({
-  email: z.string().email('Informe um e-mail valido.'),
+  email: z.string().email('Informe um e-mail válido.'),
   password: z.string().min(6, 'Informe sua senha.'),
 })
 
@@ -62,7 +62,7 @@ export function AdminAccessPage() {
       })
       navigate('/admin/dashboard', { replace: true })
     } catch (error) {
-      setFormError(getFriendlyFirebaseError(error, 'Nao foi possivel criar o admin.'))
+      setFormError(getFriendlyFirebaseError(error, 'Não foi possível criar o admin.'))
       getAdminSetupStatus().then((status) => setAdminConfigured(status.configured)).catch(() => undefined)
     }
   }
@@ -72,7 +72,7 @@ export function AdminAccessPage() {
     try {
       await login(data.email, data.password)
     } catch (error) {
-      setFormError(getFriendlyFirebaseError(error, 'Nao foi possivel entrar como admin.'))
+      setFormError(getFriendlyFirebaseError(error, 'Não foi possível entrar como admin.'))
     }
   }
 
@@ -103,7 +103,7 @@ export function AdminAccessPage() {
           {isClientAccount ? (
             <div className="space-y-4">
               <p className="rounded-md bg-white/8 p-3 text-sm text-slate-200">
-                Voce esta logado como cliente. Saia desta conta para acessar o admin.
+                Você está logado como cliente. Saia desta conta para acessar o admin.
               </p>
               <Button className="w-full" onClick={logout} variant="secondary">
                 Sair da conta cliente

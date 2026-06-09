@@ -20,12 +20,12 @@ function paymentLabel(type: Payment['type']) {
 
 function statusMessage(status: ClientQuoteView['status']) {
   const messages: Record<ClientQuoteView['status'], string> = {
-    em_analise: 'Seu orcamento esta em analise.',
-    aprovado_aguardando_entrada: 'Seu orcamento foi aprovado. Agora realize o pagamento da entrada.',
-    entrada_informada_pelo_cliente: 'Pagamento informado. Aguarde confirmacao do Grupo Dvanera.',
-    agendado: 'Entrada confirmada. Seu evento esta agendado.',
+    em_analise: 'Seu orçamento está em análise.',
+    aprovado_aguardando_entrada: 'Seu orçamento foi aprovado. Agora realize o pagamento da entrada.',
+    entrada_informada_pelo_cliente: 'Pagamento informado. Aguarde confirmação do Grupo Dvanera.',
+    agendado: 'Entrada confirmada. Seu evento está agendado.',
     realizado: 'Evento realizado. Obrigado por escolher o Grupo Dvanera.',
-    recusado: 'Este orcamento foi recusado.',
+    recusado: 'Este orçamento foi recusado.',
     cancelado: 'Este evento foi cancelado.',
   }
 
@@ -55,12 +55,12 @@ export function ClientQuoteDetailPage() {
   }, [])
 
   if (loading) return <Loading />
-  if (!quote) return <Card title="Orcamento nao encontrado" />
+  if (!quote) return <Card title="Orçamento não encontrado" />
 
   async function copyPixKey(pixKey?: string) {
     const key = pixKey || settings?.pixKey
     if (!key) {
-      setFeedback('A chave Pix ainda nao foi configurada. Fale com a administracao.')
+      setFeedback('A chave Pix ainda não foi configurada. Fale com a administração.')
       return
     }
     await navigator.clipboard.writeText(key)
@@ -72,9 +72,9 @@ export function ClientQuoteDetailPage() {
     setFeedback('')
     try {
       await clientMarkPaymentAsPaid(payment, messages[payment.id] || '')
-      setFeedback('Pagamento informado. O Grupo Dvanera fara a conferencia manual.')
+      setFeedback('Pagamento informado. O Grupo Dvanera fará a conferência manual.')
     } catch (error) {
-      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel informar o pagamento.'))
+      setFeedback(getFriendlyFirebaseError(error, 'Não foi possível informar o pagamento.'))
     } finally {
       setSubmittingId('')
     }
@@ -85,7 +85,7 @@ export function ClientQuoteDetailPage() {
       <Card
         action={<StatusBadge status={quote.status} />}
         description={`${quote.event.type} em ${formatDate(quote.event.date)} - ${quote.event.city}/${quote.event.state}`}
-        title={`Orcamento de ${quote.clientSnapshot.name}`}
+        title={`Orçamento de ${quote.clientSnapshot.name}`}
       >
         <p className="mb-5 rounded-md bg-white/8 p-3 text-sm text-slate-200">{statusMessage(quote.status)}</p>
         <div className="mb-7 border-b border-white/10 pb-6">
@@ -105,7 +105,7 @@ export function ClientQuoteDetailPage() {
             <p className="text-2xl font-semibold text-white">{formatCurrency(quote.remainingAmount)}</p>
           </div>
           <div>
-            <p className="text-sm text-slate-400">Servicos</p>
+            <p className="text-sm text-slate-400">Serviços</p>
             <p className="text-2xl font-semibold text-white">{quote.items.length}</p>
           </div>
         </div>
@@ -117,11 +117,11 @@ export function ClientQuoteDetailPage() {
           <p><strong className="text-white">Tipo:</strong> {quote.event.type}</p>
           <p><strong className="text-white">Local:</strong> {quote.event.venueName}</p>
           <p><strong className="text-white">Cidade:</strong> {quote.event.city}/{quote.event.state}</p>
-          <p className="md:col-span-2"><strong className="text-white">Endereco:</strong> {quote.event.address}</p>
+          <p className="md:col-span-2"><strong className="text-white">Endereço:</strong> {quote.event.address}</p>
         </div>
       </Card>
 
-      <Card title="Servicos contratados">
+      <Card title="Serviços contratados">
         <div className="divide-y divide-white/10">
           {quote.items.map((item) => (
             <div className="flex flex-col gap-1 py-3 sm:flex-row sm:items-center sm:justify-between" key={item.serviceId}>
@@ -135,10 +135,10 @@ export function ClientQuoteDetailPage() {
         </div>
       </Card>
 
-      <Card description="A confirmacao e feita manualmente pela administracao apos conferencia." title="Pagamentos">
+      <Card description="A confirmação é feita manualmente pela administração após conferência." title="Pagamentos">
         <div className="space-y-4">
           {payments.length === 0 ? (
-            <p className="text-sm text-slate-400">Os pagamentos aparecem quando o orcamento for aprovado.</p>
+            <p className="text-sm text-slate-400">Os pagamentos aparecem quando o orçamento for aprovado.</p>
           ) : (
             payments.map((payment) => (
               <div className="grid gap-4 rounded-lg border border-white/10 bg-white/[0.04] p-4 lg:grid-cols-[1fr_1.1fr]" key={payment.id}>
@@ -149,16 +149,16 @@ export function ClientQuoteDetailPage() {
                   </div>
                   <p className="text-2xl font-semibold text-gold-300">{formatCurrency(payment.amount)}</p>
                   <p className="mt-3 text-sm text-slate-400">Recebedor</p>
-                  <p className="font-semibold text-white">{settings?.pixReceiverName || 'Nao configurado'}</p>
+                  <p className="font-semibold text-white">{settings?.pixReceiverName || 'Não configurado'}</p>
                   <p className="mt-3 text-sm text-slate-400">Chave Pix</p>
-                  <p className="break-all font-semibold text-gold-300">{payment.pixKeyUsed || settings?.pixKey || 'Nao configurada'}</p>
+                  <p className="break-all font-semibold text-gold-300">{payment.pixKeyUsed || settings?.pixKey || 'Não configurada'}</p>
                   <p className="mt-3 text-sm text-slate-400">Banco</p>
                   <p className="font-semibold text-white">{settings?.bankName || '-'}</p>
                 </div>
                 <div className="space-y-4">
                   <Textarea
                     disabled={payment.status === 'confirmado'}
-                    label="Observacao ou referencia do comprovante"
+                    label="Observação ou referência do comprovante"
                     onChange={(event) => setMessages((current) => ({ ...current, [payment.id]: event.target.value }))}
                     value={messages[payment.id] || payment.clientMessage || ''}
                   />
@@ -177,7 +177,7 @@ export function ClientQuoteDetailPage() {
                       isLoading={submittingId === payment.id}
                       onClick={() => informPayment(payment)}
                     >
-                      Ja realizei o pagamento
+                      Já realizei o pagamento
                     </Button>
                   </div>
                 </div>

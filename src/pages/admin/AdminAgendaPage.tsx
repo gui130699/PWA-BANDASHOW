@@ -34,7 +34,7 @@ export function AdminAgendaPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        description="Eventos confirmados entram aqui automaticamente apos a confirmacao da entrada."
+        description="Eventos confirmados entram aqui automaticamente após a confirmação da entrada."
         eyebrow="Operacao"
         title="Agenda de eventos"
       />
@@ -70,11 +70,11 @@ export function AdminAgendaPage() {
             { header: 'Entrada', cell: (quote) => formatCurrency(quote.depositAmount) },
             { header: 'Restante', cell: (quote) => formatCurrency(quote.remainingAmount) },
             {
-              header: 'Servicos',
+              header: 'Serviços',
               cell: (quote) => quote.items.map((item) => item.serviceName).join(', '),
             },
             {
-              header: 'Acoes',
+              header: 'Ações',
               cell: (quote) => (
                 <div className="flex flex-wrap gap-2">
                   <Link className="font-semibold text-gold-300 hover:text-gold-100" to={`/admin/orcamentos/${quote.id}`}>

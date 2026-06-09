@@ -60,7 +60,7 @@ export function AdminQuoteDetailPage() {
   }, [quote])
 
   if (loading) return <Loading />
-  if (!quote) return <Card title="Orcamento nao encontrado" />
+  if (!quote) return <Card title="Orçamento não encontrado" />
 
   const totals = calculateQuoteTotals(
     items,
@@ -90,7 +90,7 @@ export function AdminQuoteDetailPage() {
       await action()
       setFeedback(successMessage)
     } catch (error) {
-      setFeedback(getFriendlyFirebaseError(error, 'A operacao nao foi concluida.'))
+      setFeedback(getFriendlyFirebaseError(error, 'A operação não foi concluída.'))
     } finally {
       setSaving(false)
     }
@@ -107,7 +107,7 @@ export function AdminQuoteDetailPage() {
       <Card
         action={<StatusBadge status={quote.status} />}
         description={`${quote.event.type} em ${formatDate(quote.event.date)} - ${quote.event.venueName}`}
-        title={`Analise de ${quote.clientSnapshot.name}`}
+        title={`Análise de ${quote.clientSnapshot.name}`}
       >
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
           <div>
@@ -138,7 +138,7 @@ export function AdminQuoteDetailPage() {
       </Card>
 
       <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <Card description="Edite quantidade e valor aprovado por item." title="Servicos do orcamento">
+        <Card description="Edite quantidade e valor aprovado por item." title="Serviços do orçamento">
           <div className="space-y-4">
             {items.map((item, index) => (
               <div className="grid gap-3 rounded-lg border border-white/10 bg-white/[0.04] p-4 md:grid-cols-[1fr_7rem_9rem_9rem]" key={item.serviceId}>
@@ -161,11 +161,11 @@ export function AdminQuoteDetailPage() {
           <div className="grid gap-4">
             <Input label="Desconto" min={0} onChange={(event) => setDiscount(Number(event.target.value))} type="number" value={discount} />
             <Input label="Taxa de deslocamento" min={0} onChange={(event) => setTravelFee(Number(event.target.value))} type="number" value={travelFee} />
-            <Textarea label="Observacoes internas" onChange={(event) => setAdminNotes(event.target.value)} value={adminNotes} />
+            <Textarea label="Observações internas" onChange={(event) => setAdminNotes(event.target.value)} value={adminNotes} />
             <Button
               icon={<Save className="h-4 w-4" />}
               isLoading={saving}
-              onClick={() => runAction(() => updateQuoteFinancials(quote, { items, manualCosts, discount, travelFee, adminNotes }, settings || undefined, actor), 'Orcamento atualizado.')}
+              onClick={() => runAction(() => updateQuoteFinancials(quote, { items, manualCosts, discount, travelFee, adminNotes }, settings || undefined, actor), 'Orçamento atualizado.')}
             >
               Salvar ajustes
             </Button>
@@ -181,11 +181,11 @@ export function AdminQuoteDetailPage() {
         </Card>
       </div>
 
-      <Card description="Custos visiveis somente no painel administrativo." title="Custos internos">
+      <Card description="Custos visíveis somente no painel administrativo." title="Custos internos">
         <div className="grid gap-4 md:grid-cols-[1fr_10rem_1fr_auto]">
           <Input label="Nome do custo" onChange={(event) => setManualCostForm((current) => ({ ...current, name: event.target.value }))} value={manualCostForm.name} />
           <Input label="Valor" min={0} onChange={(event) => setManualCostForm((current) => ({ ...current, cost: Number(event.target.value) }))} type="number" value={manualCostForm.cost} />
-          <Input label="Observacao" onChange={(event) => setManualCostForm((current) => ({ ...current, notes: event.target.value }))} value={manualCostForm.notes} />
+          <Input label="Observação" onChange={(event) => setManualCostForm((current) => ({ ...current, notes: event.target.value }))} value={manualCostForm.notes} />
           <div className="flex items-end">
             <Button className="w-full" onClick={addManualCost} variant="secondary">
               Adicionar
@@ -213,7 +213,7 @@ export function AdminQuoteDetailPage() {
             { header: 'Status', cell: (payment) => payment.status.replaceAll('_', ' ') },
             { header: 'Pix', cell: (payment) => payment.pixKeyUsed || '-' },
             {
-              header: 'Acao',
+              header: 'Ação',
               cell: (payment) => (
                 <Button
                   className="h-9 px-3"
@@ -232,7 +232,7 @@ export function AdminQuoteDetailPage() {
         />
       </Card>
 
-      <Card title="Decisao e status">
+      <Card title="Decisão e status">
         <div className="grid gap-4">
           <Textarea label="Motivo da recusa" onChange={(event) => setRejectionReason(event.target.value)} value={rejectionReason} />
           <div className="flex flex-wrap gap-3">
@@ -242,7 +242,7 @@ export function AdminQuoteDetailPage() {
               onClick={() => runAction(async () => {
                 await updateQuoteFinancials(quote, { items, manualCosts, discount, travelFee, adminNotes }, settings || undefined, actor)
                 await approveQuote(editableQuote, settings || undefined, actor)
-              }, 'Orcamento aprovado e entrada Pix gerada.')}
+              }, 'Orçamento aprovado e entrada Pix gerada.')}
               variant="success"
             >
               Aprovar
@@ -251,7 +251,7 @@ export function AdminQuoteDetailPage() {
               disabled={!rejectionReason}
               icon={<XCircle className="h-4 w-4" />}
               isLoading={saving}
-              onClick={() => runAction(() => rejectQuote(quote.id, rejectionReason, actor), 'Orcamento recusado.')}
+              onClick={() => runAction(() => rejectQuote(quote.id, rejectionReason, actor), 'Orçamento recusado.')}
               variant="danger"
             >
               Reprovar
@@ -261,7 +261,7 @@ export function AdminQuoteDetailPage() {
               icon={<CircleDollarSign className="h-4 w-4" />}
               isLoading={saving}
               onClick={() => runAction(() => {
-                if (!depositPayment) throw new Error('Pagamento de entrada nao encontrado.')
+                if (!depositPayment) throw new Error('Pagamento de entrada não encontrado.')
                 return confirmPayment(depositPayment.id, actor)
               }, 'Entrada confirmada e evento agendado.')}
               variant="primary"
@@ -286,7 +286,7 @@ export function AdminQuoteDetailPage() {
             >
               Marcar realizado
             </Button>
-            <Button isLoading={saving} onClick={() => runAction(() => cancelQuote(quote.id, actor), 'Orcamento cancelado.')} variant="ghost">
+            <Button isLoading={saving} onClick={() => runAction(() => cancelQuote(quote.id, actor), 'Orçamento cancelado.')} variant="ghost">
               Cancelar
             </Button>
           </div>

@@ -31,7 +31,7 @@ export function AdminDashboardPage() {
 
     return [
       {
-        label: 'Em analise',
+        label: 'Em análise',
         value: quotes.filter((quote) => quote.status === 'em_analise').length,
         icon: ClipboardList,
       },

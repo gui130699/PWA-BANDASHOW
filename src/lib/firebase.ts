@@ -31,7 +31,7 @@ if (auth) {
 
 export function requireDb() {
   if (!db) {
-    throw new Error('Firebase nao configurado. Copie .env.example para .env e preencha as chaves.')
+    throw new Error('Firebase não configurado. Copie .env.example para .env e preencha as chaves.')
   }
 
   return db
@@ -39,7 +39,7 @@ export function requireDb() {
 
 export function requireAuth() {
   if (!auth) {
-    throw new Error('Firebase Auth nao configurado. Verifique as variaveis VITE_FIREBASE_*.')
+    throw new Error('Firebase Auth não configurado. Verifique as variáveis VITE_FIREBASE_*.')
   }
 
   return auth

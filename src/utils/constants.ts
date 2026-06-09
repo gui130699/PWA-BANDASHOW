@@ -47,7 +47,7 @@ export const quoteStatusMeta: Record<
   }
 > = {
   em_analise: {
-    label: 'Em analise',
+    label: 'Em análise',
     className: 'bg-amber-400/15 text-amber-200 ring-amber-300/30',
     icon: Hourglass,
   },

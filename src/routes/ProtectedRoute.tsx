@@ -18,8 +18,8 @@ export function ProtectedRoute({ role }: { role?: UserRole }) {
       <div className="grid min-h-screen place-items-center bg-night-950 px-4 text-white">
         <Card
           className="w-full max-w-md"
-          description="Sua conta existe no Firebase Authentication, mas o perfil do aplicativo nao foi encontrado. Saia e fale com a administracao."
-          title="Perfil nao encontrado"
+          description="Sua conta existe no Firebase Authentication, mas o perfil do aplicativo não foi encontrado. Saia e fale com a administração."
+          title="Perfil não encontrado"
         >
           <Button className="w-full" onClick={() => void logout()} variant="secondary">
             Sair da conta

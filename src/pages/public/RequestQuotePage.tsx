@@ -9,10 +9,10 @@ export function RequestQuotePage() {
       <div className="mx-auto max-w-xl">
         <Card className="border-gold-300/20 bg-night-850/95">
           <ClipboardList className="mb-5 h-10 w-10 text-gold-300" />
-          <h1 className="font-display text-3xl text-ivory-50">Solicitar orcamento</h1>
+          <h1 className="font-display text-3xl text-ivory-50">Solicitar orçamento</h1>
           <p className="mt-4 leading-7 text-slate-300">
-            Para acompanhar status, aprovacao e pagamento Pix com seguranca, crie seu cadastro ou
-            entre no painel do cliente. O formulario completo fica em "Novo orcamento" depois do login.
+            Para acompanhar status, aprovação e pagamento Pix com segurança, crie seu cadastro ou
+            entre no painel do cliente. O formulário completo fica em "Novo orçamento" depois do login.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link to="/cadastro">
@@ -22,7 +22,7 @@ export function RequestQuotePage() {
             </Link>
             <Link to="/login">
               <Button className="w-full sm:w-auto" variant="secondary">
-                Ja tenho acesso
+                Já tenho acesso
               </Button>
             </Link>
           </div>

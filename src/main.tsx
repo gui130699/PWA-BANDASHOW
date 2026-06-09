@@ -30,7 +30,7 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
         })
       })
       .catch((error) => {
-        console.error('Nao foi possivel registrar o service worker.', error)
+        console.error('Não foi possível registrar o service worker.', error)
       })
   })
 }

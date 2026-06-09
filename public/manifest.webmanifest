@@ -1,7 +1,7 @@
 {
   "name": "Grupo Dvanera",
   "short_name": "Dvanera",
-  "description": "Solicite orcamentos e acompanhe eventos, agenda e pagamentos do Grupo Dvanera.",
+  "description": "Solicite orçamentos e acompanhe eventos, agenda e pagamentos do Grupo Dvanera.",
   "id": "/PWA-BANDASHOW/",
   "start_url": "/PWA-BANDASHOW/",
   "scope": "/PWA-BANDASHOW/",

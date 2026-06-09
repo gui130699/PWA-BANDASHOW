@@ -20,7 +20,7 @@ export function useCollection<T extends { id: string }>(
   useEffect(() => {
     if (!db) {
       setLoading(false)
-      setError('Firebase ainda nao esta configurado.')
+      setError('Firebase ainda não está configurado.')
       return undefined
     }
 

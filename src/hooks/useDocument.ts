@@ -14,7 +14,7 @@ export function useDocument<T extends { id?: string }>(collectionName: string, i
     }
 
     if (!db) {
-      setError('Firebase ainda nao esta configurado.')
+      setError('Firebase ainda não está configurado.')
       setLoading(false)
       return undefined
     }

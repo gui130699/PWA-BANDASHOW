@@ -25,7 +25,7 @@ export function ClientPaymentsPage() {
 
   async function copyPixKey(pixKey: string) {
     if (!pixKey) {
-      setFeedback('A chave Pix ainda nao foi configurada. Fale com a administracao.')
+      setFeedback('A chave Pix ainda não foi configurada. Fale com a administração.')
       return
     }
     await navigator.clipboard.writeText(pixKey)
@@ -37,9 +37,9 @@ export function ClientPaymentsPage() {
     setFeedback('')
     try {
       await clientMarkPaymentAsPaid(payment, messages[payment.id] || '')
-      setFeedback('Pagamento informado. Aguarde a conferencia manual.')
+      setFeedback('Pagamento informado. Aguarde a conferência manual.')
     } catch (error) {
-      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel informar o pagamento.'))
+      setFeedback(getFriendlyFirebaseError(error, 'Não foi possível informar o pagamento.'))
     } finally {
       setSubmittingId('')
     }
@@ -51,7 +51,7 @@ export function ClientPaymentsPage() {
         {loading ? (
           <p className="text-sm text-slate-400">Carregando pagamentos...</p>
         ) : payments.length === 0 ? (
-          <p className="text-sm text-slate-400">Pagamentos aparecem quando um orcamento aprovado gera entrada ou restante.</p>
+          <p className="text-sm text-slate-400">Pagamentos aparecem quando um orçamento aprovado gera entrada ou restante.</p>
         ) : (
           <div className="grid gap-4">
             {payments.map((payment) => (
@@ -68,7 +68,7 @@ export function ClientPaymentsPage() {
                 <div className="space-y-4">
                   <Textarea
                     disabled={payment.status === 'confirmado'}
-                    label="Observacao ou referencia do comprovante"
+                    label="Observação ou referência do comprovante"
                     onChange={(event) => setMessages((current) => ({ ...current, [payment.id]: event.target.value }))}
                     value={messages[payment.id] || payment.clientMessage || ''}
                   />
@@ -87,7 +87,7 @@ export function ClientPaymentsPage() {
                       isLoading={submittingId === payment.id}
                       onClick={() => informPayment(payment)}
                     >
-                      Ja realizei o pagamento
+                      Já realizei o pagamento
                     </Button>
                   </div>
                 </div>

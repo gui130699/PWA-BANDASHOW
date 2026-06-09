@@ -43,13 +43,13 @@ export function AdminPaymentsPage() {
       setPaymentNotes('')
       setFeedback('Pagamento de integrante registrado.')
     } catch (error) {
-      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel registrar o pagamento.'))
+      setFeedback(getFriendlyFirebaseError(error, 'Não foi possível registrar o pagamento.'))
     }
   }
 
   return (
     <div className="space-y-6">
-      <Card description="Confirme manualmente entradas e pagamentos finais apos conferir o banco." title="Pagamentos de clientes">
+      <Card description="Confirme manualmente entradas e pagamentos finais após conferir o banco." title="Pagamentos de clientes">
         <DataTable
           columns={[
             { header: 'Tipo', cell: (payment) => payment.type.replace('_', ' ') },
@@ -61,7 +61,7 @@ export function AdminPaymentsPage() {
             { header: 'Pix', cell: (payment) => payment.pixKeyUsed || '-' },
             { header: 'Criado em', cell: (payment) => formatDate(payment.createdAt) },
             {
-              header: 'Acao',
+              header: 'Ação',
               cell: (payment) => (
                 <Button
                   className="h-9 px-3"
@@ -102,7 +102,7 @@ export function AdminPaymentsPage() {
           />
           <Input
             onChange={(event) => setPaymentNotes(event.target.value)}
-            placeholder="Observacao"
+            placeholder="Observação"
             value={paymentNotes}
           />
           <Button icon={<HandCoins className="h-4 w-4" />} onClick={() => void registerMemberPayment()}>
@@ -120,7 +120,7 @@ export function AdminPaymentsPage() {
             { header: 'Status', cell: (payment) => payment.status },
             { header: 'Data', cell: (payment) => formatDate(payment.paidAt || payment.createdAt) },
             {
-              header: 'Acao',
+              header: 'Ação',
               cell: (payment) => (
                 <Button
                   className="h-9 px-3"
@@ -147,7 +147,7 @@ export function AdminPaymentsPage() {
             { header: 'Status', cell: (payment) => payment.status },
             { header: 'Data', cell: (payment) => formatDate(payment.paidAt || payment.createdAt) },
             {
-              header: 'Acao',
+              header: 'Ação',
               cell: (payment) => (
                 <Button
                   className="h-9 px-3"

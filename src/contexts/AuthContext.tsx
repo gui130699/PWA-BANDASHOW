@@ -82,12 +82,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const login = useCallback(async (email: string, password: string) => {
-    if (!auth) throw new Error('Firebase Auth nao configurado.')
+    if (!auth) throw new Error('Firebase Auth não configurado.')
     await signInWithEmailAndPassword(auth, email, password)
   }, [])
 
   const registerClient = useCallback(async (data: RegisterClientInput) => {
-    if (!auth || !db) throw new Error('Firebase nao configurado.')
+    if (!auth || !db) throw new Error('Firebase não configurado.')
 
     const credential = await createUserWithEmailAndPassword(auth, data.email, data.password)
     const userDoc = {

@@ -16,7 +16,7 @@ export function ClientDashboardPage() {
   const stats = useMemo(
     () => [
       {
-        label: 'Orcamentos enviados',
+        label: 'Orçamentos enviados',
         value: quotes.length,
         icon: ClipboardList,
         tone: 'gold' as const,
@@ -42,10 +42,10 @@ export function ClientDashboardPage() {
       <PageHeader
         action={
           <Link to="/cliente/novo-orcamento">
-            <Button icon={<PlusCircle className="h-4 w-4" />}>Novo orcamento</Button>
+            <Button icon={<PlusCircle className="h-4 w-4" />}>Novo orçamento</Button>
           </Link>
         }
-        description="Acompanhe seus orcamentos, eventos e pagamentos em um unico lugar."
+        description="Acompanhe seus orçamentos, eventos e pagamentos em um único lugar."
         eyebrow="Painel do cliente"
         title="Seu resumo"
       />
@@ -54,7 +54,7 @@ export function ClientDashboardPage() {
         {stats.map((item) => <MetricCard key={item.label} {...item} />)}
       </div>
 
-      <Card title="Orcamentos recentes">
+      <Card title="Orçamentos recentes">
         <DataTable
           columns={[
             {
@@ -78,8 +78,8 @@ export function ClientDashboardPage() {
             },
           ]}
           data={quotes.slice(0, 5)}
-          emptyDescription="Quando voce enviar uma solicitacao, ela aparecera aqui."
-          emptyTitle="Nenhum orcamento encontrado"
+          emptyDescription="Quando você enviar uma solicitação, ela aparecerá aqui."
+          emptyTitle="Nenhum orçamento encontrado"
           getRowKey={(quote) => quote.quoteId}
           loading={loading}
         />

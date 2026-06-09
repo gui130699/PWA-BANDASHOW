@@ -46,7 +46,7 @@ export function AdminQuotesPage() {
           { header: 'Total', cell: (quote) => formatCurrency(quote.total) },
           { header: 'Lucro', cell: (quote) => formatCurrency(quote.estimatedProfit) },
           {
-            header: 'Acao',
+            header: 'Ação',
             cell: (quote) => (
               <Link className="font-semibold text-gold-300 hover:text-gold-100" to={`/admin/orcamentos/${quote.id}`}>
                 Analisar
@@ -55,8 +55,8 @@ export function AdminQuotesPage() {
           },
         ]}
         data={filtered}
-        emptyDescription="Orcamentos enviados pelos clientes aparecem aqui."
-        emptyTitle="Nenhum orcamento encontrado"
+        emptyDescription="Orçamentos enviados pelos clientes aparecem aqui."
+        emptyTitle="Nenhum orçamento encontrado"
         getRowKey={(quote) => quote.id}
         loading={loading}
       />

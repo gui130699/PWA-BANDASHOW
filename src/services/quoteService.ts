@@ -100,7 +100,7 @@ export async function buildQuoteCostSnapshot(items: QuoteItem[]) {
           cost: link.cost,
           quantity: item.quantity,
           totalCost: link.cost * item.quantity,
-          notes: link.description || `Fornecedor vinculado ao servico ${item.serviceName}`,
+          notes: link.description || `Fornecedor vinculado ao serviço ${item.serviceName}`,
         }),
       )
       const memberCosts: CostSnapshot[] = (service.memberCostLinks || []).map(
@@ -111,7 +111,7 @@ export async function buildQuoteCostSnapshot(items: QuoteItem[]) {
           cost: link.cost,
           quantity: item.quantity,
           totalCost: link.cost * item.quantity,
-          notes: link.description || `Integrante vinculado ao servico ${item.serviceName}`,
+          notes: link.description || `Integrante vinculado ao serviço ${item.serviceName}`,
         }),
       )
 
@@ -263,13 +263,13 @@ export async function updateQuoteFinancials(
     updatedAt: serverTimestamp(),
   })
   await syncClientQuoteView(quote.id)
-  await audit(actor, 'quote_financials_updated', 'quotes', quote.id, 'Orcamento recalculado.')
+  await audit(actor, 'quote_financials_updated', 'quotes', quote.id, 'Orçamento recalculado.')
 }
 
 export async function recalculateQuote(quoteId: string, settings?: Settings, actor?: AuditActor) {
   const database = requireDb()
   const snapshot = await getDoc(doc(database, 'quotes', quoteId))
-  if (!snapshot.exists()) throw new Error('Orcamento nao encontrado.')
+  if (!snapshot.exists()) throw new Error('Orçamento não encontrado.')
 
   const quote = { id: snapshot.id, ...snapshot.data() } as Quote
   await updateQuoteFinancials(quote, {}, settings, actor)
@@ -315,7 +315,7 @@ export async function approveQuote(quote: Quote, settings?: Settings, actor?: Au
   }
 
   await syncClientQuoteView(quote.id)
-  await audit(actor, 'quote_approved', 'quotes', quote.id, 'Orcamento aprovado e entrada gerada.')
+  await audit(actor, 'quote_approved', 'quotes', quote.id, 'Orçamento aprovado e entrada gerada.')
 }
 
 export async function rejectQuote(quoteId: string, rejectionReason: string, actor?: AuditActor) {
@@ -327,7 +327,7 @@ export async function rejectQuote(quoteId: string, rejectionReason: string, acto
     updatedAt: serverTimestamp(),
   })
   await syncClientQuoteView(quoteId)
-  await audit(actor, 'quote_rejected', 'quotes', quoteId, 'Orcamento recusado.')
+  await audit(actor, 'quote_rejected', 'quotes', quoteId, 'Orçamento recusado.')
 }
 
 export async function cancelQuote(quoteId: string, actor?: AuditActor) {
@@ -338,7 +338,7 @@ export async function cancelQuote(quoteId: string, actor?: AuditActor) {
     updatedAt: serverTimestamp(),
   })
   await syncClientQuoteView(quoteId)
-  await audit(actor, 'quote_cancelled', 'quotes', quoteId, 'Orcamento cancelado.')
+  await audit(actor, 'quote_cancelled', 'quotes', quoteId, 'Orçamento cancelado.')
 }
 
 export async function markQuoteAsDone(quoteId: string, actor?: AuditActor) {

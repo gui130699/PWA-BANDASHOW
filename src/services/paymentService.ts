@@ -54,7 +54,7 @@ export async function confirmPayment(paymentId: string, actor: PaymentActor = {}
   const paymentSnapshot = await getDoc(doc(database, 'payments', paymentId))
 
   if (!paymentSnapshot.exists()) {
-    throw new Error('Pagamento nao encontrado.')
+    throw new Error('Pagamento não encontrado.')
   }
 
   const payment = { id: paymentSnapshot.id, ...paymentSnapshot.data() } as Payment
