@@ -1,9 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft, UserPlus } from 'lucide-react'
+import { UserPlus } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { z } from 'zod'
+import { AuthShell } from '../../components/brand/AuthShell'
 import { FirebaseNotice } from '../../components/FirebaseNotice'
 import { Button, Card, Input, Select, Textarea } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
@@ -44,22 +45,18 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-night-950 px-4 py-10 text-white">
-      <div className="mx-auto max-w-3xl space-y-4">
-        <Link className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-gold-200" to="/">
-          <ArrowLeft className="h-4 w-4" />
-          Voltar para o inicio
-        </Link>
-
+    <AuthShell eyebrow="Novo cliente">
+      <div className="mx-auto w-full max-w-2xl space-y-4">
         {!firebaseReady && <FirebaseNotice />}
-        <Card>
+        <Card className="border-gold-300/20 bg-night-850/95">
           <div className="mb-8 flex items-center gap-3">
-            <div className="grid h-12 w-12 place-items-center rounded-md bg-gold-400 text-night-950">
+            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-md bg-gold-400 text-night-950">
               <UserPlus className="h-6 w-6" />
             </div>
             <div>
-              <h1 className="text-2xl font-semibold">Cadastro do cliente</h1>
-              <p className="text-sm text-slate-400">Depois do cadastro voce ja pode solicitar orcamento.</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gold-300">Comece por aqui</p>
+              <h1 className="font-display text-2xl text-ivory-50">Cadastro do cliente</h1>
+              <p className="mt-1 text-sm text-slate-400">Crie seu acesso e solicite o primeiro orcamento.</p>
             </div>
           </div>
 
@@ -90,6 +87,6 @@ export function RegisterPage() {
           </form>
         </Card>
       </div>
-    </div>
+    </AuthShell>
   )
 }

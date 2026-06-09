@@ -2,7 +2,7 @@ import { doc, serverTimestamp, setDoc, where } from 'firebase/firestore'
 import { ArrowLeft, ArrowRight, Check, Minus, Plus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Card, DateInput, EmptyState, Input, Select, Textarea } from '../../components/ui'
+import { Button, Card, DateInput, EmptyState, Input, PageHeader, Select, Textarea } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
 import { useDocument } from '../../hooks/useDocument'
@@ -41,6 +41,8 @@ const emptyEvent: QuoteEvent = {
   estimatedGuests: 0,
   notes: '',
 }
+
+const stepLabels = ['Seus dados', 'Evento', 'Servicos', 'Revisao']
 
 export function NewQuotePage() {
   const { user, profile } = useAuth()
@@ -181,21 +183,26 @@ export function NewQuotePage() {
 
   return (
     <div className="space-y-6">
+      <PageHeader
+        description="Preencha as etapas abaixo. Voce podera revisar tudo antes do envio."
+        eyebrow="Nova solicitacao"
+        title="Monte seu orcamento"
+      />
       <Card>
-        <div className="flex flex-wrap items-center gap-2">
-          {[1, 2, 3, 4].map((item) => (
-            <span
-              className={[
-                'rounded-md px-3 py-1.5 text-xs font-semibold ring-1',
-                step === item
-                  ? 'bg-gold-400 text-night-950 ring-gold-300'
-                  : 'bg-white/5 text-slate-300 ring-white/10',
-              ].join(' ')}
-              key={item}
-            >
-              Etapa {item}
-            </span>
-          ))}
+        <div className="grid grid-cols-4 gap-2">
+          {stepLabels.map((label, index) => {
+            const item = index + 1
+            const active = step === item
+            const completed = step > item
+            return (
+              <div className="min-w-0" key={label}>
+                <div className={completed || active ? 'h-1 rounded-full bg-gold-400' : 'h-1 rounded-full bg-white/10'} />
+                <p className={active ? 'mt-2 truncate text-xs font-semibold text-gold-300' : 'mt-2 truncate text-xs text-slate-500'}>
+                  <span className="hidden sm:inline">{item}. </span>{label}
+                </p>
+              </div>
+            )
+          })}
         </div>
       </Card>
 

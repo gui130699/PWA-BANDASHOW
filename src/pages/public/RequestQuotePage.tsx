@@ -1,14 +1,15 @@
 import { ArrowRight, ClipboardList } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { AuthShell } from '../../components/brand/AuthShell'
 import { Card, Button } from '../../components/ui'
 
 export function RequestQuotePage() {
   return (
-    <div className="min-h-screen bg-night-950 px-4 py-12 text-white">
-      <div className="mx-auto max-w-3xl">
-        <Card>
+    <AuthShell eyebrow="Solicitacao online">
+      <div className="mx-auto max-w-xl">
+        <Card className="border-gold-300/20 bg-night-850/95">
           <ClipboardList className="mb-5 h-10 w-10 text-gold-300" />
-          <h1 className="text-3xl font-semibold">Solicitar orcamento</h1>
+          <h1 className="font-display text-3xl text-ivory-50">Solicitar orcamento</h1>
           <p className="mt-4 leading-7 text-slate-300">
             Para acompanhar status, aprovacao e pagamento Pix com seguranca, crie seu cadastro ou
             entre no painel do cliente. O formulario completo fica em "Novo orcamento" depois do login.
@@ -27,6 +28,6 @@ export function RequestQuotePage() {
           </div>
         </Card>
       </div>
-    </div>
+    </AuthShell>
   )
 }

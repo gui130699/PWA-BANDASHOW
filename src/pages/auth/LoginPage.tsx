@@ -1,9 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft, Music2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { z } from 'zod'
+import { AuthShell } from '../../components/brand/AuthShell'
 import { FirebaseNotice } from '../../components/FirebaseNotice'
 import { Button, Card, Input } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
@@ -41,21 +41,16 @@ export function LoginPage() {
   }
 
   return (
-    <div className="grid min-h-screen place-items-center bg-night-950 px-4 py-10 text-white">
-      <div className="w-full max-w-md space-y-4">
-        <Link className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-gold-200" to="/">
-          <ArrowLeft className="h-4 w-4" />
-          Voltar para o inicio
-        </Link>
-
+    <AuthShell eyebrow="Acesso ao sistema">
+      <div className="mx-auto w-full max-w-md space-y-4">
         {!firebaseReady && <FirebaseNotice />}
-        <Card>
-          <div className="mb-8 text-center">
-            <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-md bg-gold-400 text-night-950">
-              <Music2 className="h-8 w-8" />
-            </div>
-            <h1 className="text-2xl font-semibold">Entrar no Grupo Dvanera</h1>
-            <p className="mt-2 text-sm text-slate-400">Acesse como admin ou cliente.</p>
+        <Card className="border-gold-300/20 bg-night-850/95">
+          <div className="mb-7">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-300">Bem-vindo</p>
+            <h1 className="mt-2 font-display text-3xl text-ivory-50">Entrar no Grupo Dvanera</h1>
+            <p className="mt-2 text-sm leading-6 text-slate-400">
+              Acesse seus orcamentos, eventos e pagamentos.
+            </p>
           </div>
           <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
             <Input error={errors.email?.message} label="E-mail" type="email" {...register('email')} />
@@ -73,6 +68,6 @@ export function LoginPage() {
           </p>
         </Card>
       </div>
-    </div>
+    </AuthShell>
   )
 }

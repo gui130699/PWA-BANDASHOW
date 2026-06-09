@@ -2,7 +2,7 @@ import { where } from 'firebase/firestore'
 import { Copy, Send } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Badge, Button, Card, Loading, StatusBadge, Textarea } from '../../components/ui'
+import { Badge, Button, Card, Loading, QuoteTimeline, StatusBadge, Textarea } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
 import { useDocument } from '../../hooks/useDocument'
@@ -88,6 +88,9 @@ export function ClientQuoteDetailPage() {
         title={`Orcamento de ${quote.clientSnapshot.name}`}
       >
         <p className="mb-5 rounded-md bg-white/8 p-3 text-sm text-slate-200">{statusMessage(quote.status)}</p>
+        <div className="mb-7 border-b border-white/10 pb-6">
+          <QuoteTimeline status={quote.status} />
+        </div>
         <div className="grid gap-4 md:grid-cols-4">
           <div>
             <p className="text-sm text-slate-400">Total aprovado/estimado</p>

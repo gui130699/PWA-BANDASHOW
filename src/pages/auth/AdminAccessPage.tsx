@@ -1,9 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft, LogIn, ShieldCheck, UserPlus } from 'lucide-react'
+import { LogIn, ShieldCheck, UserPlus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
+import { AuthShell } from '../../components/brand/AuthShell'
 import { FirebaseNotice } from '../../components/FirebaseNotice'
 import { Button, Card, Input, Loading } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
@@ -82,21 +83,16 @@ export function AdminAccessPage() {
   const isClientAccount = profile?.role === 'client'
 
   return (
-    <div className="min-h-screen bg-night-950 px-4 py-10 text-white">
+    <AuthShell eyebrow="Area administrativa">
       <div className="mx-auto w-full max-w-md space-y-4">
-        <Link className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-gold-200" to="/">
-          <ArrowLeft className="h-4 w-4" />
-          Voltar para o inicio
-        </Link>
-
         {!firebaseReady && <FirebaseNotice />}
 
-        <Card>
+        <Card className="border-gold-300/20 bg-night-850/95">
           <div className="mb-8 text-center">
-            <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-md bg-gold-400 text-night-950">
+            <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-md border border-gold-300/30 bg-gold-400 text-night-950 shadow-gold">
               <ShieldCheck className="h-8 w-8" />
             </div>
-            <h1 className="text-2xl font-semibold">Acesso admin</h1>
+            <h1 className="font-display text-2xl text-ivory-50">Acesso administrativo</h1>
             <p className="mt-2 text-sm leading-6 text-slate-400">
               {adminConfigured
                 ? 'Entre com a conta admin cadastrada.'
@@ -176,6 +172,6 @@ export function AdminAccessPage() {
           )}
         </Card>
       </div>
-    </div>
+    </AuthShell>
   )
 }

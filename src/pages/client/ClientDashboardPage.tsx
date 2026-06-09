@@ -2,7 +2,7 @@ import { CalendarClock, ClipboardList, PlusCircle, WalletCards } from 'lucide-re
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { where } from 'firebase/firestore'
-import { Button, Card, DataTable, StatusBadge } from '../../components/ui'
+import { Button, Card, DataTable, MetricCard, PageHeader, StatusBadge } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
 import type { ClientQuoteView } from '../../types'
@@ -19,16 +19,19 @@ export function ClientDashboardPage() {
         label: 'Orcamentos enviados',
         value: quotes.length,
         icon: ClipboardList,
+        tone: 'gold' as const,
       },
       {
         label: 'Aguardando entrada',
         value: quotes.filter((quote) => quote.status === 'aprovado_aguardando_entrada').length,
         icon: WalletCards,
+        tone: 'blue' as const,
       },
       {
         label: 'Eventos agendados',
         value: quotes.filter((quote) => quote.status === 'agendado').length,
         icon: CalendarClock,
+        tone: 'green' as const,
       },
     ],
     [quotes],
@@ -36,27 +39,19 @@ export function ClientDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-2xl font-semibold text-white">Resumo</h2>
-          <p className="text-sm text-slate-400">Acompanhe seus orcamentos e pagamentos.</p>
-        </div>
-        <Link to="/cliente/novo-orcamento">
-          <Button icon={<PlusCircle className="h-4 w-4" />}>Novo orcamento</Button>
-        </Link>
-      </div>
+      <PageHeader
+        action={
+          <Link to="/cliente/novo-orcamento">
+            <Button icon={<PlusCircle className="h-4 w-4" />}>Novo orcamento</Button>
+          </Link>
+        }
+        description="Acompanhe seus orcamentos, eventos e pagamentos em um unico lugar."
+        eyebrow="Painel do cliente"
+        title="Seu resumo"
+      />
 
       <div className="grid gap-4 md:grid-cols-3">
-        {stats.map((item) => {
-          const Icon = item.icon
-          return (
-            <Card key={item.label}>
-              <Icon className="mb-4 h-7 w-7 text-gold-300" />
-              <p className="text-3xl font-semibold">{item.value}</p>
-              <p className="mt-1 text-sm text-slate-400">{item.label}</p>
-            </Card>
-          )
-        })}
+        {stats.map((item) => <MetricCard key={item.label} {...item} />)}
       </div>
 
       <Card title="Orcamentos recentes">

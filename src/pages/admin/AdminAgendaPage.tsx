@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Button, Card, DataTable, Input, Select, StatusBadge } from '../../components/ui'
+import { Button, Card, DataTable, Input, PageHeader, Select, StatusBadge } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
 import { cancelQuote, markQuoteAsDone } from '../../services/quoteService'
@@ -33,10 +33,15 @@ export function AdminAgendaPage() {
 
   return (
     <div className="space-y-6">
-      <Card
-        action={
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <PageHeader
+        description="Eventos confirmados entram aqui automaticamente apos a confirmacao da entrada."
+        eyebrow="Operacao"
+        title="Agenda de eventos"
+      />
+      <Card>
+        <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <Select
+              aria-label="Filtrar por status"
               onChange={(event) => setStatus(event.target.value)}
               options={agendaStatuses.map((item) => ({ label: quoteStatusMeta[item].label, value: item }))}
               placeholder="Todos"
@@ -45,11 +50,7 @@ export function AdminAgendaPage() {
             <Input onChange={(event) => setCity(event.target.value)} placeholder="Cidade" value={city} />
             <Input onChange={(event) => setClient(event.target.value)} placeholder="Cliente" value={client} />
             <Input onChange={(event) => setType(event.target.value)} placeholder="Tipo" value={type} />
-          </div>
-        }
-        description="Eventos confirmados entram aqui automaticamente apos confirmacao da entrada."
-        title="Agenda"
-      >
+        </div>
         <DataTable
           columns={[
             { header: 'Data', cell: (quote) => formatDate(quote.event.date) },

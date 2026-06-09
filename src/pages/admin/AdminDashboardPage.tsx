@@ -1,7 +1,7 @@
 import { BarChart3, CalendarDays, ClipboardList, TrendingUp, WalletCards } from 'lucide-react'
 import { useMemo } from 'react'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { Card, DataTable, StatusBadge } from '../../components/ui'
+import { Card, DataTable, MetricCard, PageHeader, StatusBadge } from '../../components/ui'
 import { useCollection } from '../../hooks/useCollection'
 import type { Payment, Quote } from '../../types'
 import { formatCurrency, formatDate } from '../../utils/format'
@@ -104,17 +104,19 @@ export function AdminDashboardPage() {
 
   return (
     <div className="space-y-6">
+      <PageHeader
+        description="Visao operacional de propostas, agenda, recebimentos e resultado estimado."
+        eyebrow="Centro de controle"
+        title="Resumo administrativo"
+      />
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {stats.map((item) => {
-          const Icon = item.icon
-          return (
-            <Card key={item.label}>
-              <Icon className="mb-4 h-7 w-7 text-gold-300" />
-              <p className="text-2xl font-semibold text-white">{item.value}</p>
-              <p className="mt-1 text-sm text-slate-400">{item.label}</p>
-            </Card>
-          )
-        })}
+        {stats.map((item, index) => (
+          <MetricCard
+            key={item.label}
+            {...item}
+            tone={index === 6 || index === 9 ? 'green' : index === 7 ? 'blue' : index < 4 ? 'gold' : 'neutral'}
+          />
+        ))}
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
@@ -126,10 +128,10 @@ export function AdminDashboardPage() {
                 <XAxis dataKey="month" stroke="#94a3b8" />
                 <YAxis stroke="#94a3b8" tickFormatter={(value) => `R$${Number(value) / 1000}k`} />
                 <Tooltip
-                  contentStyle={{ background: '#0d111c', border: '1px solid rgba(255,255,255,0.12)' }}
+                  contentStyle={{ background: '#101211', border: '1px solid rgba(216,170,54,0.25)' }}
                   formatter={(value) => formatCurrency(Number(value))}
                 />
-                <Bar dataKey="receita" fill="#f7b731" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="receita" fill="#d8aa36" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="custos" fill="#38bdf8" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
