@@ -49,8 +49,17 @@ type ServiceFormErrors = Partial<Record<'name' | 'category' | 'basePrice' | 'des
 export function AdminServicesPage() {
   const { user, profile } = useAuth()
   const { data: services, loading } = useCollection<Service>('services')
-  const { data: suppliers } = useCollection<Supplier>('suppliers')
-  const { data: members } = useCollection<BandMember>('bandMembers')
+  const linkedRecordConstraints = useMemo(() => [], [])
+  const {
+    data: suppliers,
+    loading: suppliersLoading,
+    error: suppliersError,
+  } = useCollection<Supplier>('suppliers', linkedRecordConstraints)
+  const {
+    data: members,
+    loading: membersLoading,
+    error: membersError,
+  } = useCollection<BandMember>('bandMembers', linkedRecordConstraints)
   const [form, setForm] = useState(emptyService)
   const [editingId, setEditingId] = useState('')
   const [filter, setFilter] = useState('all')
@@ -69,6 +78,20 @@ export function AdminServicesPage() {
   const categories = useMemo(
     () => [...new Set(services.map((service) => service.category).filter(Boolean))].sort(),
     [services],
+  )
+  const supplierOptions = useMemo(
+    () =>
+      suppliers
+        .filter((supplier) => supplier.active !== false)
+        .sort((first, second) => first.name.localeCompare(second.name, 'pt-BR')),
+    [suppliers],
+  )
+  const memberOptions = useMemo(
+    () =>
+      members
+        .filter((member) => member.active !== false)
+        .sort((first, second) => first.name.localeCompare(second.name, 'pt-BR')),
+    [members],
   )
   const filtered = useMemo(
     () =>
@@ -274,6 +297,18 @@ export function AdminServicesPage() {
     setMemberCost(0)
   }
 
+  function selectSupplier(value: string) {
+    const supplier = supplierOptions.find((item) => item.id === value)
+    setSupplierId(value)
+    setSupplierCost(supplier?.defaultCost || 0)
+  }
+
+  function selectMember(value: string) {
+    const member = memberOptions.find((item) => item.id === value)
+    setMemberId(value)
+    setMemberCost(member?.defaultPayment || 0)
+  }
+
   async function removeIfUnused(service: Service) {
     setFeedback('')
     try {
@@ -367,9 +402,18 @@ export function AdminServicesPage() {
             <div className="mt-3 grid gap-3 sm:grid-cols-[minmax(0,1fr)_8rem] xl:grid-cols-[minmax(0,1fr)_8rem_auto]">
               <Select
                 className="w-full min-w-0"
-                onChange={(event) => setSupplierId(event.target.value)}
-                options={suppliers.map((item) => ({ label: item.name, value: item.id }))}
-                placeholder="Fornecedor"
+                disabled={suppliersLoading || Boolean(suppliersError) || supplierOptions.length === 0}
+                onChange={(event) => selectSupplier(event.target.value)}
+                options={supplierOptions.map((item) => ({ label: item.name, value: item.id }))}
+                placeholder={
+                  suppliersLoading
+                    ? 'Carregando fornecedores...'
+                    : suppliersError
+                      ? 'Erro ao carregar fornecedores'
+                      : supplierOptions.length
+                        ? 'Selecione um fornecedor'
+                        : 'Nenhum fornecedor ativo cadastrado'
+                }
                 value={supplierId}
                 wrapperClassName="min-w-0"
               />
@@ -383,12 +427,23 @@ export function AdminServicesPage() {
               />
               <Button
                 className="w-full whitespace-nowrap sm:col-span-2 xl:col-span-1 xl:w-auto"
+                disabled={!supplierId || supplierCost <= 0}
                 onClick={addSupplierLink}
                 variant="secondary"
               >
                 Adicionar
               </Button>
             </div>
+            {suppliersError && (
+              <p className="mt-2 text-xs text-red-200">
+                Não foi possível carregar a lista de fornecedores.
+              </p>
+            )}
+            {!suppliersLoading && !suppliersError && supplierOptions.length === 0 && (
+              <p className="mt-2 text-xs text-amber-200">
+                Cadastre ou reative um fornecedor para vinculá-lo ao serviço.
+              </p>
+            )}
             <div className="mt-3 space-y-2">
               {form.supplierLinks.map((link, index) => (
                 <div className="flex flex-wrap justify-between gap-3 rounded-md bg-white/[0.05] px-3 py-2 text-sm" key={`${link.supplierId}-${index}`}>
@@ -411,9 +466,18 @@ export function AdminServicesPage() {
             <div className="mt-3 grid gap-3 sm:grid-cols-[minmax(0,1fr)_8rem] xl:grid-cols-[minmax(0,1fr)_8rem_auto]">
               <Select
                 className="w-full min-w-0"
-                onChange={(event) => setMemberId(event.target.value)}
-                options={members.map((item) => ({ label: item.name, value: item.id }))}
-                placeholder="Integrante"
+                disabled={membersLoading || Boolean(membersError) || memberOptions.length === 0}
+                onChange={(event) => selectMember(event.target.value)}
+                options={memberOptions.map((item) => ({ label: item.name, value: item.id }))}
+                placeholder={
+                  membersLoading
+                    ? 'Carregando integrantes...'
+                    : membersError
+                      ? 'Erro ao carregar integrantes'
+                      : memberOptions.length
+                        ? 'Selecione um integrante'
+                        : 'Nenhum integrante ativo cadastrado'
+                }
                 value={memberId}
                 wrapperClassName="min-w-0"
               />
@@ -427,12 +491,23 @@ export function AdminServicesPage() {
               />
               <Button
                 className="w-full whitespace-nowrap sm:col-span-2 xl:col-span-1 xl:w-auto"
+                disabled={!memberId || memberCost <= 0}
                 onClick={addMemberLink}
                 variant="secondary"
               >
                 Adicionar
               </Button>
             </div>
+            {membersError && (
+              <p className="mt-2 text-xs text-red-200">
+                Não foi possível carregar a lista de integrantes.
+              </p>
+            )}
+            {!membersLoading && !membersError && memberOptions.length === 0 && (
+              <p className="mt-2 text-xs text-amber-200">
+                Cadastre ou reative um integrante para vinculá-lo ao serviço.
+              </p>
+            )}
             <div className="mt-3 space-y-2">
               {form.memberCostLinks.map((link, index) => (
                 <div className="flex flex-wrap justify-between gap-3 rounded-md bg-white/[0.05] px-3 py-2 text-sm" key={`${link.memberId}-${index}`}>

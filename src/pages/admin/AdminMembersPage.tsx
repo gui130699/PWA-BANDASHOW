@@ -47,7 +47,8 @@ type MemberFormErrors = Partial<Record<'name' | 'role' | 'defaultPayment', strin
 
 export function AdminMembersPage() {
   const { user, profile } = useAuth()
-  const { data: members, loading } = useCollection<BandMember>('bandMembers')
+  const memberConstraints = useMemo(() => [], [])
+  const { data: members, loading } = useCollection<BandMember>('bandMembers', memberConstraints)
   const { data: payments } = useCollection<MemberPayment>('memberPayments')
   const [form, setForm] = useState(emptyMember)
   const [editingId, setEditingId] = useState('')

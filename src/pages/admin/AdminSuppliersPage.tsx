@@ -52,7 +52,8 @@ type SupplierFormErrors = Partial<Record<'name' | 'type' | 'defaultCost', string
 
 export function AdminSuppliersPage() {
   const { user, profile } = useAuth()
-  const { data: suppliers, loading } = useCollection<Supplier>('suppliers')
+  const supplierConstraints = useMemo(() => [], [])
+  const { data: suppliers, loading } = useCollection<Supplier>('suppliers', supplierConstraints)
   const { data: payments } = useCollection<SupplierPayment>('supplierPayments')
   const [form, setForm] = useState(emptySupplier)
   const [editingId, setEditingId] = useState('')
