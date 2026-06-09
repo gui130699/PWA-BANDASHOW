@@ -364,20 +364,30 @@ export function AdminServicesPage() {
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
           <div className="rounded-lg border border-white/10 bg-white/[0.04] p-4">
             <h3 className="font-semibold text-white">Fornecedores vinculados</h3>
-            <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_9rem_auto]">
+            <div className="mt-3 grid gap-3 sm:grid-cols-[minmax(0,1fr)_8rem] xl:grid-cols-[minmax(0,1fr)_8rem_auto]">
               <Select
+                className="w-full min-w-0"
                 onChange={(event) => setSupplierId(event.target.value)}
                 options={suppliers.map((item) => ({ label: item.name, value: item.id }))}
                 placeholder="Fornecedor"
                 value={supplierId}
+                wrapperClassName="min-w-0"
               />
               <Input
+                className="w-full min-w-0"
                 min={0}
                 onChange={(event) => setSupplierCost(Number(event.target.value))}
                 type="number"
                 value={supplierCost}
+                wrapperClassName="min-w-0"
               />
-              <Button onClick={addSupplierLink} variant="secondary">Adicionar</Button>
+              <Button
+                className="w-full whitespace-nowrap sm:col-span-2 xl:col-span-1 xl:w-auto"
+                onClick={addSupplierLink}
+                variant="secondary"
+              >
+                Adicionar
+              </Button>
             </div>
             <div className="mt-3 space-y-2">
               {form.supplierLinks.map((link, index) => (
@@ -398,20 +408,30 @@ export function AdminServicesPage() {
 
           <div className="rounded-lg border border-white/10 bg-white/[0.04] p-4">
             <h3 className="font-semibold text-white">Integrantes vinculados</h3>
-            <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_9rem_auto]">
+            <div className="mt-3 grid gap-3 sm:grid-cols-[minmax(0,1fr)_8rem] xl:grid-cols-[minmax(0,1fr)_8rem_auto]">
               <Select
+                className="w-full min-w-0"
                 onChange={(event) => setMemberId(event.target.value)}
                 options={members.map((item) => ({ label: item.name, value: item.id }))}
                 placeholder="Integrante"
                 value={memberId}
+                wrapperClassName="min-w-0"
               />
               <Input
+                className="w-full min-w-0"
                 min={0}
                 onChange={(event) => setMemberCost(Number(event.target.value))}
                 type="number"
                 value={memberCost}
+                wrapperClassName="min-w-0"
               />
-              <Button onClick={addMemberLink} variant="secondary">Adicionar</Button>
+              <Button
+                className="w-full whitespace-nowrap sm:col-span-2 xl:col-span-1 xl:w-auto"
+                onClick={addMemberLink}
+                variant="secondary"
+              >
+                Adicionar
+              </Button>
             </div>
             <div className="mt-3 space-y-2">
               {form.memberCostLinks.map((link, index) => (
