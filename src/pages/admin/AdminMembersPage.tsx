@@ -1,5 +1,7 @@
-import { Edit, Plus, RotateCcw } from 'lucide-react'
-import { useState } from 'react'
+import { Edit, ListPlus, Plus, RotateCcw } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { AdminOptionManager } from '../../components/admin/AdminOptionManager'
+import { AdminOptionSelect } from '../../components/admin/AdminOptionSelect'
 import {
   Badge,
   Button,
@@ -7,9 +9,9 @@ import {
   DataTable,
   Input,
   Modal,
-  PageTabs,
   RegistrationReviewModal,
   Select,
+  Tabs,
   Textarea,
 } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
@@ -18,9 +20,14 @@ import { createAuditLog } from '../../services/auditService'
 import { addEntity, updateEntity } from '../../services/firestoreService'
 import type { BandMember, MemberPayment } from '../../types'
 import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
-import { formatCurrency } from '../../utils/format'
+import { formatCurrency, formatDate } from '../../utils/format'
 
-const pixTypes = ['cpf', 'email', 'telefone', 'aleatoria']
+const pixTypes = [
+  { label: 'CPF', value: 'cpf' },
+  { label: 'E-mail', value: 'email' },
+  { label: 'Telefone', value: 'telefone' },
+  { label: 'Chave aleatória', value: 'aleatoria' },
+]
 
 const emptyMember: Omit<BandMember, 'id'> = {
   name: '',
@@ -48,13 +55,44 @@ export function AdminMembersPage() {
   const [activeTab, setActiveTab] = useState<MembersTab>('access')
   const [formErrors, setFormErrors] = useState<MemberFormErrors>({})
   const [reviewOpen, setReviewOpen] = useState(false)
-  const [editOpen, setEditOpen] = useState(false)
+  const [managerOpen, setManagerOpen] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [roleFilter, setRoleFilter] = useState('all')
+  const roles = useMemo(
+    () => [...new Set(members.map((member) => member.role).filter(Boolean))].sort(),
+    [members],
+  )
+  const filtered = useMemo(
+    () =>
+      members
+        .filter((member) =>
+          statusFilter === 'all'
+            ? true
+            : statusFilter === 'active'
+              ? member.active
+              : !member.active,
+        )
+        .filter((member) => roleFilter === 'all' || member.role === roleFilter)
+        .filter((member) =>
+          `${member.name} ${member.artisticName || ''} ${member.role}`
+            .toLocaleLowerCase('pt-BR')
+            .includes(search.toLocaleLowerCase('pt-BR')),
+        ),
+    [members, roleFilter, search, statusFilter],
+  )
 
   function resetForm() {
     setForm(emptyMember)
     setEditingId('')
     setFormErrors({})
+  }
+
+  function openNew() {
+    resetForm()
+    setFeedback('')
+    setActiveTab('registration')
   }
 
   function changeTab(tab: MembersTab) {
@@ -89,8 +127,8 @@ export function AdminMembersPage() {
 
   function validateMember(candidate: Omit<BandMember, 'id'>) {
     const errors: MemberFormErrors = {}
-    if (!candidate.name.trim()) errors.name = 'Informe o nome completo.'
-    if (!candidate.role.trim()) errors.role = 'Informe a funcao do integrante.'
+    if (!candidate.name) errors.name = 'Informe o nome completo.'
+    if (!candidate.role) errors.role = 'Informe a função do integrante.'
     if (!Number.isFinite(candidate.defaultPayment) || candidate.defaultPayment <= 0) {
       errors.defaultPayment = 'Informe um valor maior que zero.'
     }
@@ -114,15 +152,15 @@ export function AdminMembersPage() {
       active: member.active,
       notes: member.notes || '',
     })
-    setEditOpen(true)
+    setActiveTab('registration')
   }
 
   function requestCreate() {
-    setFeedback('')
     const candidate = normalizedForm()
     setForm(candidate)
+    setFeedback('')
     if (!validateMember(candidate)) {
-      setFeedback('Revise os campos obrigatorios antes de continuar.')
+      setFeedback('Revise os campos obrigatórios antes de continuar.')
       return
     }
     setReviewOpen(true)
@@ -144,24 +182,24 @@ export function AdminMembersPage() {
       setReviewOpen(false)
       resetForm()
       setActiveTab('access')
-      setFeedback('Integrante cadastrado.')
+      setFeedback('Integrante cadastrado com sucesso.')
     } catch (error) {
-      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel salvar.'))
+      setFeedback(getFriendlyFirebaseError(error, 'Não foi possível salvar o integrante.'))
     } finally {
       setSaving(false)
     }
   }
 
   async function saveEdit() {
-    setFeedback('')
     const candidate = normalizedForm()
     setForm(candidate)
     if (!editingId || !validateMember(candidate)) {
-      setFeedback('Revise os campos obrigatorios antes de salvar.')
+      setFeedback('Revise os campos obrigatórios antes de salvar.')
       return
     }
 
     setSaving(true)
+    setFeedback('')
     try {
       await updateEntity('bandMembers', editingId, candidate)
       await createAuditLog({
@@ -172,19 +210,31 @@ export function AdminMembersPage() {
         entityId: editingId,
         description: `Integrante ${candidate.name} atualizado.`,
       }).catch(() => undefined)
-      setEditOpen(false)
       resetForm()
-      setFeedback('Integrante atualizado.')
+      setActiveTab('access')
+      setFeedback('Integrante atualizado com sucesso.')
     } catch (error) {
-      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel atualizar.'))
+      setFeedback(getFriendlyFirebaseError(error, 'Não foi possível atualizar o integrante.'))
     } finally {
       setSaving(false)
     }
   }
 
-  function closeEdit() {
-    setEditOpen(false)
-    resetForm()
+  async function toggleStatus(member: BandMember) {
+    try {
+      await updateEntity('bandMembers', member.id, { active: !member.active })
+      await createAuditLog({
+        userId: user?.uid || 'admin',
+        userName: profile?.name || 'Admin',
+        action: member.active ? 'member_disabled' : 'member_enabled',
+        entity: 'bandMembers',
+        entityId: member.id,
+        description: `Integrante ${member.name} ${member.active ? 'desativado' : 'reativado'}.`,
+      }).catch(() => undefined)
+      setFeedback(`Integrante ${member.active ? 'desativado' : 'reativado'} com sucesso.`)
+    } catch (error) {
+      setFeedback(getFriendlyFirebaseError(error, 'Não foi possível alterar o status.'))
+    }
   }
 
   function renderMemberFields() {
@@ -198,20 +248,22 @@ export function AdminMembersPage() {
           value={form.name}
         />
         <Input
-          label="Nome artistico/apelido"
+          label="Nome artístico/apelido"
           onChange={(event) => updateForm('artisticName', event.target.value)}
           value={form.artisticName}
         />
-        <Input
+        <AdminOptionSelect
+          collectionName="memberRoles"
+          currentValue={editingId ? form.role : undefined}
           error={formErrors.role}
-          label="Funcao na banda *"
-          onChange={(event) => updateForm('role', event.target.value)}
+          label="Função na banda *"
+          onChange={(value) => updateForm('role', value)}
           required
           value={form.role}
         />
         <Input
           error={formErrors.defaultPayment}
-          label="Valor padrao por evento *"
+          label="Valor padrão por evento *"
           min={0}
           onChange={(event) => updateForm('defaultPayment', Number(event.target.value))}
           required
@@ -224,11 +276,20 @@ export function AdminMembersPage() {
         <Select
           label="Tipo da chave Pix"
           onChange={(event) => updateForm('pixKeyType', event.target.value as BandMember['pixKeyType'])}
-          options={pixTypes.map((type) => ({ label: type, value: type }))}
+          options={pixTypes}
           value={form.pixKeyType}
         />
+        <Select
+          label="Status"
+          onChange={(event) => updateForm('active', event.target.value === 'true')}
+          options={[
+            { label: 'Ativo', value: 'true' },
+            { label: 'Inativo', value: 'false' },
+          ]}
+          value={String(form.active)}
+        />
         <Textarea
-          label="Observacoes"
+          label="Observações"
           onChange={(event) => updateForm('notes', event.target.value)}
           value={form.notes}
           wrapperClassName="md:col-span-2"
@@ -239,19 +300,19 @@ export function AdminMembersPage() {
 
   return (
     <div className="space-y-6">
-      <PageTabs
+      <Tabs
         activeTab={activeTab}
         onChange={changeTab}
         tabs={[
           {
             value: 'access',
             label: 'Acesso',
-            description: 'Somente consulta e gestao dos integrantes cadastrados',
+            description: 'Consulta e gestão dos integrantes cadastrados',
           },
           {
             value: 'registration',
             label: 'Cadastro',
-            description: 'Somente para cadastrar um novo integrante',
+            description: editingId ? 'Edição do integrante selecionado' : 'Cadastro de um novo integrante',
           },
         ]}
       />
@@ -260,98 +321,137 @@ export function AdminMembersPage() {
 
       {activeTab === 'registration' ? (
         <Card
-          description="Esta area e exclusiva para novos cadastros. Campos com * sao obrigatorios."
+          description={
+            editingId
+              ? 'Altere os dados necessários e salve para retornar à consulta.'
+              : 'Esta área é exclusiva para novos cadastros. Campos com * são obrigatórios.'
+          }
           role="tabpanel"
-          title="Novo cadastro de integrante"
+          title={editingId ? 'Editar integrante' : 'Novo cadastro de integrante'}
         >
           {renderMemberFields()}
           <div className="mt-6 flex flex-wrap gap-3">
-            <Button icon={<Plus className="h-4 w-4" />} onClick={requestCreate}>
-              Revisar e cadastrar integrante
+            <Button
+              icon={editingId ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+              isLoading={saving}
+              onClick={editingId ? () => void saveEdit() : requestCreate}
+            >
+              {editingId ? 'Salvar alterações' : 'Revisar e cadastrar integrante'}
             </Button>
             <Button icon={<RotateCcw className="h-4 w-4" />} onClick={resetForm} variant="secondary">
-              Limpar formulario
+              Limpar formulário
+            </Button>
+            <Button icon={<ListPlus className="h-4 w-4" />} onClick={() => setManagerOpen(true)} variant="secondary">
+              Gerenciar funções
             </Button>
           </div>
         </Card>
       ) : (
-        <div role="tabpanel">
-          <Card
-            description="Consulte os integrantes existentes. A edicao abre em uma janela separada e nao utiliza a aba Cadastro."
-            title="Consulta de integrantes cadastrados"
-          >
-            <DataTable
-              columns={[
-                {
-                  header: 'Nome',
-                  cell: (member) => (
-                    <div>
-                      <p className="font-medium text-white">{member.name}</p>
-                      <p className="text-xs text-slate-400">{member.artisticName}</p>
-                    </div>
-                  ),
-                },
-                { header: 'Funcao', cell: (member) => member.role },
-                { header: 'Pagamento padrao', cell: (member) => formatCurrency(member.defaultPayment) },
-                {
-                  header: 'Total pago',
-                  cell: (member) => formatCurrency(payments.filter((payment) => payment.memberId === member.id).reduce((sum, payment) => sum + payment.amount, 0)),
-                },
-                {
-                  header: 'Status',
-                  cell: (member) => <Badge className={member.active ? 'bg-emerald-400/15 text-emerald-200 ring-emerald-300/20' : 'bg-red-500/15 text-red-200 ring-red-300/20'}>{member.active ? 'Ativo' : 'Inativo'}</Badge>,
-                },
-                {
-                  header: 'Acoes',
-                  cell: (member) => (
-                    <div className="flex flex-wrap gap-2">
-                      <Button
-                        aria-label={`Editar integrante ${member.name}`}
-                        className="h-9 px-3"
-                        icon={<Edit className="h-4 w-4" />}
-                        onClick={() => edit(member)}
-                        variant="secondary"
-                      >
-                        Editar
-                      </Button>
-                      <Button className="h-9 px-3" onClick={async () => {
-                        await updateEntity('bandMembers', member.id, { active: !member.active })
-                        await createAuditLog({
-                          userId: user?.uid || 'admin',
-                          userName: profile?.name || 'Admin',
-                          action: member.active ? 'member_disabled' : 'member_enabled',
-                          entity: 'bandMembers',
-                          entityId: member.id,
-                          description: `Integrante ${member.name} ${member.active ? 'desativado' : 'reativado'}.`,
-                        }).catch(() => undefined)
-                      }} variant="secondary">{member.active ? 'Desativar' : 'Reativar'}</Button>
-                    </div>
-                  ),
-                },
+        <Card
+          action={
+            <div className="flex flex-wrap gap-3">
+              <Button icon={<Plus className="h-4 w-4" />} onClick={openNew}>
+                Novo integrante
+              </Button>
+              <Button icon={<ListPlus className="h-4 w-4" />} onClick={() => setManagerOpen(true)} variant="secondary">
+                Gerenciar funções
+              </Button>
+            </div>
+          }
+          description="Consulte, filtre e edite os integrantes já cadastrados."
+          role="tabpanel"
+          title="Integrantes cadastrados"
+        >
+          <div className="mb-5 grid gap-3 md:grid-cols-[1fr_12rem_12rem]">
+            <Input onChange={(event) => setSearch(event.target.value)} placeholder="Buscar integrante..." value={search} />
+            <Select
+              onChange={(event) => setRoleFilter(event.target.value)}
+              options={[
+                { label: 'Todas as funções', value: 'all' },
+                ...roles.map((role) => ({ label: role, value: role })),
               ]}
-              data={members}
-              emptyTitle="Nenhum integrante cadastrado"
-              getRowKey={(member) => member.id}
-              loading={loading}
+              value={roleFilter}
             />
-          </Card>
-        </div>
+            <Select
+              onChange={(event) => setStatusFilter(event.target.value)}
+              options={[
+                { label: 'Todos os status', value: 'all' },
+                { label: 'Ativos', value: 'active' },
+                { label: 'Inativos', value: 'inactive' },
+              ]}
+              value={statusFilter}
+            />
+          </div>
+          <DataTable
+            columns={[
+              {
+                header: 'Nome',
+                cell: (member) => (
+                  <div>
+                    <p className="font-medium text-white">{member.name}</p>
+                    <p className="text-xs text-slate-400">{member.artisticName}</p>
+                  </div>
+                ),
+              },
+              { header: 'Função', cell: (member) => member.role },
+              { header: 'Contato', cell: (member) => member.phone || member.email || '-' },
+              { header: 'Pagamento padrão', cell: (member) => formatCurrency(member.defaultPayment) },
+              {
+                header: 'Total pago',
+                cell: (member) => formatCurrency(payments.filter((payment) => payment.memberId === member.id).reduce((sum, payment) => sum + payment.amount, 0)),
+              },
+              { header: 'Atualização', cell: (member) => formatDate(member.updatedAt || member.createdAt) },
+              {
+                header: 'Status',
+                cell: (member) => (
+                  <Badge className={member.active ? 'bg-emerald-400/15 text-emerald-200 ring-emerald-300/20' : 'bg-red-500/15 text-red-200 ring-red-300/20'}>
+                    {member.active ? 'Ativo' : 'Inativo'}
+                  </Badge>
+                ),
+              },
+              {
+                header: 'Ações',
+                cell: (member) => (
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      aria-label={`Editar integrante ${member.name}`}
+                      className="h-9 px-3"
+                      icon={<Edit className="h-4 w-4" />}
+                      onClick={() => edit(member)}
+                      variant="secondary"
+                    >
+                      Editar
+                    </Button>
+                    <Button className="h-9 px-3" onClick={() => void toggleStatus(member)} variant="secondary">
+                      {member.active ? 'Desativar' : 'Reativar'}
+                    </Button>
+                  </div>
+                ),
+              },
+            ]}
+            data={filtered}
+            emptyTitle="Nenhum integrante encontrado"
+            getRowKey={(member) => member.id}
+            loading={loading}
+          />
+        </Card>
       )}
 
       <RegistrationReviewModal
         confirmLabel="Confirmar cadastro"
-        description="Confira os dados abaixo. O integrante somente sera criado depois da sua confirmacao."
+        description="Confira os dados abaixo. O integrante somente será criado depois da sua confirmação."
         isLoading={saving}
         items={[
           { label: 'Nome completo', value: form.name },
-          { label: 'Nome artistico', value: form.artisticName || 'Nao informado' },
-          { label: 'Funcao', value: form.role },
+          { label: 'Nome artístico', value: form.artisticName || 'Não informado' },
+          { label: 'Função', value: form.role },
           { label: 'Valor por evento', value: formatCurrency(form.defaultPayment) },
-          { label: 'Telefone', value: form.phone || 'Nao informado' },
-          { label: 'E-mail', value: form.email || 'Nao informado' },
-          { label: 'Chave Pix', value: form.pixKey || 'Nao informada' },
-          { label: 'Tipo da chave', value: form.pixKey ? form.pixKeyType || 'Nao informado' : 'Nao informado' },
-          { label: 'Observacoes', value: form.notes || 'Nenhuma observacao' },
+          { label: 'Telefone', value: form.phone || 'Não informado' },
+          { label: 'E-mail', value: form.email || 'Não informado' },
+          { label: 'Chave Pix', value: form.pixKey || 'Não informada' },
+          { label: 'Tipo da chave', value: form.pixKey ? form.pixKeyType || 'Não informado' : 'Não informado' },
+          { label: 'Status', value: form.active ? 'Ativo' : 'Inativo' },
+          { label: 'Observações', value: form.notes || 'Nenhuma observação' },
         ]}
         onCancel={() => setReviewOpen(false)}
         onConfirm={() => void createConfirmed()}
@@ -359,16 +459,13 @@ export function AdminMembersPage() {
         title="Confirmar cadastro do integrante"
       />
 
-      <Modal onClose={closeEdit} open={editOpen} title="Editar integrante cadastrado">
-        {renderMemberFields()}
-        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-          <Button disabled={saving} onClick={closeEdit} variant="secondary">
-            Cancelar
-          </Button>
-          <Button isLoading={saving} onClick={() => void saveEdit()}>
-            Salvar alteracoes
-          </Button>
-        </div>
+      <Modal onClose={() => setManagerOpen(false)} open={managerOpen} title="Funções de integrantes">
+        <AdminOptionManager
+          collectionName="memberRoles"
+          description="Opções disponíveis no cadastro e na edição de integrantes."
+          singularLabel="Função"
+          title="Gerenciar funções de integrantes"
+        />
       </Modal>
     </div>
   )

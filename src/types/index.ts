@@ -23,6 +23,13 @@ export type FirestoreEntity = {
   updatedAt?: DateLike
 }
 
+export type AdminOption = FirestoreEntity & {
+  name: string
+  description?: string
+  active: boolean
+  order?: number
+}
+
 export type AppUser = {
   uid: string
   name: string
@@ -235,31 +242,82 @@ export type SupplierPayment = FirestoreEntity & {
 export type Settings = {
   id?: string
   bandName: string
+  instagram?: string
+  city?: string
+  state?: string
+  shortDescription?: string
+  aboutText?: string
   pixReceiverName: string
   pixKey: string
   pixKeyType: PixKeyType
   bankName?: string
   defaultDepositPercent: number
   paymentInstructions: string
+  paymentWarningMessage?: string
   whatsapp?: string
   email?: string
-  serviceTypes: string[]
-  eventTypes: string[]
+  quoteValidityDays?: number
+  allowManualDiscount?: boolean
+  allowTravelFee?: boolean
+  showEstimatedValueBeforeApproval?: boolean
+  allowClientNotes?: boolean
+  quoteSubmittedMessage?: string
+  quoteApprovedMessage?: string
+  quoteRejectedMessage?: string
+  quoteCanceledMessage?: string
+  messages?: {
+    quoteSubmitted?: string
+    quoteInReview?: string
+    quoteApproved?: string
+    paymentReported?: string
+    depositConfirmed?: string
+    eventScheduled?: string
+    eventCompleted?: string
+    quoteRejected?: string
+    quoteCanceled?: string
+  }
+  homeTitle?: string
+  homeSubtitle?: string
+  homePrimaryButtonText?: string
+  homeSecondaryButtonText?: string
+  useHeroImage?: boolean
+  heroImagePath?: string
+  logoPath?: string
+  brandAccentColor?: string
+  serviceTypes?: string[]
+  eventTypes?: string[]
   updatedAt?: DateLike
 }
 
 export type PublicSettings = {
   id?: string
   bandName: string
+  instagram?: string
+  city?: string
+  state?: string
+  shortDescription?: string
+  aboutText?: string
   pixReceiverName: string
   pixKey: string
   pixKeyType: PixKeyType
   bankName?: string
   paymentInstructions?: string
+  paymentWarningMessage?: string
   whatsapp?: string
   email?: string
-  serviceTypes: string[]
-  eventTypes: string[]
+  showEstimatedValueBeforeApproval?: boolean
+  allowClientNotes?: boolean
+  quoteSubmittedMessage?: string
+  homeTitle?: string
+  homeSubtitle?: string
+  homePrimaryButtonText?: string
+  homeSecondaryButtonText?: string
+  useHeroImage?: boolean
+  heroImagePath?: string
+  logoPath?: string
+  brandAccentColor?: string
+  serviceTypes?: string[]
+  eventTypes?: string[]
   updatedAt?: DateLike
 }
 
