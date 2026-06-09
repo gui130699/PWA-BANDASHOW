@@ -233,6 +233,7 @@ export type SupplierPayment = FirestoreEntity & {
 }
 
 export type Settings = {
+  id?: string
   bandName: string
   pixReceiverName: string
   pixKey: string
@@ -242,10 +243,13 @@ export type Settings = {
   paymentInstructions: string
   whatsapp?: string
   email?: string
+  serviceTypes: string[]
+  eventTypes: string[]
   updatedAt?: DateLike
 }
 
 export type PublicSettings = {
+  id?: string
   bandName: string
   pixReceiverName: string
   pixKey: string
@@ -254,6 +258,8 @@ export type PublicSettings = {
   paymentInstructions?: string
   whatsapp?: string
   email?: string
+  serviceTypes: string[]
+  eventTypes: string[]
   updatedAt?: DateLike
 }
 

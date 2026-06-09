@@ -11,6 +11,28 @@ const services = [
   { name: 'Hora extra', description: 'Periodo adicional de apresentacao.', category: 'Hora extra', basePrice: 600 },
 ]
 
+const serviceTypes = [
+  'Show',
+  'Som',
+  'Iluminacao',
+  'Transporte',
+  'Cerimonial',
+  'Hora extra',
+  'Estrutura adicional',
+  'Outro',
+]
+
+const eventTypes = [
+  'Casamento',
+  'Aniversario',
+  'Formatura',
+  'Evento empresarial',
+  'Festa particular',
+  'Baile',
+  'Festival',
+  'Outro',
+]
+
 const suppliers = [
   { name: 'Fornecedor de Som', type: 'Som', defaultCost: 800 },
   { name: 'Fornecedor de Iluminacao', type: 'Iluminacao', defaultCost: 600 },
@@ -82,6 +104,8 @@ async function main() {
     bankName: '',
     paymentInstructions:
       'Apos realizar o Pix, clique em "Ja realizei o pagamento" para que nossa equipe confirme manualmente.',
+    serviceTypes,
+    eventTypes,
     updatedAt: now(),
   }
 

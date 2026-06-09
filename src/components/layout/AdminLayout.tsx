@@ -8,6 +8,7 @@ import {
   WalletCards,
   ClipboardList,
   Music,
+  Tags,
 } from 'lucide-react'
 import { DashboardLayout } from './DashboardLayout'
 
@@ -16,6 +17,7 @@ const adminItems = [
   { label: 'Agenda', to: '/admin/agenda', icon: CalendarDays },
   { label: 'Orcamentos', to: '/admin/orcamentos', icon: ClipboardList },
   { label: 'Servicos', to: '/admin/servicos', icon: Music },
+  { label: 'Tipos', to: '/admin/tipos', icon: Tags },
   { label: 'Integrantes', to: '/admin/integrantes', icon: Users },
   { label: 'Fornecedores', to: '/admin/fornecedores', icon: Truck },
   { label: 'Pagamentos', to: '/admin/pagamentos', icon: HandCoins },

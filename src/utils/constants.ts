@@ -6,7 +6,7 @@ import {
   OctagonX,
   WalletCards,
 } from 'lucide-react'
-import type { QuoteStatus } from '../types'
+import type { QuoteStatus, Settings } from '../types'
 
 export const serviceCategories = [
   'Show',
@@ -117,7 +117,7 @@ export const quoteStatusMeta: Record<
   },
 }
 
-export const defaultSettings = {
+export const defaultSettings: Settings = {
   bandName: 'Grupo Dvanera',
   pixReceiverName: '',
   pixKey: '',
@@ -128,4 +128,6 @@ export const defaultSettings = {
     'Apos realizar o Pix, clique em "Ja realizei o pagamento" para que nossa equipe confirme manualmente.',
   whatsapp: '',
   email: '',
-} as const
+  serviceTypes: [...serviceCategories],
+  eventTypes: [...eventTypes],
+}

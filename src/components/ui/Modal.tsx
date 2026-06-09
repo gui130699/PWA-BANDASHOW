@@ -1,5 +1,6 @@
 import { X } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { useEffect, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { Button } from './Button'
 
 type ModalProps = {
@@ -10,11 +11,33 @@ type ModalProps = {
 }
 
 export function Modal({ open, title, children, onClose }: ModalProps) {
+  useEffect(() => {
+    if (!open) return undefined
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') onClose()
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [onClose, open])
+
   if (!open) return null
 
-  return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-2xl animate-fade-up rounded-lg border border-gold-300/15 bg-night-900 p-5 shadow-soft">
+  return createPortal(
+    <div
+      aria-modal="true"
+      className="fixed inset-0 z-[100] grid place-items-center bg-black/80 p-4 backdrop-blur-sm"
+      role="dialog"
+    >
+      <div className="max-h-[90vh] w-full max-w-3xl animate-fade-up overflow-y-auto rounded-lg border border-gold-300/20 bg-night-900 p-5 shadow-soft">
         <div className="mb-5 flex items-center justify-between gap-4">
           <h2 className="font-display text-lg text-ivory-50">{title}</h2>
           <Button aria-label="Fechar" className="h-10 w-10 px-0" onClick={onClose} variant="ghost">
@@ -23,6 +46,7 @@ export function Modal({ open, title, children, onClose }: ModalProps) {
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

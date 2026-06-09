@@ -1,7 +1,7 @@
 DOCUMENTACAO COMPLETA DO PROJETO - PWA-BANDASHOW / GRUPO DVANERA
 Gerado automaticamente para leitura, manutencao, auditoria tecnica e backup.
-Data de geracao: 2026-06-09 07:25:26 - America/Sao_Paulo
-Commit base documentado: 0daea7f
+Data de geracao: 2026-06-09 10:28:03 - America/Sao_Paulo
+Commit base documentado: 725ce89
 Pasta local: C:\Users\guilh\OneDrive\HP Guilherme Notebook\Área de Trabalho\PWA- Everton
 Repositorio: https://github.com/gui130699/PWA-BANDASHOW.git
 Pages: https://gui130699.github.io/PWA-BANDASHOW/
@@ -8232,7 +8232,7 @@ FIM DO ARQUIVO: public/manifest.webmanifest
 ----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: public/sw.js
 ----------------------------------------------------------------------------------------------------
-const CACHE_NAME = 'grupo-dvanera-v5'
+const CACHE_NAME = 'grupo-dvanera-v6'
 const BASE_PATH = new URL(self.registration.scope).pathname
 const APP_SHELL = [
   BASE_PATH,
@@ -9244,6 +9244,28 @@ const services = [
   { name: 'Hora extra', description: 'Periodo adicional de apresentacao.', category: 'Hora extra', basePrice: 600 },
 ]
 
+const serviceTypes = [
+  'Show',
+  'Som',
+  'Iluminacao',
+  'Transporte',
+  'Cerimonial',
+  'Hora extra',
+  'Estrutura adicional',
+  'Outro',
+]
+
+const eventTypes = [
+  'Casamento',
+  'Aniversario',
+  'Formatura',
+  'Evento empresarial',
+  'Festa particular',
+  'Baile',
+  'Festival',
+  'Outro',
+]
+
 const suppliers = [
   { name: 'Fornecedor de Som', type: 'Som', defaultCost: 800 },
   { name: 'Fornecedor de Iluminacao', type: 'Iluminacao', defaultCost: 600 },
@@ -9315,6 +9337,8 @@ async function main() {
     bankName: '',
     paymentInstructions:
       'Apos realizar o Pix, clique em "Ja realizei o pagamento" para que nossa equipe confirme manualmente.',
+    serviceTypes,
+    eventTypes,
     updatedAt: now(),
   }
 
@@ -9498,6 +9522,7 @@ import {
   WalletCards,
   ClipboardList,
   Music,
+  Tags,
 } from 'lucide-react'
 import { DashboardLayout } from './DashboardLayout'
 
@@ -9506,6 +9531,7 @@ const adminItems = [
   { label: 'Agenda', to: '/admin/agenda', icon: CalendarDays },
   { label: 'Orcamentos', to: '/admin/orcamentos', icon: ClipboardList },
   { label: 'Servicos', to: '/admin/servicos', icon: Music },
+  { label: 'Tipos', to: '/admin/tipos', icon: Tags },
   { label: 'Integrantes', to: '/admin/integrantes', icon: Users },
   { label: 'Fornecedores', to: '/admin/fornecedores', icon: Truck },
   { label: 'Pagamentos', to: '/admin/pagamentos', icon: HandCoins },
@@ -10067,8 +10093,10 @@ export { Loading } from './Loading'
 export { MetricCard } from './MetricCard'
 export { Modal } from './Modal'
 export { MoneyInput } from './MoneyInput'
+export { PageTabs } from './PageTabs'
 export { PageHeader } from './PageHeader'
 export { QuoteTimeline } from './QuoteTimeline'
+export { RegistrationReviewModal } from './RegistrationReviewModal'
 export { Select } from './Select'
 export { Textarea } from './Textarea'
 
@@ -10172,7 +10200,8 @@ FIM DO ARQUIVO: src/components/ui/MetricCard.tsx
 INICIO DO ARQUIVO: src/components/ui/Modal.tsx
 ----------------------------------------------------------------------------------------------------
 import { X } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { useEffect, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { Button } from './Button'
 
 type ModalProps = {
@@ -10183,11 +10212,33 @@ type ModalProps = {
 }
 
 export function Modal({ open, title, children, onClose }: ModalProps) {
+  useEffect(() => {
+    if (!open) return undefined
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') onClose()
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [onClose, open])
+
   if (!open) return null
 
-  return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-2xl animate-fade-up rounded-lg border border-gold-300/15 bg-night-900 p-5 shadow-soft">
+  return createPortal(
+    <div
+      aria-modal="true"
+      className="fixed inset-0 z-[100] grid place-items-center bg-black/80 p-4 backdrop-blur-sm"
+      role="dialog"
+    >
+      <div className="max-h-[90vh] w-full max-w-3xl animate-fade-up overflow-y-auto rounded-lg border border-gold-300/20 bg-night-900 p-5 shadow-soft">
         <div className="mb-5 flex items-center justify-between gap-4">
           <h2 className="font-display text-lg text-ivory-50">{title}</h2>
           <Button aria-label="Fechar" className="h-10 w-10 px-0" onClick={onClose} variant="ghost">
@@ -10196,7 +10247,8 @@ export function Modal({ open, title, children, onClose }: ModalProps) {
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 
@@ -10262,6 +10314,67 @@ export function PageHeader({ title, description, action, eyebrow }: PageHeaderPr
 FIM DO ARQUIVO: src/components/ui/PageHeader.tsx
 
 ----------------------------------------------------------------------------------------------------
+INICIO DO ARQUIVO: src/components/ui/PageTabs.tsx
+----------------------------------------------------------------------------------------------------
+import { clsx } from 'clsx'
+
+type PageTab<T extends string> = {
+  value: T
+  label: string
+  description?: string
+}
+
+type PageTabsProps<T extends string> = {
+  activeTab: T
+  onChange: (tab: T) => void
+  tabs: PageTab<T>[]
+}
+
+export function PageTabs<T extends string>({
+  activeTab,
+  onChange,
+  tabs,
+}: PageTabsProps<T>) {
+  return (
+    <div
+      aria-label="Navegacao da pagina"
+      className="grid w-full gap-3 rounded-lg border border-white/10 bg-night-850/92 p-3 shadow-soft sm:grid-cols-2"
+      role="tablist"
+    >
+      {tabs.map((tab) => {
+        const active = tab.value === activeTab
+
+        return (
+          <button
+            aria-selected={active}
+            className={clsx(
+              'min-h-20 rounded-md border px-5 py-4 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-300',
+              active
+                ? 'border-gold-300 bg-gold-400 text-night-950 shadow-glow'
+                : 'border-white/10 bg-black/15 text-slate-300 hover:border-gold-300/40 hover:bg-white/8 hover:text-white',
+            )}
+            key={tab.value}
+            onClick={() => onChange(tab.value)}
+            role="tab"
+            type="button"
+          >
+            <span className="block text-base font-semibold">{tab.label}</span>
+            {tab.description && (
+              <span className={clsx('mt-1 block text-xs', active ? 'text-night-800' : 'text-slate-500')}>
+                {tab.description}
+              </span>
+            )}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+----------------------------------------------------------------------------------------------------
+FIM DO ARQUIVO: src/components/ui/PageTabs.tsx
+
+----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: src/components/ui/QuoteTimeline.tsx
 ----------------------------------------------------------------------------------------------------
 import { Check } from 'lucide-react'
@@ -10307,6 +10420,74 @@ export function QuoteTimeline({ status }: { status: QuoteStatus }) {
 
 ----------------------------------------------------------------------------------------------------
 FIM DO ARQUIVO: src/components/ui/QuoteTimeline.tsx
+
+----------------------------------------------------------------------------------------------------
+INICIO DO ARQUIVO: src/components/ui/RegistrationReviewModal.tsx
+----------------------------------------------------------------------------------------------------
+import { CheckCircle2 } from 'lucide-react'
+import { Button } from './Button'
+import { Modal } from './Modal'
+
+type ReviewItem = {
+  label: string
+  value: string
+}
+
+type RegistrationReviewModalProps = {
+  open: boolean
+  title: string
+  description: string
+  items: ReviewItem[]
+  confirmLabel: string
+  isLoading?: boolean
+  onCancel: () => void
+  onConfirm: () => void
+}
+
+export function RegistrationReviewModal({
+  open,
+  title,
+  description,
+  items,
+  confirmLabel,
+  isLoading,
+  onCancel,
+  onConfirm,
+}: RegistrationReviewModalProps) {
+  return (
+    <Modal onClose={onCancel} open={open} title={title}>
+      <div className="rounded-lg border border-emerald-300/20 bg-emerald-400/10 p-4">
+        <div className="flex gap-3">
+          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-300" />
+          <p className="text-sm leading-6 text-emerald-50">{description}</p>
+        </div>
+      </div>
+
+      <dl className="mt-5 divide-y divide-white/10 overflow-hidden rounded-lg border border-white/10">
+        {items.map((item) => (
+          <div className="grid gap-1 bg-white/[0.025] px-4 py-3 sm:grid-cols-[11rem_1fr]" key={item.label}>
+            <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">
+              {item.label}
+            </dt>
+            <dd className="whitespace-pre-line text-sm text-ivory-50">{item.value || '-'}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <Button disabled={isLoading} onClick={onCancel} variant="secondary">
+          Voltar e corrigir
+        </Button>
+        <Button isLoading={isLoading} onClick={onConfirm} variant="success">
+          {confirmLabel}
+        </Button>
+      </div>
+    </Modal>
+  )
+}
+
+----------------------------------------------------------------------------------------------------
+FIM DO ARQUIVO: src/components/ui/RegistrationReviewModal.tsx
 
 ----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: src/components/ui/Select.tsx
@@ -10952,6 +11133,306 @@ export function AdminAgendaPage() {
 FIM DO ARQUIVO: src/pages/admin/AdminAgendaPage.tsx
 
 ----------------------------------------------------------------------------------------------------
+INICIO DO ARQUIVO: src/pages/admin/AdminCatalogTypesPage.tsx
+----------------------------------------------------------------------------------------------------
+import { Edit, Plus, RotateCcw, Trash2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Button, Card, ConfirmDialog, Input, Loading } from '../../components/ui'
+import { useAuth } from '../../contexts/AuthContext'
+import { createAuditLog } from '../../services/auditService'
+import {
+  getSettings,
+  renameServiceType,
+  saveCatalogTypes,
+} from '../../services/settingsService'
+import { eventTypes, serviceCategories } from '../../utils/constants'
+import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
+
+type CatalogKind = 'service' | 'event'
+
+type CatalogState = Record<CatalogKind, string[]>
+type DraftState = Record<CatalogKind, string>
+type EditingState = Record<CatalogKind, number | null>
+
+type PendingDelete = {
+  kind: CatalogKind
+  index: number
+  name: string
+} | null
+
+const catalogMeta: Record<
+  CatalogKind,
+  {
+    title: string
+    description: string
+    inputLabel: string
+    emptyTitle: string
+  }
+> = {
+  service: {
+    title: 'Tipos de servico',
+    description:
+      'Categorias usadas no cadastro de servicos. Ao renomear, os servicos atuais dessa categoria tambem sao atualizados.',
+    inputLabel: 'Nome do tipo de servico',
+    emptyTitle: 'Nenhum tipo de servico cadastrado',
+  },
+  event: {
+    title: 'Tipos de evento',
+    description:
+      'Opcoes exibidas ao cliente em novos orcamentos. Eventos ja enviados preservam o nome original.',
+    inputLabel: 'Nome do tipo de evento',
+    emptyTitle: 'Nenhum tipo de evento cadastrado',
+  },
+}
+
+function normalizeName(value: string) {
+  return value.trim().replace(/\s+/g, ' ')
+}
+
+export function AdminCatalogTypesPage() {
+  const { user, profile } = useAuth()
+  const [catalogs, setCatalogs] = useState<CatalogState>({
+    service: [...serviceCategories],
+    event: [...eventTypes],
+  })
+  const [drafts, setDrafts] = useState<DraftState>({ service: '', event: '' })
+  const [editing, setEditing] = useState<EditingState>({ service: null, event: null })
+  const [pendingDelete, setPendingDelete] = useState<PendingDelete>(null)
+  const [loading, setLoading] = useState(true)
+  const [savingKind, setSavingKind] = useState<CatalogKind | null>(null)
+  const [feedback, setFeedback] = useState('')
+
+  useEffect(() => {
+    getSettings()
+      .then((settings) => {
+        setCatalogs({
+          service: settings.serviceTypes?.length ? settings.serviceTypes : [...serviceCategories],
+          event: settings.eventTypes?.length ? settings.eventTypes : [...eventTypes],
+        })
+      })
+      .catch((error) => {
+        setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel carregar os tipos.'))
+      })
+      .finally(() => setLoading(false))
+  }, [])
+
+  function resetEditor(kind: CatalogKind) {
+    setDrafts((current) => ({ ...current, [kind]: '' }))
+    setEditing((current) => ({ ...current, [kind]: null }))
+  }
+
+  function startEditing(kind: CatalogKind, index: number) {
+    setDrafts((current) => ({ ...current, [kind]: catalogs[kind][index] }))
+    setEditing((current) => ({ ...current, [kind]: index }))
+    setFeedback('')
+  }
+
+  async function persistCatalog(
+    kind: CatalogKind,
+    nextValues: string[],
+    actionDescription: string,
+    renamedFrom?: string,
+    renamedTo?: string,
+  ) {
+    setSavingKind(kind)
+    setFeedback('')
+
+    try {
+      const nextCatalogs: CatalogState = { ...catalogs, [kind]: nextValues }
+
+      if (kind === 'service' && renamedFrom && renamedTo && renamedFrom !== renamedTo) {
+        await renameServiceType(
+          nextCatalogs.service,
+          nextCatalogs.event,
+          renamedFrom,
+          renamedTo,
+        )
+      } else {
+        await saveCatalogTypes(nextCatalogs.service, nextCatalogs.event)
+      }
+
+      setCatalogs(nextCatalogs)
+      resetEditor(kind)
+      await createAuditLog({
+        userId: user?.uid || 'admin',
+        userName: profile?.name || 'Admin',
+        action: 'catalog_types_updated',
+        entity: 'settings',
+        entityId: 'main',
+        description: actionDescription,
+      }).catch(() => undefined)
+      setFeedback(actionDescription)
+    } catch (error) {
+      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel salvar o tipo.'))
+    } finally {
+      setSavingKind(null)
+    }
+  }
+
+  async function saveType(kind: CatalogKind) {
+    const name = normalizeName(drafts[kind])
+    const editingIndex = editing[kind]
+
+    if (!name) {
+      setFeedback('Informe um nome para o tipo.')
+      return
+    }
+
+    const duplicate = catalogs[kind].some(
+      (item, index) =>
+        index !== editingIndex &&
+        item.toLocaleLowerCase('pt-BR') === name.toLocaleLowerCase('pt-BR'),
+    )
+
+    if (duplicate) {
+      setFeedback('Ja existe um tipo cadastrado com esse nome.')
+      return
+    }
+
+    if (editingIndex === null) {
+      await persistCatalog(
+        kind,
+        [...catalogs[kind], name],
+        `${kind === 'service' ? 'Tipo de servico' : 'Tipo de evento'} ${name} criado.`,
+      )
+      return
+    }
+
+    const previousName = catalogs[kind][editingIndex]
+    const nextValues = catalogs[kind].map((item, index) => (index === editingIndex ? name : item))
+    await persistCatalog(
+      kind,
+      nextValues,
+      `${kind === 'service' ? 'Tipo de servico' : 'Tipo de evento'} ${previousName} renomeado para ${name}.`,
+      previousName,
+      name,
+    )
+  }
+
+  async function confirmDelete() {
+    if (!pendingDelete) return
+
+    const { kind, index, name } = pendingDelete
+    setPendingDelete(null)
+
+    if (catalogs[kind].length <= 1) {
+      setFeedback('Mantenha pelo menos um tipo cadastrado.')
+      return
+    }
+
+    await persistCatalog(
+      kind,
+      catalogs[kind].filter((_, itemIndex) => itemIndex !== index),
+      `${kind === 'service' ? 'Tipo de servico' : 'Tipo de evento'} ${name} excluido.`,
+    )
+  }
+
+  function renderCatalog(kind: CatalogKind) {
+    const meta = catalogMeta[kind]
+    const editingIndex = editing[kind]
+
+    return (
+      <Card description={meta.description} title={meta.title}>
+        <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+          <Input
+            label={meta.inputLabel}
+            onChange={(event) =>
+              setDrafts((current) => ({ ...current, [kind]: event.target.value }))
+            }
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') void saveType(kind)
+            }}
+            placeholder="Digite o nome"
+            value={drafts[kind]}
+          />
+          <Button
+            className="self-end"
+            icon={<Plus className="h-4 w-4" />}
+            isLoading={savingKind === kind}
+            onClick={() => void saveType(kind)}
+          >
+            {editingIndex === null ? 'Criar tipo' : 'Salvar alteracao'}
+          </Button>
+        </div>
+
+        {editingIndex !== null && (
+          <div className="mt-3">
+            <Button
+              icon={<RotateCcw className="h-4 w-4" />}
+              onClick={() => resetEditor(kind)}
+              variant="secondary"
+            >
+              Cancelar edicao
+            </Button>
+          </div>
+        )}
+
+        <div className="mt-5 overflow-hidden rounded-lg border border-white/10">
+          {catalogs[kind].length === 0 ? (
+            <p className="p-4 text-sm text-slate-400">{meta.emptyTitle}</p>
+          ) : (
+            catalogs[kind].map((name, index) => (
+              <div
+                className="flex items-center justify-between gap-3 border-b border-white/10 bg-white/[0.025] px-4 py-3 last:border-b-0"
+                key={`${name}-${index}`}
+              >
+                <span className="text-sm font-medium text-ivory-50">{name}</span>
+                <div className="flex gap-2">
+                  <Button
+                    aria-label={`Editar ${name}`}
+                    className="h-9 w-9 px-0"
+                    disabled={savingKind !== null}
+                    onClick={() => startEditing(kind, index)}
+                    variant="ghost"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    aria-label={`Excluir ${name}`}
+                    className="h-9 w-9 px-0"
+                    disabled={savingKind !== null}
+                    onClick={() => setPendingDelete({ kind, index, name })}
+                    variant="danger"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </Card>
+    )
+  }
+
+  if (loading) return <Loading />
+
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-6 xl:grid-cols-2">
+        {renderCatalog('service')}
+        {renderCatalog('event')}
+      </div>
+
+      {feedback && <p className="rounded-md bg-white/8 p-3 text-sm text-slate-200">{feedback}</p>}
+
+      <ConfirmDialog
+        confirmLabel="Excluir tipo"
+        description={`O tipo "${pendingDelete?.name || ''}" deixara de aparecer em novos cadastros. Registros existentes manterao o valor salvo.`}
+        onCancel={() => setPendingDelete(null)}
+        onConfirm={() => void confirmDelete()}
+        open={Boolean(pendingDelete)}
+        title="Excluir tipo?"
+        variant="danger"
+      />
+    </div>
+  )
+}
+
+----------------------------------------------------------------------------------------------------
+FIM DO ARQUIVO: src/pages/admin/AdminCatalogTypesPage.tsx
+
+----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: src/pages/admin/AdminClientsPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { Card, DataTable } from '../../components/ui'
@@ -11151,16 +11632,27 @@ FIM DO ARQUIVO: src/pages/admin/AdminDashboardPage.tsx
 ----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: src/pages/admin/AdminMembersPage.tsx
 ----------------------------------------------------------------------------------------------------
-import { Edit, HandCoins, Plus, RotateCcw } from 'lucide-react'
+import { Edit, Plus, RotateCcw } from 'lucide-react'
 import { useState } from 'react'
-import { Badge, Button, Card, DataTable, Input, Select, Textarea } from '../../components/ui'
+import {
+  Badge,
+  Button,
+  Card,
+  DataTable,
+  Input,
+  Modal,
+  PageTabs,
+  RegistrationReviewModal,
+  Select,
+  Textarea,
+} from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
 import { createAuditLog } from '../../services/auditService'
 import { addEntity, updateEntity } from '../../services/firestoreService'
 import type { BandMember, MemberPayment } from '../../types'
 import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
-import { formatCurrency, formatDate } from '../../utils/format'
+import { formatCurrency } from '../../utils/format'
 
 const pixTypes = ['cpf', 'email', 'telefone', 'aleatoria']
 
@@ -11177,23 +11669,72 @@ const emptyMember: Omit<BandMember, 'id'> = {
   notes: '',
 }
 
+type MembersTab = 'access' | 'registration'
+type MemberFormErrors = Partial<Record<'name' | 'role' | 'defaultPayment', string>>
+
 export function AdminMembersPage() {
   const { user, profile } = useAuth()
   const { data: members, loading } = useCollection<BandMember>('bandMembers')
   const { data: payments } = useCollection<MemberPayment>('memberPayments')
   const [form, setForm] = useState(emptyMember)
   const [editingId, setEditingId] = useState('')
-  const [paymentMemberId, setPaymentMemberId] = useState('')
-  const [paymentAmount, setPaymentAmount] = useState(0)
-  const [paymentNotes, setPaymentNotes] = useState('')
   const [feedback, setFeedback] = useState('')
+  const [activeTab, setActiveTab] = useState<MembersTab>('access')
+  const [formErrors, setFormErrors] = useState<MemberFormErrors>({})
+  const [reviewOpen, setReviewOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
 
   function resetForm() {
     setForm(emptyMember)
     setEditingId('')
+    setFormErrors({})
+  }
+
+  function changeTab(tab: MembersTab) {
+    if (tab === activeTab) return
+    if (tab === 'registration') resetForm()
+    setFeedback('')
+    setActiveTab(tab)
+  }
+
+  function updateForm<K extends keyof Omit<BandMember, 'id'>>(
+    key: K,
+    value: Omit<BandMember, 'id'>[K],
+  ) {
+    setForm((current) => ({ ...current, [key]: value }))
+    if (key in formErrors) {
+      setFormErrors((current) => ({ ...current, [key]: undefined }))
+    }
+  }
+
+  function normalizedForm() {
+    return {
+      ...form,
+      name: form.name.trim(),
+      artisticName: form.artisticName?.trim() || '',
+      role: form.role.trim(),
+      phone: form.phone?.trim() || '',
+      email: form.email?.trim() || '',
+      pixKey: form.pixKey?.trim() || '',
+      notes: form.notes?.trim() || '',
+    }
+  }
+
+  function validateMember(candidate: Omit<BandMember, 'id'>) {
+    const errors: MemberFormErrors = {}
+    if (!candidate.name.trim()) errors.name = 'Informe o nome completo.'
+    if (!candidate.role.trim()) errors.role = 'Informe a funcao do integrante.'
+    if (!Number.isFinite(candidate.defaultPayment) || candidate.defaultPayment <= 0) {
+      errors.defaultPayment = 'Informe um valor maior que zero.'
+    }
+    setFormErrors(errors)
+    return Object.keys(errors).length === 0
   }
 
   function edit(member: BandMember) {
+    setFeedback('')
+    setFormErrors({})
     setEditingId(member.id)
     setForm({
       name: member.name,
@@ -11207,159 +11748,262 @@ export function AdminMembersPage() {
       active: member.active,
       notes: member.notes || '',
     })
+    setEditOpen(true)
   }
 
-  async function save() {
+  function requestCreate() {
+    setFeedback('')
+    const candidate = normalizedForm()
+    setForm(candidate)
+    if (!validateMember(candidate)) {
+      setFeedback('Revise os campos obrigatorios antes de continuar.')
+      return
+    }
+    setReviewOpen(true)
+  }
+
+  async function createConfirmed() {
+    setSaving(true)
     setFeedback('')
     try {
-      if (editingId) {
-        await updateEntity('bandMembers', editingId, form)
-        await createAuditLog({
-          userId: user?.uid || 'admin',
-          userName: profile?.name || 'Admin',
-          action: 'member_updated',
-          entity: 'bandMembers',
-          entityId: editingId,
-          description: `Integrante ${form.name} atualizado.`,
-        }).catch(() => undefined)
-        setFeedback('Integrante atualizado.')
-      } else {
-        const reference = await addEntity('bandMembers', form)
-        await createAuditLog({
-          userId: user?.uid || 'admin',
-          userName: profile?.name || 'Admin',
-          action: 'member_created',
-          entity: 'bandMembers',
-          entityId: reference.id,
-          description: `Integrante ${form.name} cadastrado.`,
-        }).catch(() => undefined)
-        setFeedback('Integrante cadastrado.')
-      }
+      const reference = await addEntity('bandMembers', form)
+      await createAuditLog({
+        userId: user?.uid || 'admin',
+        userName: profile?.name || 'Admin',
+        action: 'member_created',
+        entity: 'bandMembers',
+        entityId: reference.id,
+        description: `Integrante ${form.name} cadastrado.`,
+      }).catch(() => undefined)
+      setReviewOpen(false)
       resetForm()
+      setActiveTab('access')
+      setFeedback('Integrante cadastrado.')
     } catch (error) {
       setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel salvar.'))
+    } finally {
+      setSaving(false)
     }
   }
 
-  async function registerPayment() {
-    const member = members.find((item) => item.id === paymentMemberId)
-    if (!member || paymentAmount <= 0) return
+  async function saveEdit() {
     setFeedback('')
-    try {
-      await addEntity('memberPayments', {
-        memberId: member.id,
-        memberName: member.name,
-        amount: paymentAmount,
-        status: 'pago',
-        pixKey: member.pixKey || '',
-        notes: paymentNotes,
-        paidAt: new Date(),
-      })
-      setPaymentMemberId('')
-      setPaymentAmount(0)
-      setPaymentNotes('')
-      setFeedback('Pagamento de integrante registrado.')
-    } catch (error) {
-      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel registrar pagamento.'))
+    const candidate = normalizedForm()
+    setForm(candidate)
+    if (!editingId || !validateMember(candidate)) {
+      setFeedback('Revise os campos obrigatorios antes de salvar.')
+      return
     }
+
+    setSaving(true)
+    try {
+      await updateEntity('bandMembers', editingId, candidate)
+      await createAuditLog({
+        userId: user?.uid || 'admin',
+        userName: profile?.name || 'Admin',
+        action: 'member_updated',
+        entity: 'bandMembers',
+        entityId: editingId,
+        description: `Integrante ${candidate.name} atualizado.`,
+      }).catch(() => undefined)
+      setEditOpen(false)
+      resetForm()
+      setFeedback('Integrante atualizado.')
+    } catch (error) {
+      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel atualizar.'))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  function closeEdit() {
+    setEditOpen(false)
+    resetForm()
+  }
+
+  function renderMemberFields() {
+    return (
+      <div className="grid gap-4 md:grid-cols-2">
+        <Input
+          error={formErrors.name}
+          label="Nome completo *"
+          onChange={(event) => updateForm('name', event.target.value)}
+          required
+          value={form.name}
+        />
+        <Input
+          label="Nome artistico/apelido"
+          onChange={(event) => updateForm('artisticName', event.target.value)}
+          value={form.artisticName}
+        />
+        <Input
+          error={formErrors.role}
+          label="Funcao na banda *"
+          onChange={(event) => updateForm('role', event.target.value)}
+          required
+          value={form.role}
+        />
+        <Input
+          error={formErrors.defaultPayment}
+          label="Valor padrao por evento *"
+          min={0}
+          onChange={(event) => updateForm('defaultPayment', Number(event.target.value))}
+          required
+          type="number"
+          value={form.defaultPayment}
+        />
+        <Input label="Telefone" onChange={(event) => updateForm('phone', event.target.value)} value={form.phone} />
+        <Input label="E-mail" onChange={(event) => updateForm('email', event.target.value)} value={form.email} />
+        <Input label="Chave Pix" onChange={(event) => updateForm('pixKey', event.target.value)} value={form.pixKey} />
+        <Select
+          label="Tipo da chave Pix"
+          onChange={(event) => updateForm('pixKeyType', event.target.value as BandMember['pixKeyType'])}
+          options={pixTypes.map((type) => ({ label: type, value: type }))}
+          value={form.pixKeyType}
+        />
+        <Textarea
+          label="Observacoes"
+          onChange={(event) => updateForm('notes', event.target.value)}
+          value={form.notes}
+          wrapperClassName="md:col-span-2"
+        />
+      </div>
+    )
   }
 
   return (
     <div className="space-y-6">
-      <Card description="Gerencie dados, Pix e valor padrao pago por evento." title="Cadastro de integrantes">
-        <div className="grid gap-4 md:grid-cols-2">
-          <Input label="Nome completo" onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} value={form.name} />
-          <Input label="Nome artistico/apelido" onChange={(event) => setForm((current) => ({ ...current, artisticName: event.target.value }))} value={form.artisticName} />
-          <Input label="Funcao na banda" onChange={(event) => setForm((current) => ({ ...current, role: event.target.value }))} value={form.role} />
-          <Input label="Valor padrao por evento" min={0} onChange={(event) => setForm((current) => ({ ...current, defaultPayment: Number(event.target.value) }))} type="number" value={form.defaultPayment} />
-          <Input label="Telefone" onChange={(event) => setForm((current) => ({ ...current, phone: event.target.value }))} value={form.phone} />
-          <Input label="E-mail" onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} value={form.email} />
-          <Input label="Chave Pix" onChange={(event) => setForm((current) => ({ ...current, pixKey: event.target.value }))} value={form.pixKey} />
-          <Select label="Tipo da chave Pix" onChange={(event) => setForm((current) => ({ ...current, pixKeyType: event.target.value as BandMember['pixKeyType'] }))} options={pixTypes.map((type) => ({ label: type, value: type }))} value={form.pixKeyType} />
-          <Textarea label="Observacoes" onChange={(event) => setForm((current) => ({ ...current, notes: event.target.value }))} value={form.notes} wrapperClassName="md:col-span-2" />
-        </div>
-        {feedback && <p className="mt-4 rounded-md bg-white/8 p-3 text-sm text-slate-200">{feedback}</p>}
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Button icon={<Plus className="h-4 w-4" />} onClick={save}>{editingId ? 'Salvar integrante' : 'Cadastrar integrante'}</Button>
-          <Button icon={<RotateCcw className="h-4 w-4" />} onClick={resetForm} variant="secondary">Limpar</Button>
-        </div>
-      </Card>
+      <PageTabs
+        activeTab={activeTab}
+        onChange={changeTab}
+        tabs={[
+          {
+            value: 'access',
+            label: 'Acesso',
+            description: 'Somente consulta e gestao dos integrantes cadastrados',
+          },
+          {
+            value: 'registration',
+            label: 'Cadastro',
+            description: 'Somente para cadastrar um novo integrante',
+          },
+        ]}
+      />
 
-      <Card description="Registre valores pagos e mantenha historico por integrante." title="Pagamento para integrante">
-        <div className="grid gap-4 md:grid-cols-[1fr_10rem_1fr_auto]">
-          <Select onChange={(event) => {
-            const member = members.find((item) => item.id === event.target.value)
-            setPaymentMemberId(event.target.value)
-            setPaymentAmount(member?.defaultPayment || 0)
-          }} options={members.map((member) => ({ label: member.name, value: member.id }))} placeholder="Integrante" value={paymentMemberId} />
-          <Input min={0} onChange={(event) => setPaymentAmount(Number(event.target.value))} type="number" value={paymentAmount} />
-          <Input onChange={(event) => setPaymentNotes(event.target.value)} placeholder="Observacao" value={paymentNotes} />
-          <Button icon={<HandCoins className="h-4 w-4" />} onClick={registerPayment}>Registrar</Button>
+      {feedback && <p className="rounded-md bg-white/8 p-3 text-sm text-slate-200">{feedback}</p>}
+
+      {activeTab === 'registration' ? (
+        <Card
+          description="Esta area e exclusiva para novos cadastros. Campos com * sao obrigatorios."
+          role="tabpanel"
+          title="Novo cadastro de integrante"
+        >
+          {renderMemberFields()}
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Button icon={<Plus className="h-4 w-4" />} onClick={requestCreate}>
+              Revisar e cadastrar integrante
+            </Button>
+            <Button icon={<RotateCcw className="h-4 w-4" />} onClick={resetForm} variant="secondary">
+              Limpar formulario
+            </Button>
+          </div>
+        </Card>
+      ) : (
+        <div role="tabpanel">
+          <Card
+            description="Consulte os integrantes existentes. A edicao abre em uma janela separada e nao utiliza a aba Cadastro."
+            title="Consulta de integrantes cadastrados"
+          >
+            <DataTable
+              columns={[
+                {
+                  header: 'Nome',
+                  cell: (member) => (
+                    <div>
+                      <p className="font-medium text-white">{member.name}</p>
+                      <p className="text-xs text-slate-400">{member.artisticName}</p>
+                    </div>
+                  ),
+                },
+                { header: 'Funcao', cell: (member) => member.role },
+                { header: 'Pagamento padrao', cell: (member) => formatCurrency(member.defaultPayment) },
+                {
+                  header: 'Total pago',
+                  cell: (member) => formatCurrency(payments.filter((payment) => payment.memberId === member.id).reduce((sum, payment) => sum + payment.amount, 0)),
+                },
+                {
+                  header: 'Status',
+                  cell: (member) => <Badge className={member.active ? 'bg-emerald-400/15 text-emerald-200 ring-emerald-300/20' : 'bg-red-500/15 text-red-200 ring-red-300/20'}>{member.active ? 'Ativo' : 'Inativo'}</Badge>,
+                },
+                {
+                  header: 'Acoes',
+                  cell: (member) => (
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        aria-label={`Editar integrante ${member.name}`}
+                        className="h-9 px-3"
+                        icon={<Edit className="h-4 w-4" />}
+                        onClick={() => edit(member)}
+                        variant="secondary"
+                      >
+                        Editar
+                      </Button>
+                      <Button className="h-9 px-3" onClick={async () => {
+                        await updateEntity('bandMembers', member.id, { active: !member.active })
+                        await createAuditLog({
+                          userId: user?.uid || 'admin',
+                          userName: profile?.name || 'Admin',
+                          action: member.active ? 'member_disabled' : 'member_enabled',
+                          entity: 'bandMembers',
+                          entityId: member.id,
+                          description: `Integrante ${member.name} ${member.active ? 'desativado' : 'reativado'}.`,
+                        }).catch(() => undefined)
+                      }} variant="secondary">{member.active ? 'Desativar' : 'Reativar'}</Button>
+                    </div>
+                  ),
+                },
+              ]}
+              data={members}
+              emptyTitle="Nenhum integrante cadastrado"
+              getRowKey={(member) => member.id}
+              loading={loading}
+            />
+          </Card>
         </div>
-      </Card>
+      )}
 
-      <Card title="Integrantes cadastrados">
-        <DataTable
-          columns={[
-            {
-              header: 'Nome',
-              cell: (member) => (
-                <div>
-                  <p className="font-medium text-white">{member.name}</p>
-                  <p className="text-xs text-slate-400">{member.artisticName}</p>
-                </div>
-              ),
-            },
-            { header: 'Funcao', cell: (member) => member.role },
-            { header: 'Pagamento padrao', cell: (member) => formatCurrency(member.defaultPayment) },
-            {
-              header: 'Total pago',
-              cell: (member) => formatCurrency(payments.filter((payment) => payment.memberId === member.id).reduce((sum, payment) => sum + payment.amount, 0)),
-            },
-            {
-              header: 'Status',
-              cell: (member) => <Badge className={member.active ? 'bg-emerald-400/15 text-emerald-200 ring-emerald-300/20' : 'bg-red-500/15 text-red-200 ring-red-300/20'}>{member.active ? 'Ativo' : 'Inativo'}</Badge>,
-            },
-            {
-              header: 'Acoes',
-              cell: (member) => (
-                <div className="flex gap-2">
-                  <Button aria-label="Editar" className="h-9 w-9 px-0" onClick={() => edit(member)} variant="ghost"><Edit className="h-4 w-4" /></Button>
-                  <Button className="h-9 px-3" onClick={async () => {
-                    await updateEntity('bandMembers', member.id, { active: !member.active })
-                    await createAuditLog({
-                      userId: user?.uid || 'admin',
-                      userName: profile?.name || 'Admin',
-                      action: member.active ? 'member_disabled' : 'member_enabled',
-                      entity: 'bandMembers',
-                      entityId: member.id,
-                      description: `Integrante ${member.name} ${member.active ? 'desativado' : 'reativado'}.`,
-                    }).catch(() => undefined)
-                  }} variant="secondary">{member.active ? 'Desativar' : 'Reativar'}</Button>
-                </div>
-              ),
-            },
-          ]}
-          data={members}
-          emptyTitle="Nenhum integrante cadastrado"
-          getRowKey={(member) => member.id}
-          loading={loading}
-        />
-      </Card>
+      <RegistrationReviewModal
+        confirmLabel="Confirmar cadastro"
+        description="Confira os dados abaixo. O integrante somente sera criado depois da sua confirmacao."
+        isLoading={saving}
+        items={[
+          { label: 'Nome completo', value: form.name },
+          { label: 'Nome artistico', value: form.artisticName || 'Nao informado' },
+          { label: 'Funcao', value: form.role },
+          { label: 'Valor por evento', value: formatCurrency(form.defaultPayment) },
+          { label: 'Telefone', value: form.phone || 'Nao informado' },
+          { label: 'E-mail', value: form.email || 'Nao informado' },
+          { label: 'Chave Pix', value: form.pixKey || 'Nao informada' },
+          { label: 'Tipo da chave', value: form.pixKey ? form.pixKeyType || 'Nao informado' : 'Nao informado' },
+          { label: 'Observacoes', value: form.notes || 'Nenhuma observacao' },
+        ]}
+        onCancel={() => setReviewOpen(false)}
+        onConfirm={() => void createConfirmed()}
+        open={reviewOpen}
+        title="Confirmar cadastro do integrante"
+      />
 
-      <Card title="Historico de pagamentos">
-        <DataTable
-          columns={[
-            { header: 'Integrante', cell: (payment) => payment.memberName },
-            { header: 'Valor', cell: (payment) => formatCurrency(payment.amount) },
-            { header: 'Status', cell: (payment) => payment.status },
-            { header: 'Data', cell: (payment) => formatDate(payment.paidAt || payment.createdAt) },
-          ]}
-          data={payments}
-          emptyTitle="Nenhum pagamento registrado"
-          getRowKey={(payment) => payment.id}
-        />
-      </Card>
+      <Modal onClose={closeEdit} open={editOpen} title="Editar integrante cadastrado">
+        {renderMemberFields()}
+        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <Button disabled={saving} onClick={closeEdit} variant="secondary">
+            Cancelar
+          </Button>
+          <Button isLoading={saving} onClick={() => void saveEdit()}>
+            Salvar alteracoes
+          </Button>
+        </div>
+      </Modal>
     </div>
   )
 }
@@ -11370,12 +12014,15 @@ FIM DO ARQUIVO: src/pages/admin/AdminMembersPage.tsx
 ----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: src/pages/admin/AdminPaymentsPage.tsx
 ----------------------------------------------------------------------------------------------------
-import { CheckCircle2 } from 'lucide-react'
-import { Button, Card, DataTable, Badge } from '../../components/ui'
+import { CheckCircle2, HandCoins } from 'lucide-react'
+import { useState } from 'react'
+import { Badge, Button, Card, DataTable, Input, Select } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
+import { addEntity } from '../../services/firestoreService'
 import { confirmPayment, markInternalPaymentAsPaid } from '../../services/paymentService'
-import type { MemberPayment, Payment, SupplierPayment } from '../../types'
+import type { BandMember, MemberPayment, Payment, SupplierPayment } from '../../types'
+import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
 import { formatCurrency, formatDate } from '../../utils/format'
 
 export function AdminPaymentsPage() {
@@ -11383,6 +12030,38 @@ export function AdminPaymentsPage() {
   const { data: payments, loading } = useCollection<Payment>('payments')
   const { data: memberPayments } = useCollection<MemberPayment>('memberPayments')
   const { data: supplierPayments } = useCollection<SupplierPayment>('supplierPayments')
+  const { data: members } = useCollection<BandMember>('bandMembers')
+  const [paymentMemberId, setPaymentMemberId] = useState('')
+  const [paymentAmount, setPaymentAmount] = useState(0)
+  const [paymentNotes, setPaymentNotes] = useState('')
+  const [feedback, setFeedback] = useState('')
+
+  async function registerMemberPayment() {
+    const member = members.find((item) => item.id === paymentMemberId)
+    if (!member || paymentAmount <= 0) {
+      setFeedback('Selecione um integrante e informe um valor maior que zero.')
+      return
+    }
+
+    setFeedback('')
+    try {
+      await addEntity('memberPayments', {
+        memberId: member.id,
+        memberName: member.name,
+        amount: paymentAmount,
+        status: 'pago',
+        pixKey: member.pixKey || '',
+        notes: paymentNotes.trim(),
+        paidAt: new Date(),
+      })
+      setPaymentMemberId('')
+      setPaymentAmount(0)
+      setPaymentNotes('')
+      setFeedback('Pagamento de integrante registrado.')
+    } catch (error) {
+      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel registrar o pagamento.'))
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -11417,6 +12096,36 @@ export function AdminPaymentsPage() {
           getRowKey={(payment) => payment.id}
           loading={loading}
         />
+      </Card>
+
+      <Card description="Registre um pagamento realizado para um integrante." title="Registrar pagamento de integrante">
+        <div className="grid gap-4 md:grid-cols-[1fr_10rem_1fr_auto]">
+          <Select
+            onChange={(event) => {
+              const member = members.find((item) => item.id === event.target.value)
+              setPaymentMemberId(event.target.value)
+              setPaymentAmount(member?.defaultPayment || 0)
+            }}
+            options={members.map((member) => ({ label: member.name, value: member.id }))}
+            placeholder="Integrante"
+            value={paymentMemberId}
+          />
+          <Input
+            min={0}
+            onChange={(event) => setPaymentAmount(Number(event.target.value))}
+            type="number"
+            value={paymentAmount}
+          />
+          <Input
+            onChange={(event) => setPaymentNotes(event.target.value)}
+            placeholder="Observacao"
+            value={paymentNotes}
+          />
+          <Button icon={<HandCoins className="h-4 w-4" />} onClick={() => void registerMemberPayment()}>
+            Registrar
+          </Button>
+        </div>
+        {feedback && <p className="mt-4 rounded-md bg-white/8 p-3 text-sm text-slate-200">{feedback}</p>}
       </Card>
 
       <Card title="Pagamentos de integrantes">
@@ -11862,14 +12571,34 @@ INICIO DO ARQUIVO: src/pages/admin/AdminServicesPage.tsx
 ----------------------------------------------------------------------------------------------------
 import { collection, getDocs } from 'firebase/firestore'
 import { Edit, Plus, RotateCcw, Trash2 } from 'lucide-react'
-import { useMemo, useState } from 'react'
-import { Badge, Button, Card, DataTable, Input, Select, Textarea } from '../../components/ui'
+import { useEffect, useMemo, useState } from 'react'
+import {
+  Badge,
+  Button,
+  Card,
+  DataTable,
+  Input,
+  Modal,
+  PageTabs,
+  RegistrationReviewModal,
+  Select,
+  Textarea,
+} from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
+import { useDocument } from '../../hooks/useDocument'
 import { requireDb } from '../../lib/firebase'
 import { createService, removeService, updateService } from '../../services/serviceService'
 import { createAuditLog } from '../../services/auditService'
-import type { BandMember, MemberCostLink, Quote, Service, Supplier, SupplierLink } from '../../types'
+import type {
+  BandMember,
+  MemberCostLink,
+  Quote,
+  Service,
+  Settings,
+  Supplier,
+  SupplierLink,
+} from '../../types'
 import { serviceCategories } from '../../utils/constants'
 import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
 import { formatCurrency } from '../../utils/format'
@@ -11886,11 +12615,15 @@ const emptyService: Omit<Service, 'id'> = {
   internalNotes: '',
 }
 
+type ServicesTab = 'access' | 'registration'
+type ServiceFormErrors = Partial<Record<'name' | 'category' | 'basePrice' | 'description', string>>
+
 export function AdminServicesPage() {
   const { user, profile } = useAuth()
   const { data: services, loading } = useCollection<Service>('services')
   const { data: suppliers } = useCollection<Supplier>('suppliers')
   const { data: members } = useCollection<BandMember>('bandMembers')
+  const { data: settings } = useDocument<Settings>('settings', 'main')
   const [form, setForm] = useState(emptyService)
   const [editingId, setEditingId] = useState('')
   const [filter, setFilter] = useState('all')
@@ -11900,6 +12633,32 @@ export function AdminServicesPage() {
   const [memberId, setMemberId] = useState('')
   const [memberCost, setMemberCost] = useState(0)
   const [feedback, setFeedback] = useState('')
+  const [activeTab, setActiveTab] = useState<ServicesTab>('access')
+  const [formErrors, setFormErrors] = useState<ServiceFormErrors>({})
+  const [reviewOpen, setReviewOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const configuredServiceTypes = useMemo(
+    () => (settings?.serviceTypes?.length ? settings.serviceTypes : serviceCategories),
+    [settings?.serviceTypes],
+  )
+  const serviceTypeOptions = useMemo(
+    () =>
+      editingId && form.category && !configuredServiceTypes.includes(form.category)
+        ? [form.category, ...configuredServiceTypes]
+        : configuredServiceTypes,
+    [configuredServiceTypes, editingId, form.category],
+  )
+
+  useEffect(() => {
+    if (
+      !editingId &&
+      configuredServiceTypes.length > 0 &&
+      !configuredServiceTypes.includes(form.category)
+    ) {
+      setForm((current) => ({ ...current, category: configuredServiceTypes[0] }))
+    }
+  }, [configuredServiceTypes, editingId, form.category])
 
   const filtered = useMemo(
     () =>
@@ -11910,15 +12669,60 @@ export function AdminServicesPage() {
   )
 
   function resetForm() {
-    setForm(emptyService)
+    setForm({
+      ...emptyService,
+      category: configuredServiceTypes[0] || '',
+    })
     setEditingId('')
     setSupplierId('')
     setMemberId('')
     setSupplierCost(0)
     setMemberCost(0)
+    setFormErrors({})
+  }
+
+  function changeTab(tab: ServicesTab) {
+    if (tab === activeTab) return
+    if (tab === 'registration') resetForm()
+    setFeedback('')
+    setActiveTab(tab)
+  }
+
+  function updateForm<K extends keyof Omit<Service, 'id'>>(
+    key: K,
+    value: Omit<Service, 'id'>[K],
+  ) {
+    setForm((current) => ({ ...current, [key]: value }))
+    if (key in formErrors) {
+      setFormErrors((current) => ({ ...current, [key]: undefined }))
+    }
+  }
+
+  function validateService(candidate: Omit<Service, 'id'>) {
+    const errors: ServiceFormErrors = {}
+    if (!candidate.name.trim()) errors.name = 'Informe o nome do servico.'
+    if (!candidate.category.trim()) errors.category = 'Selecione o tipo do servico.'
+    if (!candidate.description.trim()) errors.description = 'Informe uma descricao do servico.'
+    if (!Number.isFinite(candidate.basePrice) || candidate.basePrice <= 0) {
+      errors.basePrice = 'Informe um valor maior que zero.'
+    }
+    setFormErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
+  function normalizedForm() {
+    return {
+      ...form,
+      name: form.name.trim(),
+      description: form.description.trim(),
+      category: form.category.trim(),
+      internalNotes: form.internalNotes?.trim() || '',
+    }
   }
 
   function edit(service: Service) {
+    setFeedback('')
+    setFormErrors({})
     setEditingId(service.id)
     setForm({
       name: service.name,
@@ -11931,37 +12735,71 @@ export function AdminServicesPage() {
       memberCostLinks: service.memberCostLinks || [],
       internalNotes: service.internalNotes || '',
     })
+    setEditOpen(true)
   }
 
-  async function save() {
+  function requestCreate() {
+    setFeedback('')
+    const candidate = normalizedForm()
+    setForm(candidate)
+    if (!validateService(candidate)) {
+      setFeedback('Revise os campos obrigatorios antes de continuar.')
+      return
+    }
+    setReviewOpen(true)
+  }
+
+  async function createConfirmed() {
+    setSaving(true)
     setFeedback('')
     try {
-      if (editingId) {
-        await updateService(editingId, form)
-        await createAuditLog({
-          userId: user?.uid || 'admin',
-          userName: profile?.name || 'Admin',
-          action: 'service_updated',
-          entity: 'services',
-          entityId: editingId,
-          description: `Servico ${form.name} atualizado.`,
-        }).catch(() => undefined)
-        setFeedback('Servico atualizado.')
-      } else {
-        const reference = await createService(form)
-        await createAuditLog({
-          userId: user?.uid || 'admin',
-          userName: profile?.name || 'Admin',
-          action: 'service_created',
-          entity: 'services',
-          entityId: reference.id,
-          description: `Servico ${form.name} criado.`,
-        }).catch(() => undefined)
-        setFeedback('Servico criado.')
-      }
+      const reference = await createService(form)
+      await createAuditLog({
+        userId: user?.uid || 'admin',
+        userName: profile?.name || 'Admin',
+        action: 'service_created',
+        entity: 'services',
+        entityId: reference.id,
+        description: `Servico ${form.name} criado.`,
+      }).catch(() => undefined)
+      setReviewOpen(false)
       resetForm()
+      setActiveTab('access')
+      setFeedback('Servico criado.')
     } catch (error) {
       setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel salvar o servico.'))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function saveEdit() {
+    setFeedback('')
+    const candidate = normalizedForm()
+    setForm(candidate)
+    if (!editingId || !validateService(candidate)) {
+      setFeedback('Revise os campos obrigatorios antes de salvar.')
+      return
+    }
+
+    setSaving(true)
+    try {
+      await updateService(editingId, candidate)
+      await createAuditLog({
+        userId: user?.uid || 'admin',
+        userName: profile?.name || 'Admin',
+        action: 'service_updated',
+        entity: 'services',
+        entityId: editingId,
+        description: `Servico ${candidate.name} atualizado.`,
+      }).catch(() => undefined)
+      setEditOpen(false)
+      resetForm()
+      setFeedback('Servico atualizado.')
+    } catch (error) {
+      setFeedback(getFriendlyFirebaseError(error, 'Nao foi possivel atualizar o servico.'))
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -12013,24 +12851,62 @@ export function AdminServicesPage() {
     }
   }
 
-  return (
-    <div className="space-y-6">
-      <Card description="Cadastre servicos vendidos ao cliente e seus custos internos." title="Cadastro de servicos">
+  function closeEdit() {
+    setEditOpen(false)
+    resetForm()
+  }
+
+  function renderServiceFields() {
+    return (
+      <>
         <div className="grid gap-4 md:grid-cols-2">
-          <Input label="Nome do servico" onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} value={form.name} />
-          <Select label="Categoria" onChange={(event) => setForm((current) => ({ ...current, category: event.target.value }))} options={serviceCategories.map((category) => ({ label: category, value: category }))} value={form.category} />
-          <Input label="Valor padrao" min={0} onChange={(event) => setForm((current) => ({ ...current, basePrice: Number(event.target.value) }))} type="number" value={form.basePrice} />
+          <Input
+            error={formErrors.name}
+            label="Nome do servico *"
+            onChange={(event) => updateForm('name', event.target.value)}
+            required
+            value={form.name}
+          />
+          <Select
+            error={formErrors.category}
+            label="Tipo do servico *"
+            onChange={(event) => updateForm('category', event.target.value)}
+            options={serviceTypeOptions.map((category) => ({ label: category, value: category }))}
+            required
+            value={form.category}
+          />
+          <Input
+            error={formErrors.basePrice}
+            label="Valor padrao *"
+            min={0}
+            onChange={(event) => updateForm('basePrice', Number(event.target.value))}
+            required
+            type="number"
+            value={form.basePrice}
+          />
           <Select
             label="Permitir edicao do valor"
-            onChange={(event) => setForm((current) => ({ ...current, allowPriceEdit: event.target.value === 'true' }))}
+            onChange={(event) => updateForm('allowPriceEdit', event.target.value === 'true')}
             options={[
               { label: 'Sim', value: 'true' },
               { label: 'Nao', value: 'false' },
             ]}
             value={String(form.allowPriceEdit)}
           />
-          <Textarea label="Descricao" onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} value={form.description} wrapperClassName="md:col-span-2" />
-          <Textarea label="Observacoes internas" onChange={(event) => setForm((current) => ({ ...current, internalNotes: event.target.value }))} value={form.internalNotes} wrapperClassName="md:col-span-2" />
+          <Textarea
+            error={formErrors.description}
+            label="Descricao *"
+            onChange={(event) => updateForm('description', event.target.value)}
+            required
+            value={form.description}
+            wrapperClassName="md:col-span-2"
+          />
+          <Textarea
+            label="Observacoes internas"
+            onChange={(event) => updateForm('internalNotes', event.target.value)}
+            value={form.internalNotes}
+            wrapperClassName="md:col-span-2"
+          />
         </div>
 
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
@@ -12046,7 +12922,7 @@ export function AdminServicesPage() {
                 <div className="flex justify-between gap-3 rounded-md bg-white/[0.05] px-3 py-2 text-sm" key={`${link.supplierId}-${index}`}>
                   <span>{link.supplierName}</span>
                   <strong>{formatCurrency(link.cost)}</strong>
-                  <button className="text-red-200" onClick={() => setForm((current) => ({ ...current, supplierLinks: current.supplierLinks.filter((_, itemIndex) => itemIndex !== index) }))} type="button">
+                  <button className="text-red-200" onClick={() => updateForm('supplierLinks', form.supplierLinks.filter((_, itemIndex) => itemIndex !== index))} type="button">
                     remover
                   </button>
                 </div>
@@ -12066,7 +12942,7 @@ export function AdminServicesPage() {
                 <div className="flex justify-between gap-3 rounded-md bg-white/[0.05] px-3 py-2 text-sm" key={`${link.memberId}-${index}`}>
                   <span>{link.memberName}</span>
                   <strong>{formatCurrency(link.cost)}</strong>
-                  <button className="text-red-200" onClick={() => setForm((current) => ({ ...current, memberCostLinks: current.memberCostLinks.filter((_, itemIndex) => itemIndex !== index) }))} type="button">
+                  <button className="text-red-200" onClick={() => updateForm('memberCostLinks', form.memberCostLinks.filter((_, itemIndex) => itemIndex !== index))} type="button">
                     remover
                   </button>
                 </div>
@@ -12074,71 +12950,152 @@ export function AdminServicesPage() {
             </div>
           </div>
         </div>
+      </>
+    )
+  }
 
-        {feedback && <p className="mt-4 rounded-md bg-white/8 p-3 text-sm text-slate-200">{feedback}</p>}
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Button icon={<Plus className="h-4 w-4" />} onClick={save}>
-            {editingId ? 'Salvar alteracoes' : 'Criar servico'}
+  return (
+    <div className="space-y-6">
+      <PageTabs
+        activeTab={activeTab}
+        onChange={changeTab}
+        tabs={[
+          {
+            value: 'access',
+            label: 'Acesso',
+            description: 'Somente consulta e gestao dos servicos cadastrados',
+          },
+          {
+            value: 'registration',
+            label: 'Cadastro',
+            description: 'Somente para cadastrar um novo servico',
+          },
+        ]}
+      />
+
+      {feedback && <p className="rounded-md bg-white/8 p-3 text-sm text-slate-200">{feedback}</p>}
+
+      {activeTab === 'registration' ? (
+        <Card
+          description="Esta area e exclusiva para novos cadastros. Campos com * sao obrigatorios."
+          role="tabpanel"
+          title="Novo cadastro de servico"
+        >
+          {renderServiceFields()}
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Button icon={<Plus className="h-4 w-4" />} onClick={requestCreate}>
+              Revisar e cadastrar servico
+            </Button>
+            <Button icon={<RotateCcw className="h-4 w-4" />} onClick={resetForm} variant="secondary">
+              Limpar formulario
+            </Button>
+          </div>
+        </Card>
+      ) : (
+        <Card
+          action={
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Input onChange={(event) => setSearch(event.target.value)} placeholder="Pesquisar" value={search} />
+              <Select
+                onChange={(event) => setFilter(event.target.value)}
+                options={[
+                  { label: 'Todos', value: 'all' },
+                  { label: 'Ativos', value: 'active' },
+                  { label: 'Inativos', value: 'inactive' },
+                ]}
+                value={filter}
+              />
+            </div>
+          }
+          description="Consulte os servicos existentes. A edicao abre em uma janela separada e nao utiliza a aba Cadastro."
+          role="tabpanel"
+          title="Consulta de servicos cadastrados"
+        >
+          <DataTable
+            columns={[
+              { header: 'Servico', cell: (service) => service.name },
+              { header: 'Tipo', cell: (service) => service.category },
+              { header: 'Valor', cell: (service) => formatCurrency(service.basePrice) },
+              {
+                header: 'Status',
+                cell: (service) => (
+                  <Badge className={service.active ? 'bg-emerald-400/15 text-emerald-200 ring-emerald-300/20' : 'bg-red-500/15 text-red-200 ring-red-300/20'}>
+                    {service.active ? 'Ativo' : 'Inativo'}
+                  </Badge>
+                ),
+              },
+              {
+                header: 'Acoes',
+                cell: (service) => (
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      aria-label={`Editar servico ${service.name}`}
+                      className="h-9 px-3"
+                      icon={<Edit className="h-4 w-4" />}
+                      onClick={() => edit(service)}
+                      variant="secondary"
+                    >
+                      Editar
+                    </Button>
+                    <Button aria-label="Ativar ou desativar" className="h-9 px-3" onClick={() => updateService(service.id, { active: !service.active })} variant="secondary">
+                      {service.active ? 'Desativar' : 'Reativar'}
+                    </Button>
+                    <Button aria-label="Excluir" className="h-9 w-9 px-0" onClick={() => removeIfUnused(service)} variant="danger">
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ),
+              },
+            ]}
+            data={filtered}
+            emptyTitle="Nenhum servico cadastrado"
+            getRowKey={(service) => service.id}
+            loading={loading}
+          />
+        </Card>
+      )}
+
+      <RegistrationReviewModal
+        confirmLabel="Confirmar cadastro"
+        description="Confira os dados abaixo. O servico somente sera criado depois da sua confirmacao."
+        isLoading={saving}
+        items={[
+          { label: 'Nome', value: form.name },
+          { label: 'Tipo', value: form.category },
+          { label: 'Descricao', value: form.description },
+          { label: 'Valor padrao', value: formatCurrency(form.basePrice) },
+          { label: 'Edicao de valor', value: form.allowPriceEdit ? 'Permitida' : 'Nao permitida' },
+          {
+            label: 'Fornecedores',
+            value: form.supplierLinks.length
+              ? form.supplierLinks.map((link) => `${link.supplierName}: ${formatCurrency(link.cost)}`).join('\n')
+              : 'Nenhum fornecedor vinculado',
+          },
+          {
+            label: 'Integrantes',
+            value: form.memberCostLinks.length
+              ? form.memberCostLinks.map((link) => `${link.memberName}: ${formatCurrency(link.cost)}`).join('\n')
+              : 'Nenhum integrante vinculado',
+          },
+          { label: 'Observacoes', value: form.internalNotes || 'Nenhuma observacao' },
+        ]}
+        onCancel={() => setReviewOpen(false)}
+        onConfirm={() => void createConfirmed()}
+        open={reviewOpen}
+        title="Confirmar cadastro do servico"
+      />
+
+      <Modal onClose={closeEdit} open={editOpen} title="Editar servico cadastrado">
+        {renderServiceFields()}
+        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <Button disabled={saving} onClick={closeEdit} variant="secondary">
+            Cancelar
           </Button>
-          <Button icon={<RotateCcw className="h-4 w-4" />} onClick={resetForm} variant="secondary">
-            Limpar
+          <Button isLoading={saving} onClick={() => void saveEdit()}>
+            Salvar alteracoes
           </Button>
         </div>
-      </Card>
-
-      <Card
-        action={
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Input onChange={(event) => setSearch(event.target.value)} placeholder="Pesquisar" value={search} />
-            <Select
-              onChange={(event) => setFilter(event.target.value)}
-              options={[
-                { label: 'Todos', value: 'all' },
-                { label: 'Ativos', value: 'active' },
-                { label: 'Inativos', value: 'inactive' },
-              ]}
-              value={filter}
-            />
-          </div>
-        }
-        title="Servicos cadastrados"
-      >
-        <DataTable
-          columns={[
-            { header: 'Servico', cell: (service) => service.name },
-            { header: 'Categoria', cell: (service) => service.category },
-            { header: 'Valor', cell: (service) => formatCurrency(service.basePrice) },
-            {
-              header: 'Status',
-              cell: (service) => (
-                <Badge className={service.active ? 'bg-emerald-400/15 text-emerald-200 ring-emerald-300/20' : 'bg-red-500/15 text-red-200 ring-red-300/20'}>
-                  {service.active ? 'Ativo' : 'Inativo'}
-                </Badge>
-              ),
-            },
-            {
-              header: 'Acoes',
-              cell: (service) => (
-                <div className="flex gap-2">
-                  <Button aria-label="Editar" className="h-9 w-9 px-0" onClick={() => edit(service)} variant="ghost">
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button aria-label="Ativar ou desativar" className="h-9 px-3" onClick={() => updateService(service.id, { active: !service.active })} variant="secondary">
-                    {service.active ? 'Desativar' : 'Reativar'}
-                  </Button>
-                  <Button aria-label="Excluir" className="h-9 w-9 px-0" onClick={() => removeIfUnused(service)} variant="danger">
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              ),
-            },
-          ]}
-          data={filtered}
-          emptyTitle="Nenhum servico cadastrado"
-          getRowKey={(service) => service.id}
-          loading={loading}
-        />
-      </Card>
+      </Modal>
     </div>
   )
 }
@@ -13325,7 +14282,7 @@ import { useCollection } from '../../hooks/useCollection'
 import { useDocument } from '../../hooks/useDocument'
 import { requireDb } from '../../lib/firebase'
 import { createClientQuote } from '../../services/quoteService'
-import type { Client, PublicService, QuoteEvent, QuoteItem } from '../../types'
+import type { Client, PublicService, PublicSettings, QuoteEvent, QuoteItem } from '../../types'
 import { brazilianStates, eventTypes } from '../../utils/constants'
 import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
 import { formatCurrency } from '../../utils/format'
@@ -13374,6 +14331,10 @@ export function NewQuotePage() {
   const serviceConstraints = useMemo(() => [where('active', '==', true)], [])
   const { data: services, loading: servicesLoading } = useCollection<PublicService>('publicServices', serviceConstraints)
   const { data: client } = useDocument<Client>('clients', user?.uid)
+  const { data: publicSettings } = useDocument<PublicSettings>('publicSettings', 'main')
+  const configuredEventTypes = publicSettings?.eventTypes?.length
+    ? publicSettings.eventTypes
+    : eventTypes
 
   useEffect(() => {
     if (client) setClientForm(client)
@@ -13542,7 +14503,7 @@ export function NewQuotePage() {
           <div className="grid gap-4 md:grid-cols-2">
             <DateInput label="Data do evento" onChange={(value) => updateEvent('date', value)} value={eventForm.date} />
             <Input label="Horario previsto" onChange={(event) => updateEvent('time', event.target.value)} type="time" value={eventForm.time} />
-            <Select label="Tipo de evento" onChange={(event) => updateEvent('type', event.target.value)} options={eventTypes.map((type) => ({ label: type, value: type }))} placeholder="Selecione" value={eventForm.type} />
+            <Select label="Tipo de evento" onChange={(event) => updateEvent('type', event.target.value)} options={configuredEventTypes.map((type) => ({ label: type, value: type }))} placeholder="Selecione" value={eventForm.type} />
             <Input label="Nome do local" onChange={(event) => updateEvent('venueName', event.target.value)} value={eventForm.venueName} />
             <Input label="Endereco completo" onChange={(event) => updateEvent('address', event.target.value)} value={eventForm.address} wrapperClassName="md:col-span-2" />
             <Input label="Cidade" onChange={(event) => updateEvent('city', event.target.value)} value={eventForm.city} />
@@ -14026,6 +14987,11 @@ const AdminAgendaPage = lazy(() =>
 const AdminClientsPage = lazy(() =>
   import('../pages/admin/AdminClientsPage').then((module) => ({ default: module.AdminClientsPage })),
 )
+const AdminCatalogTypesPage = lazy(() =>
+  import('../pages/admin/AdminCatalogTypesPage').then((module) => ({
+    default: module.AdminCatalogTypesPage,
+  })),
+)
 const AdminDashboardPage = lazy(() =>
   import('../pages/admin/AdminDashboardPage').then((module) => ({ default: module.AdminDashboardPage })),
 )
@@ -14131,6 +15097,7 @@ export const router = createBrowserRouter(
             { path: 'orcamentos', element: <AdminQuotesPage /> },
             { path: 'orcamentos/:id', element: <AdminQuoteDetailPage /> },
             { path: 'servicos', element: <AdminServicesPage /> },
+            { path: 'tipos', element: <AdminCatalogTypesPage /> },
             { path: 'integrantes', element: <AdminMembersPage /> },
             { path: 'fornecedores', element: <AdminSuppliersPage /> },
             { path: 'pagamentos', element: <AdminPaymentsPage /> },
@@ -14905,9 +15872,19 @@ FIM DO ARQUIVO: src/services/serviceService.ts
 ----------------------------------------------------------------------------------------------------
 INICIO DO ARQUIVO: src/services/settingsService.ts
 ----------------------------------------------------------------------------------------------------
-import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  serverTimestamp,
+  setDoc,
+  where,
+  writeBatch,
+} from 'firebase/firestore'
 import { requireDb } from '../lib/firebase'
-import type { PublicSettings, Settings } from '../types'
+import type { PublicSettings, Service, Settings } from '../types'
 import { defaultSettings } from '../utils/constants'
 
 export async function getSettings(): Promise<Settings> {
@@ -14946,6 +15923,70 @@ export async function saveSettings(settings: Settings) {
   ])
 }
 
+export async function saveCatalogTypes(serviceTypes: string[], eventTypes: string[]) {
+  const database = requireDb()
+  const updatedAt = serverTimestamp()
+  const catalog = { serviceTypes, eventTypes, updatedAt }
+
+  await Promise.all([
+    setDoc(doc(database, 'settings', 'main'), catalog, { merge: true }),
+    setDoc(doc(database, 'publicSettings', 'main'), catalog, { merge: true }),
+  ])
+}
+
+export async function renameServiceType(
+  serviceTypes: string[],
+  eventTypes: string[],
+  previousName: string,
+  nextName: string,
+) {
+  const database = requireDb()
+  const snapshot = await getDocs(
+    query(collection(database, 'services'), where('category', '==', previousName)),
+  )
+  const serviceDocuments = snapshot.docs
+  const chunkSize = 200
+  const chunks = serviceDocuments.length
+    ? Array.from(
+        { length: Math.ceil(serviceDocuments.length / chunkSize) },
+        (_, index) => serviceDocuments.slice(index * chunkSize, (index + 1) * chunkSize),
+      )
+    : [[]]
+
+  for (const [index, chunk] of chunks.entries()) {
+    const batch = writeBatch(database)
+    const updatedAt = serverTimestamp()
+
+    if (index === 0) {
+      const catalog = { serviceTypes, eventTypes, updatedAt }
+      batch.set(doc(database, 'settings', 'main'), catalog, { merge: true })
+      batch.set(doc(database, 'publicSettings', 'main'), catalog, { merge: true })
+    }
+
+    chunk.forEach((serviceDocument) => {
+      const service = serviceDocument.data() as Service
+      batch.update(serviceDocument.ref, { category: nextName, updatedAt })
+      batch.set(
+        doc(database, 'publicServices', serviceDocument.id),
+        {
+          serviceId: serviceDocument.id,
+          name: service.name,
+          description: service.description,
+          category: nextName,
+          basePrice: service.basePrice,
+          active: service.active,
+          allowPriceEdit: service.allowPriceEdit,
+          createdAt: service.createdAt || updatedAt,
+          updatedAt,
+        },
+        { merge: true },
+      )
+    })
+
+    await batch.commit()
+  }
+}
+
 export async function getPublicSettings(): Promise<PublicSettings> {
   const database = requireDb()
   const snapshot = await getDoc(doc(database, 'publicSettings', 'main'))
@@ -14967,6 +16008,8 @@ export function toPublicSettings(settings: Settings): PublicSettings {
     paymentInstructions: settings.paymentInstructions,
     whatsapp: settings.whatsapp,
     email: settings.email,
+    serviceTypes: settings.serviceTypes,
+    eventTypes: settings.eventTypes,
     updatedAt: settings.updatedAt,
   }
 }
@@ -15212,6 +16255,7 @@ export type SupplierPayment = FirestoreEntity & {
 }
 
 export type Settings = {
+  id?: string
   bandName: string
   pixReceiverName: string
   pixKey: string
@@ -15221,10 +16265,13 @@ export type Settings = {
   paymentInstructions: string
   whatsapp?: string
   email?: string
+  serviceTypes: string[]
+  eventTypes: string[]
   updatedAt?: DateLike
 }
 
 export type PublicSettings = {
+  id?: string
   bandName: string
   pixReceiverName: string
   pixKey: string
@@ -15233,6 +16280,8 @@ export type PublicSettings = {
   paymentInstructions?: string
   whatsapp?: string
   email?: string
+  serviceTypes: string[]
+  eventTypes: string[]
   updatedAt?: DateLike
 }
 
@@ -15324,7 +16373,7 @@ import {
   OctagonX,
   WalletCards,
 } from 'lucide-react'
-import type { QuoteStatus } from '../types'
+import type { QuoteStatus, Settings } from '../types'
 
 export const serviceCategories = [
   'Show',
@@ -15435,7 +16484,7 @@ export const quoteStatusMeta: Record<
   },
 }
 
-export const defaultSettings = {
+export const defaultSettings: Settings = {
   bandName: 'Grupo Dvanera',
   pixReceiverName: '',
   pixKey: '',
@@ -15446,7 +16495,9 @@ export const defaultSettings = {
     'Apos realizar o Pix, clique em "Ja realizei o pagamento" para que nossa equipe confirme manualmente.',
   whatsapp: '',
   email: '',
-} as const
+  serviceTypes: [...serviceCategories],
+  eventTypes: [...eventTypes],
+}
 
 ----------------------------------------------------------------------------------------------------
 FIM DO ARQUIVO: src/utils/constants.ts
