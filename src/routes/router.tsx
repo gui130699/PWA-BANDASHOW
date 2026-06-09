@@ -10,11 +10,6 @@ const AdminAgendaPage = lazy(() =>
 const AdminClientsPage = lazy(() =>
   import('../pages/admin/AdminClientsPage').then((module) => ({ default: module.AdminClientsPage })),
 )
-const AdminCatalogTypesPage = lazy(() =>
-  import('../pages/admin/AdminCatalogTypesPage').then((module) => ({
-    default: module.AdminCatalogTypesPage,
-  })),
-)
 const AdminDashboardPage = lazy(() =>
   import('../pages/admin/AdminDashboardPage').then((module) => ({ default: module.AdminDashboardPage })),
 )
@@ -120,7 +115,6 @@ export const router = createBrowserRouter(
             { path: 'orcamentos', element: <AdminQuotesPage /> },
             { path: 'orcamentos/:id', element: <AdminQuoteDetailPage /> },
             { path: 'servicos', element: <AdminServicesPage /> },
-            { path: 'tipos', element: <AdminCatalogTypesPage /> },
             { path: 'integrantes', element: <AdminMembersPage /> },
             { path: 'fornecedores', element: <AdminSuppliersPage /> },
             { path: 'pagamentos', element: <AdminPaymentsPage /> },

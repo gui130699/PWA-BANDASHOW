@@ -3,13 +3,14 @@ import { ArrowLeft, ArrowRight, Check, Minus, Plus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Card, DateInput, EmptyState, Input, PageHeader, Select, Textarea } from '../../components/ui'
+import { AdminOptionSelect } from '../../components/admin/AdminOptionSelect'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCollection } from '../../hooks/useCollection'
 import { useDocument } from '../../hooks/useDocument'
 import { requireDb } from '../../lib/firebase'
 import { createClientQuote } from '../../services/quoteService'
-import type { Client, PublicService, PublicSettings, QuoteEvent, QuoteItem } from '../../types'
-import { brazilianStates, eventTypes } from '../../utils/constants'
+import type { Client, PublicService, QuoteEvent, QuoteItem } from '../../types'
+import { brazilianStates } from '../../utils/constants'
 import { getFriendlyFirebaseError } from '../../utils/firebaseErrors'
 import { formatCurrency } from '../../utils/format'
 
@@ -57,10 +58,6 @@ export function NewQuotePage() {
   const serviceConstraints = useMemo(() => [where('active', '==', true)], [])
   const { data: services, loading: servicesLoading } = useCollection<PublicService>('publicServices', serviceConstraints)
   const { data: client } = useDocument<Client>('clients', user?.uid)
-  const { data: publicSettings } = useDocument<PublicSettings>('publicSettings', 'main')
-  const configuredEventTypes = publicSettings?.eventTypes?.length
-    ? publicSettings.eventTypes
-    : eventTypes
 
   useEffect(() => {
     if (client) setClientForm(client)
@@ -229,7 +226,12 @@ export function NewQuotePage() {
           <div className="grid gap-4 md:grid-cols-2">
             <DateInput label="Data do evento" onChange={(value) => updateEvent('date', value)} value={eventForm.date} />
             <Input label="Horario previsto" onChange={(event) => updateEvent('time', event.target.value)} type="time" value={eventForm.time} />
-            <Select label="Tipo de evento" onChange={(event) => updateEvent('type', event.target.value)} options={configuredEventTypes.map((type) => ({ label: type, value: type }))} placeholder="Selecione" value={eventForm.type} />
+            <AdminOptionSelect
+              collectionName="eventTypes"
+              label="Tipo de evento"
+              onChange={(value) => updateEvent('type', value)}
+              value={eventForm.type}
+            />
             <Input label="Nome do local" onChange={(event) => updateEvent('venueName', event.target.value)} value={eventForm.venueName} />
             <Input label="Endereco completo" onChange={(event) => updateEvent('address', event.target.value)} value={eventForm.address} wrapperClassName="md:col-span-2" />
             <Input label="Cidade" onChange={(event) => updateEvent('city', event.target.value)} value={eventForm.city} />
