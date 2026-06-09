@@ -55,6 +55,8 @@ As páginas de Serviços, Integrantes e Fornecedores possuem duas áreas interna
 
 Em Serviços, a consulta também informa permissão de edição do valor, vínculos e custo interno padrão. Em Integrantes, a listagem administrativa reúne telefone, e-mail, chave e tipo de chave Pix, valor padrão e ações relacionadas. Em Fornecedores, a consulta reúne contatos, localização, dados Pix, custos, pagamentos e o gerenciamento dos tipos carregados do Firestore.
 
+A página de Pagamentos permite selecionar integrantes e fornecedores diretamente das listas ativas. O valor padrão é preenchido automaticamente e o registro guarda destinatário, função ou tipo, contatos, Pix, data, status, referência, observação e responsável pelo lançamento.
+
 Os cadastros auxiliares são mantidos no Firestore e podem ser gerenciados nos formulários ou em Configurações:
 
 ```txt

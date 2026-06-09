@@ -28,6 +28,11 @@ Roteiro autenticado para homologação:
 - [ ] Cadastrar, editar, desativar e reativar um tipo de fornecedor
 - [ ] Confirmar que tipos inativos não aparecem em novos cadastros
 - [ ] Registrar pagamento de fornecedor e conferir o histórico
+- [ ] Selecionar integrante pelo nome na página Pagamentos e conferir o valor padrão
+- [ ] Registrar pagamento pendente e pago para integrante
+- [ ] Selecionar fornecedor pelo nome na página Pagamentos e conferir o custo padrão
+- [ ] Registrar pagamento pendente e pago para fornecedor
+- [ ] Conferir Pix, contato, referência, observação, datas e responsável nos históricos
 - [ ] Criar, editar, desativar e reativar cada cadastro auxiliar
 - [ ] Confirmar que somente opções ativas aparecem nos selects
 - [ ] Salvar cada grupo de Configurações e conferir `settings/main`

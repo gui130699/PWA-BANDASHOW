@@ -24,6 +24,9 @@ Validação final executada em 8 de junho de 2026.
 - [x] Salvamento centralizado em `settingsService.updateSettings()`
 - [x] Auditoria geral e por grupo de configuração alterado
 - [x] Indicadores de Pix, sincronização pública, cache e ambiente
+- [x] Pagamentos de integrantes com seleção por nome e dados completos
+- [x] Pagamentos de fornecedores com seleção por nome e dados completos
+- [x] Históricos internos exibem Pix, contatos, datas, referência e responsável
 - [x] Revisão textual PT-BR
 - [x] `npm run check:text`
 

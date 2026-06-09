@@ -297,11 +297,21 @@ export function AdminSuppliersPage() {
       const reference = await addEntity('supplierPayments', {
         supplierId: supplier.id,
         supplierName: supplier.name,
+        supplierType: supplier.type,
+        contactName: supplier.contactName || '',
+        phone: supplier.phone || '',
+        email: supplier.email || '',
         amount: paymentAmount,
         status: 'pago',
         pixKey: supplier.pixKey || '',
+        pixKeyType: supplier.pixKeyType || 'cpf',
+        bankName: supplier.bankName || '',
+        reference: '',
         notes: paymentNotes.trim(),
+        scheduledFor: new Date(),
         paidAt: new Date(),
+        registeredBy: user?.uid || 'admin',
+        registeredByName: profile?.name || 'Admin',
       })
       await createAuditLog({
         userId: user?.uid || 'admin',

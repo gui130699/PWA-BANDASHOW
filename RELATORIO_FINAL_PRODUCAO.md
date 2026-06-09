@@ -8,6 +8,8 @@ O complemento final de conformidade separou de forma explícita consulta e formu
 
 Fornecedores passaram a contar com busca, filtros de tipo e status, consulta de contatos, localização, Pix, custos e pagamentos. O formulário preserva os campos existentes, adiciona cidade, estado e banco como dados opcionais e continua integrado aos tipos de fornecedores do Firestore.
 
+A gestão de pagamentos internos foi ampliada com formulários independentes para integrantes e fornecedores. Ambos carregam os nomes ativos do Firestore, preenchem valores padrão e registram snapshots de contato, Pix, função ou tipo, data, status, referência, observação e administrador responsável.
+
 Foram criados quatro cadastros auxiliares no Firestore: `serviceCategories`, `supplierTypes`, `memberRoles` e `eventTypes`. Os formulários usam somente opções ativas, preservam valores históricos durante edições e registram as alterações em `auditLogs`.
 
 A página de Configurações foi reorganizada em oito seções recolhíveis, com busca, recarga, feedback, gerenciamento dos cadastros auxiliares e sincronização restrita de dados públicos em `publicSettings/main`. O serviço centralizado de configurações registra auditoria geral e por grupo alterado, enquanto a área de manutenção informa o estado do Pix, da sincronização pública, do cache PWA e do ambiente.

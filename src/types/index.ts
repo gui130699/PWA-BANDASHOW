@@ -224,22 +224,41 @@ export type MemberPayment = FirestoreEntity & {
   memberId: string
   quoteId?: string
   memberName: string
+  memberRole?: string
+  artisticName?: string
+  phone?: string
+  email?: string
   amount: number
   status: 'pendente' | 'pago'
   pixKey?: string
+  pixKeyType?: PixKeyType
+  reference?: string
   notes?: string
+  scheduledFor?: DateLike
   paidAt?: DateLike
+  registeredBy?: string
+  registeredByName?: string
 }
 
 export type SupplierPayment = FirestoreEntity & {
   supplierId: string
   quoteId?: string
   supplierName: string
+  supplierType?: string
+  contactName?: string
+  phone?: string
+  email?: string
   amount: number
   status: 'pendente' | 'pago'
   pixKey?: string
+  pixKeyType?: PixKeyType
+  bankName?: string
+  reference?: string
   notes?: string
+  scheduledFor?: DateLike
   paidAt?: DateLike
+  registeredBy?: string
+  registeredByName?: string
 }
 
 export type Settings = {
