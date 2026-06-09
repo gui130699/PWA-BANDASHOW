@@ -29,14 +29,14 @@ export function DataTable<T>({
   if (data.length === 0) return <EmptyState description={emptyDescription} title={emptyTitle} />
 
   return (
-    <div className="overflow-hidden rounded-lg border border-white/10">
+    <div className="overflow-hidden rounded-lg border border-white/10 bg-black/10">
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-white/10">
-          <thead className="bg-white/[0.04]">
+          <thead className="bg-white/[0.045]">
             <tr>
               {columns.map((column) => (
                 <th
-                  className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400"
+                  className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.08em] text-slate-400"
                   key={column.header}
                 >
                   {column.header}
@@ -46,7 +46,7 @@ export function DataTable<T>({
           </thead>
           <tbody className="divide-y divide-white/10">
             {data.map((row) => (
-              <tr className="bg-transparent transition hover:bg-white/[0.03]" key={getRowKey(row)}>
+              <tr className="bg-transparent transition hover:bg-gold-300/[0.035]" key={getRowKey(row)}>
                 {columns.map((column) => (
                   <td className={column.className || 'px-4 py-3 text-sm text-slate-200'} key={column.header}>
                     {column.cell(row)}

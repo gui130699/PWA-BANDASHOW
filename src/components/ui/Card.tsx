@@ -11,7 +11,7 @@ export function Card({ title, description, action, className, children, ...props
   return (
     <section
       className={clsx(
-        'rounded-lg border border-white/10 bg-white/[0.055] p-5 shadow-soft backdrop-blur',
+        'rounded-lg border border-white/10 bg-night-850/92 p-5 shadow-soft backdrop-blur transition-colors',
         className,
       )}
       {...props}
@@ -19,8 +19,8 @@ export function Card({ title, description, action, className, children, ...props
       {(title || description || action) && (
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            {title && <h2 className="text-lg font-semibold text-white">{title}</h2>}
-            {description && <p className="mt-1 text-sm text-slate-400">{description}</p>}
+            {title && <h2 className="font-display text-lg text-ivory-50">{title}</h2>}
+            {description && <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-400">{description}</p>}
           </div>
           {action}
         </div>

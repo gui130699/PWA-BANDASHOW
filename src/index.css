@@ -3,8 +3,15 @@
 @tailwind utilities;
 
 :root {
-  color: #f8fafc;
-  background: #05060a;
+  --brand-bg: #050505;
+  --brand-surface: #101211;
+  --brand-surface-raised: #171a18;
+  --brand-primary: #d8aa36;
+  --brand-primary-soft: #e7c66f;
+  --brand-text: #fbfaf6;
+  --brand-muted: #a9aaa5;
+  color: var(--brand-text);
+  background: var(--brand-bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -17,14 +24,19 @@
 
 html {
   min-width: 320px;
-  background: #05060a;
+  scroll-behavior: smooth;
+  background: var(--brand-bg);
 }
 
 body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
-  background: #05060a;
+  background:
+    linear-gradient(rgba(216, 170, 54, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(216, 170, 54, 0.025) 1px, transparent 1px),
+    var(--brand-bg);
+  background-size: 42px 42px;
 }
 
 a {
@@ -40,6 +52,22 @@ textarea {
 }
 
 ::selection {
-  color: #05060a;
-  background: #ffd166;
+  color: var(--brand-bg);
+  background: var(--brand-primary-soft);
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand-primary-soft);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -16,7 +16,7 @@ export function MobileMenu({ open, title, items, onClose }: MobileMenuProps) {
     <div className="fixed inset-0 z-40 lg:hidden">
       <button
         aria-label="Fechar menu"
-        className="absolute inset-0 bg-black/70"
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
         onClick={onClose}
         type="button"
       />
