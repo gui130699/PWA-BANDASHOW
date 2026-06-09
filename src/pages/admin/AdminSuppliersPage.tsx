@@ -53,7 +53,11 @@ type SupplierFormErrors = Partial<Record<'name' | 'type' | 'defaultCost', string
 export function AdminSuppliersPage() {
   const { user, profile } = useAuth()
   const supplierConstraints = useMemo(() => [], [])
-  const { data: suppliers, loading } = useCollection<Supplier>('suppliers', supplierConstraints)
+  const {
+    data: suppliers,
+    loading,
+    error: suppliersError,
+  } = useCollection<Supplier>('suppliers', supplierConstraints)
   const { data: payments } = useCollection<SupplierPayment>('supplierPayments')
   const [form, setForm] = useState(emptySupplier)
   const [editingId, setEditingId] = useState('')
@@ -73,6 +77,13 @@ export function AdminSuppliersPage() {
 
   const supplierTypes = useMemo(
     () => [...new Set(suppliers.map((supplier) => supplier.type).filter(Boolean))].sort(),
+    [suppliers],
+  )
+  const paymentSupplierOptions = useMemo(
+    () =>
+      suppliers
+        .filter((supplier) => supplier.active !== false)
+        .sort((first, second) => first.name.localeCompare(second.name, 'pt-BR')),
     [suppliers],
   )
   const filtered = useMemo(
@@ -309,6 +320,12 @@ export function AdminSuppliersPage() {
     } finally {
       setPaymentSaving(false)
     }
+  }
+
+  function selectPaymentSupplier(value: string) {
+    const supplier = paymentSupplierOptions.find((item) => item.id === value)
+    setPaymentSupplierId(value)
+    setPaymentAmount(supplier?.defaultCost || 0)
   }
 
   function renderSupplierFields() {
@@ -578,30 +595,48 @@ export function AdminSuppliersPage() {
           </Card>
 
           <Card description="Registre custos pagos e mantenha o histórico financeiro." title="Pagamento para fornecedor">
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_10rem_minmax(0,1fr)_auto]">
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-[minmax(0,1.25fr)_minmax(9rem,0.45fr)_minmax(0,1fr)_auto]">
               <Select
-                onChange={(event) => {
-                  const supplier = suppliers.find((item) => item.id === event.target.value)
-                  setPaymentSupplierId(event.target.value)
-                  setPaymentAmount(supplier?.defaultCost || 0)
-                }}
-                options={suppliers.map((supplier) => ({ label: supplier.name, value: supplier.id }))}
-                placeholder="Fornecedor"
+                className="w-full min-w-0"
+                disabled={loading || Boolean(suppliersError) || paymentSupplierOptions.length === 0}
+                label="Fornecedor"
+                onChange={(event) => selectPaymentSupplier(event.target.value)}
+                options={paymentSupplierOptions.map((supplier) => ({
+                  label: supplier.name,
+                  value: supplier.id,
+                }))}
+                placeholder={
+                  loading
+                    ? 'Carregando fornecedores...'
+                    : suppliersError
+                      ? 'Erro ao carregar fornecedores'
+                      : paymentSupplierOptions.length
+                        ? 'Selecione um fornecedor'
+                        : 'Nenhum fornecedor ativo cadastrado'
+                }
                 value={paymentSupplierId}
+                wrapperClassName="min-w-0"
               />
               <Input
+                className="w-full min-w-0"
+                label="Valor do pagamento"
                 min={0}
                 onChange={(event) => setPaymentAmount(Number(event.target.value))}
                 type="number"
                 value={paymentAmount}
+                wrapperClassName="min-w-0"
               />
               <Input
+                className="w-full min-w-0"
+                label="Observação"
                 onChange={(event) => setPaymentNotes(event.target.value)}
-                placeholder="Observação"
+                placeholder="Informe uma observação, se necessário"
                 value={paymentNotes}
+                wrapperClassName="min-w-0"
               />
               <Button
-                className="w-full md:col-span-2 xl:col-span-1 xl:w-auto"
+                className="w-full self-end whitespace-nowrap md:col-span-2 xl:col-span-1 xl:w-auto"
+                disabled={!paymentSupplierId || paymentAmount <= 0}
                 icon={<HandCoins className="h-4 w-4" />}
                 isLoading={paymentSaving}
                 onClick={() => void registerPayment()}
@@ -609,6 +644,16 @@ export function AdminSuppliersPage() {
                 Registrar
               </Button>
             </div>
+            {suppliersError && (
+              <p className="mt-3 text-xs text-red-200">
+                Não foi possível carregar a lista de fornecedores.
+              </p>
+            )}
+            {!loading && !suppliersError && paymentSupplierOptions.length === 0 && (
+              <p className="mt-3 text-xs text-amber-200">
+                Cadastre ou reative um fornecedor para registrar pagamentos.
+              </p>
+            )}
           </Card>
 
           <Card title="Histórico de pagamentos">
