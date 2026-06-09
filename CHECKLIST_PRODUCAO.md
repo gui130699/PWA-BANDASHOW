@@ -6,6 +6,7 @@ Validação final executada em 8 de junho de 2026.
 
 - [x] Serviços separados em Acesso e Cadastro
 - [x] Integrantes separados em Acesso e Cadastro
+- [x] Fornecedores separados em Acesso e Cadastro
 - [x] Botões de edição carregam o registro na aba Cadastro
 - [x] Cadastros vazios bloqueados
 - [x] Resumo de confirmação antes de novos cadastros
@@ -14,6 +15,7 @@ Validação final executada em 8 de junho de 2026.
 - [x] Integrantes exibem contatos e dados Pix na consulta administrativa
 - [x] Categorias de serviços no Firestore
 - [x] Tipos de fornecedores no Firestore
+- [x] Tipos de fornecedores carregados no formulário e gerenciados pela aba Acesso
 - [x] Funções de integrantes no Firestore
 - [x] Tipos de evento no Firestore
 - [x] Regras de leitura e escrita dos cadastros auxiliares

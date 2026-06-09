@@ -2,9 +2,11 @@
 
 ## Revisão administrativa - 9 de junho de 2026
 
-Foi concluída a reorganização das páginas de Serviços e Integrantes em abas internas de Acesso e Cadastro. A edição deixou de abrir um modal separado e agora carrega o registro na aba Cadastro, com retorno automático para Acesso após salvar.
+Foi concluída a reorganização das páginas de Serviços, Integrantes e Fornecedores em abas internas de Acesso e Cadastro. A edição carrega o registro na aba Cadastro, com retorno automático para Acesso após salvar.
 
 O complemento final de conformidade separou de forma explícita consulta e formulário, adicionou ações de cancelamento, manteve a confirmação resumida antes da criação e ampliou as listas administrativas. Serviços agora exibem permissão de edição do valor e custo interno vinculado; Integrantes exibem contatos e dados Pix permitidos ao administrador.
+
+Fornecedores passaram a contar com busca, filtros de tipo e status, consulta de contatos, localização, Pix, custos e pagamentos. O formulário preserva os campos existentes, adiciona cidade, estado e banco como dados opcionais e continua integrado aos tipos de fornecedores do Firestore.
 
 Foram criados quatro cadastros auxiliares no Firestore: `serviceCategories`, `supplierTypes`, `memberRoles` e `eventTypes`. Os formulários usam somente opções ativas, preservam valores históricos durante edições e registram as alterações em `auditLogs`.
 

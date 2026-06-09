@@ -21,6 +21,13 @@ Roteiro autenticado para homologação:
 - [ ] Conferir permissão de edição de valor, vínculos e custo interno na lista
 - [ ] Repetir o fluxo em Integrantes
 - [ ] Conferir telefone, e-mail e dados Pix na lista de Integrantes
+- [ ] Abrir Fornecedores e alternar entre Acesso e Cadastro
+- [ ] Cadastrar fornecedor após revisar o resumo e confirmar retorno para Acesso
+- [ ] Editar fornecedor pela lista e confirmar abertura da aba Cadastro preenchida
+- [ ] Conferir busca e filtros por tipo e status em Fornecedores
+- [ ] Cadastrar, editar, desativar e reativar um tipo de fornecedor
+- [ ] Confirmar que tipos inativos não aparecem em novos cadastros
+- [ ] Registrar pagamento de fornecedor e conferir o histórico
 - [ ] Criar, editar, desativar e reativar cada cadastro auxiliar
 - [ ] Confirmar que somente opções ativas aparecem nos selects
 - [ ] Salvar cada grupo de Configurações e conferir `settings/main`

@@ -116,8 +116,11 @@ export type Supplier = FirestoreEntity & {
   contactName?: string
   phone?: string
   email?: string
+  city?: string
+  state?: string
   pixKey?: string
-  pixKeyType?: Exclude<PixKeyType, 'cnpj'>
+  pixKeyType?: PixKeyType
+  bankName?: string
   defaultCost: number
   active: boolean
   notes?: string

@@ -45,7 +45,7 @@ Guia completo: `BRANDING_DVANERA.md`.
 
 ## Administração de cadastros
 
-As páginas de Serviços e Integrantes possuem duas áreas internas bem separadas:
+As páginas de Serviços, Integrantes e Fornecedores possuem duas áreas internas bem separadas:
 
 - **Acesso**: consulta, busca, filtros, edição e ativação/desativação;
 - **Cadastro**: criação e edição com formulário completo;
@@ -53,7 +53,7 @@ As páginas de Serviços e Integrantes possuem duas áreas internas bem separada
 - novos cadastros exigem campos obrigatórios e uma confirmação com resumo;
 - após salvar, a interface retorna automaticamente para Acesso.
 
-Em Serviços, a consulta também informa permissão de edição do valor, vínculos e custo interno padrão. Em Integrantes, a listagem administrativa reúne telefone, e-mail, chave e tipo de chave Pix, valor padrão e ações relacionadas.
+Em Serviços, a consulta também informa permissão de edição do valor, vínculos e custo interno padrão. Em Integrantes, a listagem administrativa reúne telefone, e-mail, chave e tipo de chave Pix, valor padrão e ações relacionadas. Em Fornecedores, a consulta reúne contatos, localização, dados Pix, custos, pagamentos e o gerenciamento dos tipos carregados do Firestore.
 
 Os cadastros auxiliares são mantidos no Firestore e podem ser gerenciados nos formulários ou em Configurações:
 
